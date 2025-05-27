@@ -1,0 +1,166 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  color: black;
+  font-family: Arial, sans-serif;
+}
+
+.accountContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+  margin-top: 8rem;
+}
+
+.accountSignIn {
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.accountUsernameInput {
+  height: 1.5rem;
+  margin-bottom: 10px;
+  border: 0;
+  background-color: inherit;
+  width: 100%;
+  font-weight: 600;
+  text-align: center;
+  font-size: 16px;
+  outline: none;
+  margin-top: 20px;
+}
+
+.inputWithEditIcon {
+  width: 100%;
+  position: relative;
+}
+
+.accountPasswordInput {
+  text-align: center;
+  display: block;
+  color: #000;
+  border: 0;
+  border-bottom: 1px solid #333;
+  background-color: inherit;
+  width: 500px;
+  height: 40px;
+  font-size: 18px;
+  overflow: hidden;
+  padding: 0 30px 0 30px;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+.editAccountIcon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #333;
+  cursor: pointer;
+}
+
+.editAccountIcon:hover {
+  color: gray;
+}
+
+.newPasswordInput {
+  position: relative;
+  display: block;
+  color: #000;
+  border: 0;
+  border-bottom: 1px solid #333;
+  background-color: inherit;
+  width: 500px;
+  height: 40px;
+  font-size: 18px;
+  overflow: hidden;
+  padding: 0 30px 0 30px;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+.inputWithEyeIcon {
+  width: 100%;
+  position: relative;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #333;
+  cursor: pointer;
+}
+
+.saveButtonCont {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.saveBtn {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  white-space: normal;
+  overflow: hidden;
+  transition: color 0.3s;
+  border: 1px solid black;
+  justify-content: flex-end;
+  align-items: end;
+  text-align: end;
+}
+
+.saveBtn:hover {
+  background-color: transparent;
+  color: black;
+}
+
+.alertContainer {
+  min-height: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.alertMessage {
+  text-align: center;
+  color: red;
+}
+
+.successfulAlertMessage {
+  text-align: center;
+  color: gray;
+}
+
+@media (max-width: 590px) {
+  .accountContentWrapper {
+    max-width: 400px;
+  }
+
+  .accountPasswordInput {
+    max-width: 400px;
+  }
+
+  .newPasswordInput {
+    max-width: 400px;
+  }
+}

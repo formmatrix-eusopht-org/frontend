@@ -1,0 +1,218 @@
+.vehicleInformationWrapper {
+  font-family: Arial, sans-serif;
+}
+
+.vehicleInformationHeading {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.vehicleHeaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+  width: 100%;  
+}
+
+.formLabel {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+  width: 100%;  
+}
+
+.vehicleInformationWrapper .formInput.engineNumberInput {
+  width: 66.2%;
+}
+
+.formInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 14px;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.checkboxInput {
+  width: 15px;
+  height: 15px;
+}
+
+.vehicleInformationWrapper .formInput.vehicleLicenseInput {
+  width: 66.2%;
+}
+
+.vehicleInformationWrapper .formInput.hullIdInput {
+  width: 66.2%; 
+}
+
+.vehicleFirstGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  width: 100%;  
+}
+
+.vehicleFormItem {
+  flex: 1 1;
+  margin-right: 10px;
+   
+  max-width: calc(50% - 10px);  
+  position: relative;  
+  min-width: 0;  
+}
+
+.yearInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 14px;
+}
+
+.makeInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 14px;
+}
+
+ 
+.mileageRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 15px;
+  width: 100%;  
+}
+
+.mileageField {
+  flex: 0 0 200px;
+  min-width: 150px;
+}
+
+.mileageCheckboxes {
+  flex: 1;
+  display: flex;
+   
+  gap: 20px;
+  align-items: center;
+}
+
+.mileageGroup {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12%;
+}
+
+.mileageInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 14px;
+}
+
+.odometerInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 14px;
+}
+
+ 
+.vehicleFirstGroup label, 
+.mileageField label,
+.vehicleInformationWrapper label:not(.checkboxLabel) {
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  margin-bottom: 5px !important;
+  font-weight: normal !important;
+  box-sizing: border-box !important;
+}
+
+ 
+.vehicleFirstGroup:first-of-type:has(> :nth-child(3)) .vehicleFormItem {
+  max-width: calc(33.33% - 10px) !important;
+  flex: 0 1 calc(33.33% - 10px) !important;
+}
+
+ 
+@media (max-width: 768px) {
+  .mileageRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .mileageField {
+    width: 100%;
+    flex: auto;
+  }
+  
+  .mileageCheckboxes {
+    margin-top: 10px;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 702px) {
+  .vehicleFirstGroup label, 
+  .mileageField label,
+  .vehicleInformationWrapper label:not(.checkboxLabel) {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 625px) {
+  .vehicleFirstGroup label, 
+  .mileageField label,
+  .vehicleInformationWrapper label:not(.checkboxLabel) {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 586px) {
+  .vehicleFirstGroup {
+    flex-wrap: wrap;  
+  }
+  
+  .vehicleFormItem {
+    min-width: 45%;
+    margin-top: 10px;
+     
+  }
+  
+   
+  .vehicleFirstGroup:first-of-type:has(> :nth-child(3)) .vehicleFormItem {
+    max-width: 100% !important;
+    flex: 0 1 100% !important;
+    margin-bottom: 10px;
+  }
+}

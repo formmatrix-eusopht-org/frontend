@@ -1,0 +1,126 @@
+.item-requested-wrapper {
+    width: 100%;
+    margin-bottom: 20px;
+
+  }
+
+  .checkbox-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .checkbox-roww {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .validation-errorr {
+    color: #cb1313 !important;
+    background-color: #fffafa;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+     
+    max-width: 100%;
+  }
+  
+  .checkbox-label input[type="checkbox"] {
+    margin-top: 3px;
+    margin-right: 8px;
+  }
+  
+  .checkbox-label span {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .checkbox-label i {
+    font-style: italic;
+    color: #555;
+  }
+  
+  .surrendered-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .plates-number-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .plates-label {
+    font-size: 14px;
+    margin-right: 5px;
+  }
+  
+  .other-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .other-explanation {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 768px) {
+    .checkbox-roww {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .surrendered-section,
+    .plates-number-section {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .other-section {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .other-explanation {
+      width: 100%;
+    }
+  }
+
+ 
+
+.checkbox-label.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkbox-label.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+}
+
+.checkbox-label.disabled span {
+  color: #777;
+}
+
+.surrendered-section.disabled {
+  opacity: 0.6;
+}
+
+ 
+.other-explanation[readonly] {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  cursor: not-allowed;
+}

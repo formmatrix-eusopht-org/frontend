@@ -1,0 +1,171 @@
+.familyRelationText {
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 5px 0;
+  width: 100%;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.smogWrapper {
+  background-color: white;
+  margin-bottom: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.smogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.smogTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.smogSubtitle {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.smogContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-left: 0;
+  justify-content: flex-start;
+  width: 100%;
+  text-align: left;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.checkboxWithSubOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.subCheckboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: 25px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.subCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  justify-content: flex-start;
+  text-align: left;
+  margin-left: 0;
+}
+
+.otherInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 22px;  
+}
+
+.otherInput {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 200px;
+  height: 22px;  
+  box-sizing: border-box;
+  vertical-align: middle;
+  margin: 0;
+}
+
+.indentedCheckbox {
+  margin-left: 25px;
+  width: 90%;
+  max-width: 650px;
+  word-wrap: break-word;
+}
+
+.indentedCheckbox .checkboxLabel {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.footnote {
+  font-size: 12px;
+  color: #666;
+  margin-top: 15px;
+  font-style: italic;
+}
+
+
+
+.otherInput:focus {
+  outline: none;
+  border-color: #0066ff;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.2);
+}
+
+ 
+@media (max-width: 768px) {
+  .subCheckboxGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .otherInputGroup {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .otherInput {
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  .indentedCheckbox {
+    margin-left: 15px;
+    width: calc(100% - 15px);
+  }
+  
+  .familyRelationText {
+    font-size: 13px;
+  }
+}

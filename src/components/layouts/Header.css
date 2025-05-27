@@ -1,0 +1,336 @@
+.headerWrapper {
+  background: white;
+  font-family: 'Roboto', sans-serif;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+ 
+.menuIcon {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  left: 20px;
+  top: 15px;
+  z-index: 1100;
+}
+
+.iconSize {
+  width: 24px;
+  height: 24px;
+  color: #999;
+}
+
+ 
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  z-index: 0;
+}
+
+.headerLogo {
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.headerLogo:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+}
+
+ 
+.myLinks {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0;
+  list-style-type: none;
+  margin: 0;
+  flex-grow: 1;
+  gap: 20px;
+}
+
+ 
+@media (max-width: 800px) {
+  .menuIcon {
+    display: block;
+    margin-top: 4px;
+
+  }
+
+  accountLabel {
+    display: inline-block;
+  }
+
+  .dropdownMenuWrapper {
+    left: 0 !important;
+    width: 250px !important;  }
+
+  .drawerOpen .linkActive {
+    margin-left: 15px; 
+  }
+  .drawerOpen .navIcon {
+    display: inline-block;
+  }
+
+  .menuTitleWrapper {
+    display: flex
+    ;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10%;
+  }
+  
+  .menuTitle {
+    font-size: 18px;
+        font-weight: 500;
+  }
+  
+
+  .navIcon {
+    display: inline-block;
+  }
+
+  .headerWrapper {
+    justify-content: center;
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+
+  .myLinks {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 60px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.2);
+     
+     
+     
+  }
+
+  .myLinks.drawerOpen {
+    transform: translateX(0);
+  }
+  
+  .logoutButton {
+    margin-top: auto;
+         
+        border-top: 1px solid #ccc;
+  }
+  .linkLabel {
+    width: 100%;
+     
+  }
+
+  .linkRoute {
+    display: block;
+    padding: 15px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .dropdownContainer {
+    width: 100%;
+    padding: 15px;
+    text-align: left;
+    display: block;
+  }
+
+  .dropdownMenu {
+    position: static;
+    transform: none;
+    width: 100%;
+    box-shadow: none;
+    margin-top: 0;
+  }
+
+  .headerDivider {
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;  
+    margin: 10px 0;  
+  }
+  
+}
+
+ 
+.linkRoute,
+.linkActive {
+  text-decoration: none;
+  color: black;
+}
+
+.linkActive {
+  color: black;
+     
+    font-weight: bold;
+}
+
+.linkRoute:hover {
+  color: grey;
+}
+
+.dropdownMenuWrapper {
+  position: absolute;
+  top: 100%;   
+  left: -130px;
+  width: 210px;  
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  display: none;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+.showDropdown {
+  display: block;
+}
+
+.linkLabel {
+  position: relative;  
+}
+
+.dropdownContainer {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdownMenuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdownMenuList li {
+  padding: 10px;
+  text-align: left;
+}
+
+.dropdownMenuList a {
+  display: block;
+  text-decoration: none;
+  color: black;
+  padding: 8px 12px;
+}
+
+.dropdownMenuList a:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdownContainer .chevronIcon {
+  margin-left: auto;
+  cursor: pointer;
+
+}
+
+
+.dropdownMenu li {
+  list-style-type: none;
+}
+
+.dropdownMenu a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+}
+
+.chevronIcon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-left: 4px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+
+}
+
+.chevronIcon.rotate {
+  transform: rotate(180deg);
+  cursor: pointer;
+
+}
+
+ 
+.navIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  display: none;
+}
+
+@media (max-width: 801px) {
+  .accountIcon {
+    display: inline-block !important;
+    margin-bottom: 13px;
+  }
+}
+@media (min-width: 801px) and (max-width: 7680px) {
+  .menuTitle {
+    display: none;
+  }
+
+  .headerDivider{
+    display: none;
+  }
+
+  .drawerDivider{
+    display: none !important;
+  }
+}
+
+
+ 
+.drawerDivider {
+  width: 100%;
+  height: 1px;
+  background-color: #ddd;  
+  margin: 10px 0;  
+  display: none;  
+}
+
+ 
+.drawerOpen .drawerDivider {
+  display: block;
+}
+
+.accountIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+   
+}
+
+.accountLabel {
+  margin-left: 10px;
+  margin-bottom: 10px;}
+
+@media (min-width: 801px) {
+  .accountLabel {
+    display: none;
+  }
+}

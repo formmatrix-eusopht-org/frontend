@@ -1,0 +1,277 @@
+ 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  display: flex
+  ;
+      position: fixed;
+      height: 100vh;
+      flex-direction: column;
+      width: 18rem;
+      flex-shrink: 0;
+      background: white;
+      left: 0;
+      top: 0;
+      box-shadow: 1px 0 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3sease-in-out;
+}
+
+ 
+.sidebarWrapper {
+  display: flex
+  ;
+      flex-direction: column;
+      overflow-y: auto;
+       
+      margin-top: 30%;
+  }
+
+
+ 
+.searchScenarioWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-grow: 1;
+  padding: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 20px;
+  border-radius: 5px;
+  position: relative;
+  background-color: #EEEEEE;
+}
+
+.scenarioInput {
+  background-color: inherit;
+  height: 40px;
+  border: 0;
+  padding-left: 35px;
+  width: 80%;
+  outline: none;
+}
+
+.scenarioIcon {
+  position: absolute;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  color: black;
+}
+
+
+ 
+.scenarioBase {
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  position: relative;
+  width: 240px;
+  height: 50px;
+  background: inherit;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: black;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+}
+
+
+.scenarioBase:hover {
+  background-color: black;
+  color: inherit;
+  border-radius: 5px;
+}
+
+.scenarioBase:hover h1 {
+  color: white;
+}
+
+.scenarioBase:hover .icon {
+  color: white;
+}
+
+
+.icon{
+  transition: transform 0.3s ease;
+  color: black;
+  margin-right: 20px;
+}
+
+.icon.open {
+  transform: rotate(180deg);
+}
+
+.scenarioBase.activeScenario {
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+}
+
+.scenarioBase.activeScenario h1 {
+  color: white;
+}
+
+.scenarioBase.activeScenario .icon {
+  color: white;
+  
+}
+
+.scenarioTitle {
+  color: black;
+  display: flex;
+  font-size: 15px;
+  font-weight: 500;
+  padding-left: 20px;
+  justify-content: center;
+  text-align: center;
+  flex: 1;
+}
+
+.subsections {
+  font-size: 13px;
+  font-weight: 400;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-right: 50px;
+  margin-left: 5px;
+  margin-top: 2px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.subsections:hover {
+  background-color: #EEEEEE;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.subsections.active {
+  font-weight: bold;
+  background-color: #EEEEEE;
+}
+
+@media (max-width: 800px) {
+  .sidebar {
+    width: 80%;
+    max-width: 270px;
+    transform: translateX(-100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+
+   .sidebarWrapper{
+    margin-top: 10%;
+   }
+  }
+
+   
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+   
+  .dragbutton {
+    position: fixed;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+  }
+
+  .dragicon {
+    width: 40px;
+    height: 40px;
+    color: black;
+  }
+
+   
+  .close {
+    display: flex
+    ;
+            width: 100%;
+             
+            margin-left: 15px;
+            background-color: #007bff00;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            justify-content: flex-start;
+  }
+
+  .closeIcon {
+    width: 30px;
+    height: 30px;
+    color: #565a5c;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+    display: none;
+  }
+
+  .overlay.show {
+    display: block;
+  }
+}
+
+@media (min-width: 801px) and (max-width: 7680px) {
+  .dragbutton {
+    display: none;
+  }
+}
+.sidebarToggle {
+  position: fixed;
+  left: 0;
+  top: 30%;
+  transform: translateY(-50%);
+  background-color: rgb(0 0 0 / 0%);
+  color: #000000;
+  border: .7px solid black;
+  border-radius: 0 12px 12px 0;
+  padding: 4px;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  height: 160px;
+  display: flex
+;
+  align-items: center;
+  justify-content: center;
+}
+@media (min-width: 801px) {
+  .close {
+    display: none;
+  }
+}

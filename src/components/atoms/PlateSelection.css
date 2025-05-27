@@ -1,0 +1,56 @@
+ 
+
+.checklistRow {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.checklistColumn {
+  flex: 1;
+  min-width: 0;  
+}
+
+.categoryTitle {
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.radioInput {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  accent-color: #0066cc;
+}
+
+.checklistLabel {
+  font-size: 14px;
+  cursor: pointer;
+}
+
+ 
+.inputContainer {
+  margin-top: 15px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+  max-width: 600px;
+}
+
+ 
+@media (max-width: 768px) {
+  .checklistRow {
+    flex-direction: column;
+    gap: 20px;
+  }
+}

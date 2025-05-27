@@ -1,0 +1,166 @@
+.releaseWrapper {
+    font-family: Arial, sans-serif;
+    margin-bottom: 20px;
+}
+
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.releaseHeading {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.releaseFormGroup {
+    margin-bottom: 15px;
+}
+
+.releaseFormLabel {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.releaseFormInput {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    font-size: 14px;
+    width: 65.2%;
+}
+
+.streetAptGroup {
+    display: flex;
+    gap: 20px;
+}
+
+.formGroup {
+    flex: 1;
+}
+
+.streetField {
+    flex: 2;
+}
+
+.aptField {
+    flex: 1;
+}
+
+.formLabel {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.formInputt {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.cityStateZipGroupp {
+    display: flex;
+    gap: 20px;
+}
+
+.cityFieldCustomWidth {
+    flex: 2;
+}
+
+.regStateWrapper {
+    flex: 1;
+    position: relative;
+}
+
+.zipCodeField {
+    flex: 1;
+}
+
+ 
+
+ 
+
+ 
+.regStateWrapper {
+    position: relative;
+    z-index: 5;
+  }
+  
+   
+  .regStateDropDown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #666;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  
+   
+  .regIcon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease;
+  }
+  
+  .regIcon.rotate {
+    transform: rotate(180deg);
+  }
+  
+   
+  .regStateMenu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+   
+  .regStateLists {
+    padding: 12px 16px;
+    color: rgb(150 148 148);
+    font-size: 15px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .regStateLists:hover {
+    background-color: #f5f5f5;
+  }
+  
+   
+  .cityStateZipGroupp {
+    position: relative;
+    overflow: visible;
+  }
+  
+  .releaseWrapper {
+    position: relative;
+    overflow: visible;
+  }
