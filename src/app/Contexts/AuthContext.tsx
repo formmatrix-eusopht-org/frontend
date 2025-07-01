@@ -1,0 +1,183 @@
+'use client';
+
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAuth } from 'firebase/auth';
+import { doc, onSnapshot, getFirestore, deleteDoc } from 'firebase/firestore';
+import { auth, initFirebase } from '../../../firebase-config';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { getCookie } from '../Actions/cookie';
+
+initFirebase(); // Ensure Firebase is initialized once
+
+interface AuthContextType {
+  user: User | null;
+  emailSignIn: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  isSubscribed: boolean;
+  loading: boolean;
+  isLoggingIn: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const router = useRouter();
+
+  // ✅ Session Check with Backend Cookie
+  const checkSession = async () => {
+    try {
+      setLoading(true)
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/checksession`,
+        { withCredentials: true }
+      );
+
+      if (data.user && auth.currentUser) {
+        setUser(auth.currentUser);
+      } else {
+        await logout();
+      }
+    } catch (error) {
+      console.error('Session check failed:', error);
+    } finally {
+      setSessionChecked(true);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkSession();
+  }, []);
+
+  // ✅ Email/Password Login
+  const emailSignIn = async (email: string, password: string) => {
+    if (isLoggingIn) return;
+
+    setIsLoggingIn(true);
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken(true);
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`,
+        { token },
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        setUser(userCredential.user);
+        localStorage.setItem('userRole', JSON.stringify(data.role));
+        router.push('/home');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+      setIsLoggingIn(false);
+    }
+  };
+
+  // ✅ Logout
+  const logout = async () => {
+    try {
+      setLoading(true);
+      const sessionId = getCookie('sessionId');
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/logout`,
+        { sessionId },
+        { withCredentials: true }
+      );
+
+      await auth.signOut();
+      setUser(null);
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Track Firebase Auth State
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser || null);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // ✅ Subscription Logic from Firestore
+  useEffect(() => {
+    if (!sessionChecked || !user?.uid) return;
+
+    const creationTime = user.metadata.creationTime;
+    if (!creationTime) return;
+
+    const accountAgeInDays =
+      (Date.now() - new Date(creationTime).getTime()) / (1000 * 60 * 60 * 24);
+
+    const db = getFirestore();
+    const userRef = doc(db, 'users', user.uid);
+
+    if (accountAgeInDays < 7) {
+      setIsSubscribed(true);
+      return;
+    }
+    console.log(user);
+
+    const unsubscribe = onSnapshot(userRef, async (docSnap) => {
+      try {
+        if (!docSnap.exists()) {
+          setIsSubscribed(false);
+          router.push('/signUp');
+          return;
+        }
+
+        const { isSubscribed } = docSnap.data();
+        setIsSubscribed(isSubscribed);
+
+        if (!isSubscribed && accountAgeInDays >= 14) {
+          await deleteDoc(userRef);
+          const currentUser = getAuth().currentUser;
+          if (currentUser) await deleteUser(currentUser);
+          await logout();
+        } else if (!isSubscribed) {
+          router.push('/signUp');
+        }
+      } catch (err) {
+        console.error('Subscription check failed:', err);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user, sessionChecked, router]);
+
+  if (!sessionChecked) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const UserAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('UserAuth must be used inside AuthContextProvider');
+  return context;
+};

@@ -1,97 +1,85 @@
 'use client';
+
 import React, { useState } from 'react';
-import './login.css';
-import Link from 'next/link';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/16/solid';
-import { UserAuth } from '../context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
+import { UserAuth } from './Contexts/AuthContext';
 
-export default function LoginPage() {
-  const { emailSignIn, isSubscribed, isLoggingIn } = UserAuth();
-  const router = useRouter();
-
+const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [error, setError] = useState('');
+  const { emailSignIn, isLoggingIn } = UserAuth();
 
-  const handleSignIn = async (event:any) => {
-    event.preventDefault();
-    
-    if (isLoggingIn) return; // Prevent multiple submissions
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
     try {
-      if (emailSignIn) {
-        await emailSignIn(email, password);
-        // Navigation is handled in the context
-      }
-    } catch (error) {
-      console.error('Error signing in: ', error);
-      setLoginError(true);
+      await emailSignIn(email, password);
+    } catch (err: any) {
+      setError('Login failed. Please check your credentials.');
+      console.error('Login error:', err);
     }
   };
 
-  const togglePasswordVisibility = (e:any) => {
-    e.preventDefault(); // Prevent form submission
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <div>
-      <div className="center-container">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+      <div className="max-w-md w-full space-y-6 text-center">
         <div>
-          <h1 className="login-CompanyName">FormMatic</h1>
-          <p className="login-companySlogan">From Data to Documents in Seconds.</p>
-          <h2 className="login-SignIn">Sign In</h2>
+          <h1 className="text-8xl text-black">FormMatic</h1>
+          <p className="mt-2 text-gray-600 text-lg">From Data to Documents in Seconds.</p>
+        </div>
 
-          <form onSubmit={handleSignIn}>
-            <input
-              className="usernameInput"
-              type="text"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        <form onSubmit={handleLogin} className="space-y-6">
+          <h2 className="text-2xl font-semibold text-black">Sign In</h2>
 
-            <div className="input-container-forIcon">
+          {error && <p className="text-red-600 text-sm">{error}</p>}
+
+          <div className="text-left space-y-4">
+            <div>
               <input
-                className={`passwordInput ${loginError ? 'error' : ''}`}
-                type={showPassword ? 'text' : 'password'}
+                type="email"
+                required
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border-b border-gray-400 focus:outline-none py-1 text-black"
+              />
+            </div>
+
+            <div className="relative">
+              <input
+                type={showPass ? 'text' : 'password'}
+                required
                 placeholder="Password"
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setLoginError(false);
-                }}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border-b border-gray-400 focus:outline-none py-1 pr-10 text-black"
               />
-              <button 
-                type="button" 
-                onClick={togglePasswordVisibility} 
-                className="toggle-password"
+              <button
+                type="button"
+                className="absolute right-2 top-2 text-gray-600"
+                onClick={() => setShowPass((prev) => !prev)}
               >
-                {showPassword ? <EyeIcon className="icon" /> : <EyeSlashIcon className="icon" />}
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-
-            <div className={`errorLogin ${loginError ? 'visible' : ''}`}>
-              Incorrect username or password.
-            </div>
-            <button 
-              type="submit" 
-              className="loginButton"
-              disabled={isLoggingIn}
-            >
-              {isLoggingIn ? 'Logging in...' : 'Log In'}
-            </button>
-          </form>
-
-          <div className="forgot-password-container">
-            <Link href="/forgotPassword" className="forgot-password-link">
-              Forgot Password?
-            </Link>
           </div>
-        </div>
+
+          <button
+            type="submit"
+            disabled={isLoggingIn}
+            className="w-full bg-black text-white py-2 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-60"
+          >
+            {isLoggingIn ? 'Logging In...' : 'Log In'}
+          </button>
+
+          <p className="text-sm text-gray-600 hover:underline cursor-pointer">Forgot Password?</p>
+        </form>
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;
