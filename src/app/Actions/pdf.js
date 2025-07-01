@@ -483,24 +483,24 @@ const mergeFilledPDFs = async (formTypes, formData) => {
             });
 
             // Second pass: Make all fields read-only
-            // fields.forEach((field) => {
-            //     try {
-            //         // Try all available methods to set read-only
-            //         if (typeof field.enableReadOnly === 'function') {
-            //             field.enableReadOnly();
-            //         }
-            //         // if (typeof field.setReadOnly === 'function') {
-            //         // field.setReadOnly(true);
-            //         // }
+            fields.forEach((field) => {
+                try {
+                    // Try all available methods to set read-only
+                    if (typeof field.enableReadOnly === 'function') {
+                        field.enableReadOnly();
+                    }
+                    // if (typeof field.setReadOnly === 'function') {
+                    // field.setReadOnly(true);
+                    // }
 
-            //         // Additional visual indication
-            //         // if (field instanceof PDFTextField) {
-            //         //     field.setBackgroundColor([0.95, 0.95, 0.95]);
-            //         // }
-            //     } catch (e) {
-            //         console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
-            //     }
-            // });
+                    // Additional visual indication
+                    // if (field instanceof PDFTextField) {
+                    //     field.setBackgroundColor([0.95, 0.95, 0.95]);
+                    // }
+                } catch (e) {
+                    console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
+                }
+            });
 
             // Optional: Flatten the form to make fields permanently uneditable
             // form.flatten();
