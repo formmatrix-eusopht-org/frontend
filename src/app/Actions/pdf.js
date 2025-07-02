@@ -8,30 +8,49 @@ import {
 function formatSingleOwner(owner) {
     if (!owner) return '';
 
-    const last = owner['Last Name'] ? owner['Last Name'] : '';
-    const first = owner['First Name'] ? (last ? `, ${owner['First Name']}` : owner['First Name']) : '';
-    const middle = owner['Middle Name'] ? ((last || first) ? `, ${owner['Middle Name']}` : owner['Middle Name']) : '';
+    const last = owner['Last Name'] || '';
+    const first = owner['First Name'] || '';
+    const middle = owner['Middle Name'] || '';
 
-    return `${last}${first}${middle}`;
+    const fullName = [last, first, middle].filter(Boolean).join(' ');
+    return fullName;
 }
 
-const buildFieldMapping = (formData) => {
-    const owner1 = formatSingleOwner(formData.ownersData[0]);
-    const owner2 = formatSingleOwner(formData.ownersData[1]);
-    const owner3 = formatSingleOwner(formData.ownersData[2]);
 
-    const newOwner1 = formatSingleOwner(formData.newOwnerData[0]);
-    const newOwner2 = formatSingleOwner(formData.newOwnerData[1]);
-    const newOwner3 = formatSingleOwner(formData.newOwnerData[2]);
+const buildFieldMapping = (formData) => {
+    const owner1 = formatSingleOwner(formData.ownersData?.[0]);
+    const owner2 = formatSingleOwner(formData.ownersData?.[1]);
+    const owner3 = formatSingleOwner(formData.ownersData?.[2]);
+
+    const newOwner1 = formatSingleOwner(formData.newOwnerData?.[0]);
+    const newOwner2 = formatSingleOwner(formData.newOwnerData?.[1]);
+    const newOwner3 = formatSingleOwner(formData.newOwnerData?.[2]);
+
+    const joinNames = (...names) =>
+        names.filter(name => name && name.trim()).join(', ');
+
+    const rawDate = formData.ownersData[0]?.['Date of Sale'] || '';
+    const normalizedDate = rawDate.replace(/\s+/g, '/'); // Replace spaces with slashes
+
+    const [month = '', day = '', year = ''] = normalizedDate.split('/');
+
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'YEAR MODEL': formData.vehicleInfoState?.['Year of Vehicle'] || "",
         'MAKE': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
         'LICENSE PLATE/CF NO': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         'MOTORCYCLE ENGINE NUMBER': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        'I/We': owner1,
-        'to': newOwner1,
-        "PRINTBUYER'S": formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData[0]?.['Relationship with Gifter'] || '' : '',
+        'I/We': joinNames(owner1, owner2, owner3),
+        'to': joinNames(newOwner1, newOwner2, newOwner3),
+        'sellingmonth': month || '',
+        'sellingdate': day || '',
+        'sellingyear1': year[0] || '',
+        'sellingyear2': year[1] || '',
+        'sellingyear3': year[2] || '',
+        'sellingyear4': year[3] || '',
+        'giftvalue': formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData[0]?.['Gift Value'] || '' : '',
+        'sellingprice': formData.transactionSelections?.includes('Vehicle is a Gift') ? '' : formData.newOwnerData[0]?.['Purchase Price/Value'] || '',
+        'relation': formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData[0]?.['Relationship with Gifter'] || '' : '',
         "PRINT BUYER'S NAME": newOwner1,
         'Purchase price': formData.newOwnerData[0]?.['6 Purchase Price/Market Value'] || "",
         'SIGNATUREx': "",
@@ -544,16 +563,16 @@ export async function handleOnPDF() {
         const senerio = JSON.parse(savedSenerio || "{}");
         let formTypes = [];
 
-        console.log("form : ", form.transactionSelections);
+        // console.log("form : ", form.transactionSelections);
         // console.log("form : ", form);
 
-        console.log("senerio : ", senerio);
-        console.log("formTypes : ", formTypes);
+        // console.log("senerio : ", senerio);
+        // console.log("formTypes : ", formTypes);
 
 
         // ====> SIMPLE TRANSFER SCENARIO
         if (senerio.includes("Simple Transfer")) {
-            formTypes.push('DMVREG262', 'Reg227');
+            formTypes.push('DMVREG262new', 'Reg227');
             //==> Without Title: REG 227
             if (form.transactionSelections.includes("Transaction with Vehicle Title")) {
                 formTypes = formTypes.filter(formType => formType !== "Reg227");
@@ -598,5 +617,3 @@ export async function handleOnPDF() {
         console.error("error in genrating pdf : ", e)
     }
 }
-
-
