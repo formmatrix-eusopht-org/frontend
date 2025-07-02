@@ -4,42 +4,60 @@ import {
     PDFCheckBox,
     PDFRadioGroup,
 } from 'pdf-lib';
+
+function formatSingleOwner(owner) {
+    if (!owner) return '';
+
+    const last = owner['Last Name'] ? owner['Last Name'] : '';
+    const first = owner['First Name'] ? (last ? `, ${owner['First Name']}` : owner['First Name']) : '';
+    const middle = owner['Middle Name'] ? ((last || first) ? `, ${owner['Middle Name']}` : owner['Middle Name']) : '';
+
+    return `${last}${first}${middle}`;
+}
+
 const buildFieldMapping = (formData) => {
+    const owner1 = formatSingleOwner(formData.ownersData[0]);
+    const owner2 = formatSingleOwner(formData.ownersData[1]);
+    const owner3 = formatSingleOwner(formData.ownersData[2]);
+
+    const newOwner1 = formatSingleOwner(formData.newOwnerData[0]);
+    const newOwner2 = formatSingleOwner(formData.newOwnerData[1]);
+    const newOwner3 = formatSingleOwner(formData.newOwnerData[2]);
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'YEAR MODEL': formData.vehicleInfoState?.['Year of Vehicle'] || "",
         'MAKE': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
         'LICENSE PLATE/CF NO': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         'MOTORCYCLE ENGINE NUMBER': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        'I/We': `${formData.ownersData?.[0]?.['First Name'] || ''} ${formData.ownersData?.[0]?.['Middle Name'] || ''} ${formData.ownersData?.[0]?.['Last Name'] || ''}`,
-        'to': `${formData.newOwnerData?.[0]?.['First Name'] || ''} ${formData.newOwnerData?.[0]?.['Middle Name'] || ''} ${formData.newOwnerData?.[0]?.['Last Name'] || ''}`,
+        'I/We': owner1,
+        'to': newOwner1,
         "PRINTBUYER'S": formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData[0]?.['Relationship with Gifter'] || '' : '',
-        "PRINT BUYER'S NAME": `${formData.newOwnerData?.[0]?.['First Name'] || ''} ${formData.newOwnerData?.[0]?.['Middle Name'] || ''} ${formData.newOwnerData?.[0]?.['Last Name'] || ''}`,
-        'Purchase price': formData.newOwnerData?.[0]?.['6 Purchase Price/Market Value'] || "",
+        "PRINT BUYER'S NAME": newOwner1,
+        'Purchase price': formData.newOwnerData[0]?.['6 Purchase Price/Market Value'] || "",
         'SIGNATUREx': "",
-        'DL/ID OR DEALER/DISM #': formData.newOwnerData?.[0]?.['Driver License Number'] || '',
-        "PRINT BUYER'S NAME_1": `${formData.newOwnerData?.[1]?.['First Name'] || ''} ${formData.newOwnerData?.[1]?.['Middle Name'] || ''} ${formData.newOwnerData?.[1]?.['Last Name'] || ''}`,
+        'DL/ID OR DEALER/DISM #': formData.newOwnerData[0]?.['Driver License Number'] || '',
+        "PRINT BUYER'S NAME_1": newOwner2,
         "SIGNATUREx_1": "",
-        "DL/ID OR DEALER/DISM #_1": formData.newOwnerData?.[1]?.['Driver License Number'] || '',
-        "PRINT BUYER'S NAME_2": `${formData.newOwnerData?.[2]?.['First Name'] || ''} ${formData.newOwnerData?.[2]?.['Middle Name'] || ''} ${formData.newOwnerData?.[2]?.['Last Name'] || ''}`,
+        "DL/ID OR DEALER/DISM #_1": formData.newOwnerData[1]?.['Driver License Number'] || '',
+        "PRINT BUYER'S NAME_2": newOwner3,
         'SIGNATUREx_2': "",
-        'DL/ID OR DEALER/DISM #_2': formData.newOwnerData?.[2]?.['Driver License Number'] || '',
-        'DAYTIME TELEPHONE NO': formData.newOwnerData?.[0]?.['Phone Number'] || '',
-        "PRINTSELLER'S NAME": `${formData.ownersData?.[0]?.['First Name'] || ''} ${formData.ownersData?.[0]?.['Middle Name'] || ''} ${formData.ownersData?.[0]?.['Last Name'] || ''}`,
+        'DL/ID OR DEALER/DISM #_2': formData.newOwnerData[2]?.['Driver License Number'] || '',
+        'DAYTIME TELEPHONE NO': formData.newOwnerData[0]?.['Phone Number'] || '',
+        "PRINTSELLER'S NAME": owner1,
         'SIGNATUREx_3': "",
-        'DL/ID OR DEALER/DISM #_3': formData.ownersData?.[0]?.['Driver License Number'] || '',
-        "PRINT SELLER'S NAME": `${formData.ownersData?.[1]?.['First Name'] || ''} ${formData.ownersData?.[1]?.['Middle Name'] || ''} ${formData.ownersData?.[1]?.['Last Name'] || ''}`,
+        'DL/ID OR DEALER/DISM #_3': formData.ownersData[0]?.['Driver License Number'] || '',
+        "PRINT SELLER'S NAME": owner2,
         'SIGNATUREx_4': "",
-        'DL/ID OR DEALER/DISM #_4': formData.ownersData?.[1]?.['Driver License Number'] || '',
-        "PRINT SELLER'S NAME_1": `${formData.ownersData?.[2]?.['First Name'] || ''} ${formData.ownersData?.[2]?.['Middle Name'] || ''} ${formData.ownersData?.[2]?.['Last Name'] || ''}`,
+        'DL/ID OR DEALER/DISM #_4': formData.ownersData[1]?.['Driver License Number'] || '',
+        "PRINT SELLER'S NAME_1": owner3,
         'SIGNATUREx_5': "",
-        'DL/ID OR DEALER/DISM #_5': formData.ownersData?.[2]?.['Driver License Number'] || '',
-        'DAYTIME TELEPHONE NO_1': formData.ownersData?.[0]?.['Phone Number'] || '',
+        'DL/ID OR DEALER/DISM #_5': formData.ownersData[2]?.['Driver License Number'] || '',
+        'DAYTIME TELEPHONE NO_1': formData.ownersData[0]?.['Phone Number'] || '',
         'I/We_1': formData.powerOfAttorneyData?.appointer || '',
         'appoint': formData.powerOfAttorneyData?.appointee || '',
-        'CheckBox': true,
-        'CheckBox_1': true,
-        'CheckBox_2': true,
+        'CheckBox': "CheckBox",
+        'CheckBox_1': "CheckBox",
+        'CheckBox_2': "CheckBox",
         'text_60czib': formData.newOwnerMailingAddress?.Street ? formData.newOwnerMailingAddress?.Street || '' : formData.newOwnerAddress?.Street || '',
         'text_61pxrx': formData.newOwnerMailingAddress.City ? formData.newOwnerMailingAddress.City || '' : formData.newOwnerAddress.City || '',
         'text_62cqaf': formData.newOwnerMailingAddress.State ? formData.newOwnerMailingAddress.State || '' : formData.newOwnerAddress.State || '',
@@ -51,7 +69,7 @@ const buildFieldMapping = (formData) => {
         'License Plate/CF Number1': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         'Vehicle/Vessel ID/Number1': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'Year/Make': formData.vehicleInfoState?.['Year of Vehicle'] || "",
-        '1 True Full Name, Last': `${formData.ownersData?.[0]?.['First Name'] || ''} ${formData.ownersData?.[0]?.['Middle Name'] || ''} ${formData.ownersData?.[0]?.['Last Name'] || ''}`,
+        '1 True Full Name, Last': owner1,
         '1 DL/ID Number-1.0': formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
         '1 DL/ID Number-1.1': formData.ownersData?.[0]?.['Driver License Number']?.split('')[1] || '',
         '1 DL/ID Number-1.2': formData.ownersData?.[0]?.['Driver License Number']?.split('')[2] || '',
@@ -62,7 +80,7 @@ const buildFieldMapping = (formData) => {
         '1 DL/ID Number-1.7': formData.ownersData?.[0]?.['Driver License Number']?.split('')[7] || '',
         'state.1': formData.ownersData?.[0]?.['State'] || '',
         "state.0": formData.ownersData?.[1]?.['State'] || '',
-        "1 True Full Name, Last-2": `${formData.ownersData?.[1]?.['First Name'] || ''} ${formData.ownersData?.[1]?.['Middle Name'] || ''} ${formData.ownersData?.[1]?.['Last Name'] || ''}`,
+        "1 True Full Name, Last-2": owner2,
         "1 DL/ID Number-2.0": formData.ownersData?.[1]?.['Driver License Number']?.[0] || '',
         "1 DL/ID Number-2.1": formData.ownersData?.[1]?.['Driver License Number']?.[1] || '',
         "1 DL/ID Number-2.2": formData.ownersData?.[1]?.['Driver License Number']?.[2] || '',
@@ -88,9 +106,9 @@ const buildFieldMapping = (formData) => {
         "2 City": formData.LegalOwnerOfRecordData?.["City"] || '',
         "2 States1": formData.LegalOwnerOfRecordData?.["State"] || '',
         "2 Zip Code": formData.LegalOwnerOfRecordData?.["ZIP Code"] || '',
-        "3 Print Name Legal Owner.0": `${formData.ownersData?.[0]?.['First Name'] || ''} ${formData.ownersData?.[0]?.['Middle Name'] || ''} ${formData.ownersData?.[0]?.['Last Name'] || ''}`,
-        "3 Print Name Legal Owner.1": ` ${formData.ownersData?.[1]?.['First Name'] || ''} ${formData.ownersData?.[1]?.['Middle Name'] || ''} ${formData.ownersData?.[1]?.['Last Name'] || ''}`,
-        "3 Print Name Legal Owner.2.0": `${formData.ownersData?.[2]?.['First Name'] || ''} ${formData.ownersData?.[2]?.['Middle Name'] || ''} ${formData.ownersData?.[2]?.['Last Name'] || ''}`,
+        "3 Print Name Legal Owner.0": owner1,
+        "3 Print Name Legal Owner.1": owner2,
+        "3 Print Name Legal Owner.2.0": owner3,
         "3 Date.0": formData.ownersData?.[0]?.['Date of Sale'] || '',
         "area code.0": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
         "3 Daytime Phone Number": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
@@ -109,7 +127,7 @@ const buildFieldMapping = (formData) => {
         "Gift Box": "Gift Box",
         "Gift Box1": "Gift Box1",
         "market value": formData.newOwnerData?.[0]?.["Market Value"] || '',
-        "true full name of new owner, last, first, middle, suffix, business name, or lessor": `${formData.newOwnerData?.[0]?.['First Name'] || ''} ${formData.newOwnerData?.[0]?.['Middle Name'] || ''} ${formData.newOwnerData?.[0]?.['Last Name'] || ''}`,
+        "true full name of new owner, last, first, middle, suffix, business name, or lessor": newOwner1,
         "6 DL/ID Card Numer-1.0.0": formData.newOwnerData[0]?.['Driver License Number']?.split(' ')[0] || '',
         "6 DL/ID Card Numer-1.0.1.0": formData.newOwnerData[1]?.['Driver License Number']?.split(' ')[0] || '',
         "6 DL/ID Card Numer-1.0.1.1": formData.newOwnerData[1]?.['Driver License Number']?.split(' ')[1] || '',
@@ -127,9 +145,9 @@ const buildFieldMapping = (formData) => {
         "6 DL/ID Card Numer-1.6": formData.newOwnerData[0]?.['Driver License Number']?.split(' ')[6] || '',
         "6 DL/ID Card Numer-1.7.0": formData.newOwnerData[0]?.['Driver License Number']?.split(' ')[7] || '',
         "6 DL/ID Card Numer-1.7.1": formData.newOwnerData[0]?.State || '',
-        "6 Name First-1": `${formData.newOwnerData[1]?.['First Name'] || ''} ${formData.newOwnerData[1]?.['Middle Name'] || ''} ${formData.newOwnerData[1]?.['Last Name'] || ''}`,
+        "6 Name First-1": newOwner2,
         "6 state": formData.newOwnerData[1]?.['State'] || '',
-        "6 Name Last-2": `${formData.newOwnerData[2]?.['First Name'] || ''} ${formData.newOwnerData[2]?.['Middle Name'] || '-'} ${formData.newOwnerData[2]?.['Last Name'] || ''}`,
+        "6 Name Last-2": newOwner3,
         "6 DL/ID CArd Number-2.0": formData.newOwnerData[2]?.['Driver License Number']?.split(' ')[0] || '',
         "6 DL/ID CArd Number-2.1": formData.newOwnerData[2]?.['Driver License Number']?.split(' ')[1] || '',
         "6 DL/ID CArd Number-2.2": formData.newOwnerData[2]?.['Driver License Number']?.split(' ')[2] || '',
@@ -151,7 +169,7 @@ const buildFieldMapping = (formData) => {
         '6 States 2.0': formData.newOwnerMailingAddress?.State || '',
         '6 Zip Code-2.0': formData.newOwnerMailingAddress?.["ZIP Code"] || '',
         'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.Street || ''} ${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''} ${formData.newOwnerLesseeAddress?.City || ''} ${formData.newOwnerLesseeAddress?.State || ''} `,
-        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.Street || ''} ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''} ${formData.newOwnerKeptAddress?.City || ''} ${formData.newOwnerKeptAddress?.State || '-'} `,
+        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.Street || ''} ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''} ${formData.newOwnerKeptAddress?.City || ''} ${formData.newOwnerKeptAddress?.State || ''} `,
         'county.0.0': formData.newOwnerKeptAddress?.County || '',
         '6 area code 1': formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '',
         'daytime telephone number': formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '',
@@ -195,9 +213,9 @@ const buildFieldMapping = (formData) => {
         "Text9.19": formData.vehicleInfoState?.['Vehicle/Hull Identification Number']?.split('')[18] || "",
         'Text10': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
         "Text11": formData.vehicleInfoState?.['Year of Vehicle'] || "",
-        'Text62': `${formData.newOwnerData?.[0]?.['First Name'] || ''} ${formData.newOwnerData?.[0]?.['Middle Name'] || ''} ${formData.newOwnerData?.[0]?.['Last Name'] || ''}`,
-        'Text73': `${formData.newOwnerData?.[1]?.['First Name'] || ''} ${formData.newOwnerData?.[1]?.['Middle Name'] || ''} ${formData.newOwnerData?.[1]?.['Last Name'] || ''}`,
-        'Text81': `${formData.newOwnerData?.[2]?.['First Name'] || ''} ${formData.newOwnerData?.[2]?.['Middle Name'] || ''} ${formData.newOwnerData?.[2]?.['Last Name'] || ''}`,
+        'Text62': newOwner1,
+        'Text73': newOwner2,
+        'Text81': newOwner3,
         "Text64": formData.newOwnerData?.[0]?.['State'] || '',
         "Text74": formData.newOwnerData?.[1]?.['State'] || '',
         "Text75": formData.newOwnerData?.[2]?.['State'] || '',
@@ -483,24 +501,24 @@ const mergeFilledPDFs = async (formTypes, formData) => {
             });
 
             // Second pass: Make all fields read-only
-            fields.forEach((field) => {
-                try {
-                    // Try all available methods to set read-only
-                    if (typeof field.enableReadOnly === 'function') {
-                        field.enableReadOnly();
-                    }
-                    // if (typeof field.setReadOnly === 'function') {
-                    // field.setReadOnly(true);
-                    // }
+            // fields.forEach((field) => {
+            //     try {
+            //         // Try all available methods to set read-only
+            //         if (typeof field.enableReadOnly === 'function') {
+            //             field.enableReadOnly();
+            //         }
+            //         // if (typeof field.setReadOnly === 'function') {
+            //         // field.setReadOnly(true);
+            //         // }
 
-                    // Additional visual indication
-                    // if (field instanceof PDFTextField) {
-                    //     field.setBackgroundColor([0.95, 0.95, 0.95]);
-                    // }
-                } catch (e) {
-                    console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
-                }
-            });
+            //         // Additional visual indication
+            //         // if (field instanceof PDFTextField) {
+            //         //     field.setBackgroundColor([0.95, 0.95, 0.95]);
+            //         // }
+            //     } catch (e) {
+            //         console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
+            //     }
+            // });
 
             // Optional: Flatten the form to make fields permanently uneditable
             // form.flatten();
