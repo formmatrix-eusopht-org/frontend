@@ -544,55 +544,51 @@ export async function handleOnPDF() {
         const senerio = JSON.parse(savedSenerio || "{}");
         let formTypes = [];
 
-        if (senerio.includes('Disabled Person Placards/Plates')) {
-            formTypes = ['REG195'];
-        } else if (
-            senerio.includes('Personalized Plates (Order)') ||
-            senerio.includes('Personalized Plates (Reassignment)') ||
-            senerio.includes('Personalized Plates (Replacement)') ||
-            senerio.includes('Personalized Plates (Exchange)')
-        ) {
-            formTypes = ['REG17'];
-        } else if (
-            senerio.includes("Filing for Planned Non-Operation (PNO)") ||
-            senerio.includes('Certificate Of Non-Operation')
-        ) {
-            formTypes = ['REG102'];
-        } else if (senerio.includes('Add Lienholder')) {
-            formTypes = ['Reg227'];
-        } else if (senerio.includes('Remove Lienholder')) {
-            formTypes = ['Reg227', 'DMVReg166'];
-        } else if (senerio.includes('Duplicate Title')) {
-            formTypes = ['Reg227'];
-        } else if (
-            senerio.includes('Duplicate Registration') ||
-            senerio.includes('Duplicate Plates & Stickers') ||
-            senerio.includes('Duplicate Stickers')
-        ) {
-            formTypes = ['Reg156'];
-        } else if (senerio.includes('Name Change')) {
-            formTypes = ['Reg256'];
-        } else if (senerio.includes('Change Of Address')) {
-            formTypes = ['DMV14'];
-        } else if (senerio.includes('Salvage')) {
-            formTypes = ['Reg488c'];
-        } else if (senerio.includes('Restoring PNO Vehicle to Operational')) {
-            formTypes = ['Reg256'];
-        } else if (senerio.includes('Commercial Vehicle')) {
-            formTypes = ['Reg343', 'Reg4008', 'Reg256'];
-        } else if (senerio.includes('Simple Transfer')) {
-            formTypes = ['DMVREG262', 'Reg227'];
-            if (
-                form.transactionSelections?.includes('Family Transfer') ||
-                form.transactionSelections?.includes('Vehicle is a Gift') ||
-                form.transactionSelections?.includes('Smog Exemption')
-            ) {
-                formTypes.push('Reg256');
+        console.log("form : ", form.transactionSelections);
+        // console.log("form : ", form);
+
+        console.log("senerio : ", senerio);
+        console.log("formTypes : ", formTypes);
+
+
+        // ====> SIMPLE TRANSFER SCENARIO
+        if (senerio.includes("Simple Transfer")) {
+            formTypes.push('DMVREG262', 'Reg227');
+            //==> Without Title: REG 227
+            if (form.transactionSelections.includes("Transaction with Vehicle Title")) {
+                formTypes = formTypes.filter(formType => formType !== "Reg227");
             }
-            if (form.transactionSelections?.includes('Out of State Title')) {
-                formTypes.push('Reg343');
+
+            //==> With Title: FORM 262
+            if (form.transactionSelections?.includes("Transaction with Vehicle Title")) {
+                formTypes.push("DMVREG262");
+            }
+
+
+            //==> Out Of State Title: REG 343
+            if (form.transactionSelections?.includes("Out of State Title")) {
+                formTypes.push("Reg343");
+            }
+
+            //==> Current Lienholder: REG 227
+            if (form.transactionSelections?.includes("There is a Current Lienholder")) {
+                formTypes.push("Reg227");
+            }
+
+            //==> Vehicle is a Gift OR Family Transfer OR Smog Exemption: REG 256
+            if (
+                form.transactionSelections?.includes("Family Transfer") ||
+                form.transactionSelections?.includes("Vehicle is a Gift") ||
+                form.transactionSelections?.includes("Smog Exemption")
+            ) {
+                formTypes.push("Reg256");
             }
         }
+
+
+        //==> Remove duplicates just in case
+        formTypes = [...new Set(formTypes)];
+
 
         const mergedBytes = await mergeFilledPDFs(formTypes, form);
         const blob = new Blob([mergedBytes], { type: 'application/pdf' });
@@ -602,3 +598,5 @@ export async function handleOnPDF() {
         console.error("error in genrating pdf : ", e)
     }
 }
+
+
