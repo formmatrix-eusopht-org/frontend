@@ -125,7 +125,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                 }
             ],
@@ -238,7 +238,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOptions: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     fieldName: "Mailing Address",
                     type: "radiocheckbox",
                     subFields: [
@@ -265,7 +265,7 @@ export const seneriosDetails = [
                         },
                     ]
                 }, {
-                    lable: "If lessee address is different",
+                    label: "If lessee address is different",
                     fieldName: "Lessee Address",
                     type: "radiocheckbox",
                     subFields: [
@@ -292,7 +292,7 @@ export const seneriosDetails = [
                         },
                     ]
                 }, {
-                    lable: "Trailer/Vessel location",
+                    label: "Trailer/Vessel location",
                     fieldName: "Vessel or Trailer Coach Principally Kept At",
                     type: "radiocheckbox",
                     subFields: [
@@ -635,18 +635,6 @@ export const seneriosDetails = [
                     label: 'Make of Vehicle OR Vessel Builder',
                     type: "input field",
                     placeholder: 'Make of Vehicle OR Vessel Builder'
-                }, {
-                    label: 'Mileage of Vehicle',
-                    type: "input field",
-                    placeholder: 'Mileage of Vehicle'
-                }, {
-                    label: 'NOT Actual Mileage',
-                    type: "checkbox",
-                    placeholder: 'NOT Actual Mileage'
-                }, {
-                    label: 'Mileage Exceeds Mechanical Limit',
-                    type: "checkbox",
-                    placeholder: 'Mileage Exceeds Mechanical Limit'
                 }
             ]
         }, {
@@ -690,7 +678,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                 }
             ],
@@ -828,7 +816,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                 }
             ],
@@ -958,7 +946,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                 }
             ],
@@ -1004,7 +992,7 @@ export const seneriosDetails = [
             blockName: "New Lien Holder",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     subFields: [
                         {
                             label: 'Street',
@@ -1134,7 +1122,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                 }
             ],
@@ -1180,7 +1168,7 @@ export const seneriosDetails = [
             blockName: "Lien Release",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                     subFields: [
                         { label: 'Street', type: "input field", placeholder: 'Street' },
@@ -1261,7 +1249,7 @@ export const seneriosDetails = [
             blockName: "Address",
             subOption: [
                 {
-                    lable: "If mailing address is different",
+                    label: "If mailing address is different",
                     type: "radiocheckbox",
                 }
             ],
