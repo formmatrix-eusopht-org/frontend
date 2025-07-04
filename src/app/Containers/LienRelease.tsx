@@ -28,8 +28,8 @@ export const LeinRealease = ({
     const addressFields = block.fields || [];
     const radioOptions =
         block.subOption?.map((opt: any) => ({
-            label: opt.lable,
-            value: opt.lable.toLowerCase().replace(/\s+/g, "-"),
+            label: opt.label,
+            value: opt.label.toLowerCase().replace(/\s+/g, "-"),
             subFields: opt.subFields,
         })) || [];
 
