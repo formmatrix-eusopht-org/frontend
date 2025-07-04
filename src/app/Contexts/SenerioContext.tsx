@@ -9,7 +9,7 @@ type Field = {
 };
 
 type SubOption = {
-  lable: string;
+  label: string;
   type: string;
 };
 
@@ -60,7 +60,7 @@ const buildCombinedForm = (
         ];
 
         const uniqueSubOptions = Array.from(
-          new Map(mergedSubOptions.map((s) => [s.lable, s])).values()
+          new Map(mergedSubOptions.map((s) => [s.label, s])).values()
         );
 
         combinedBlocksMap[key] = {
@@ -121,7 +121,7 @@ export const SenerioProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   }, [])
-  const senerioValues = { senerio, setSenerio,  formData }
+  const senerioValues = { senerio, setSenerio, formData }
   return (
     <SenerioContext.Provider value={senerioValues}>
       {children}
