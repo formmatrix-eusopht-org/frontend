@@ -11,7 +11,7 @@ interface Field {
 }
 
 interface SubOption {
-  lable: string;
+  label: string;
   type: "checkbox";
   value?: boolean;
   subFields?: Field[]; // ✅ RENAMED
@@ -48,8 +48,8 @@ export const NewLienHolder = ({
   const subFields = block.subOption?.[0]?.subFields || []; // ✅ RENAMED
   // Map subOption to radio options
   const radioOptions = block.subOption?.map((opt) => ({
-    label: opt.lable,
-    value: opt.lable.toLowerCase().replace(/\s+/g, "-"),
+    label: opt.label,
+    value: opt.label.toLowerCase().replace(/\s+/g, "-"),
   })) || [];
 
   const selectedRadio = isMailingDifferent ? radioOptions[0]?.value : null;
