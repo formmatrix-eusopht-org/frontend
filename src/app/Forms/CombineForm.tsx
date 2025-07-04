@@ -509,7 +509,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     const handleVehicleStorageLocation = (label: string, value: string | boolean) => {
         setVehicleStorageLocation((prev) => ({ ...prev, [label]: String(value) }));
-        console.log(vehicleStorageLocation);
+        // console.log(vehicleStorageLocation);
 
     };
     const handleOptionsForValidations = (options: string[] = []) => {
