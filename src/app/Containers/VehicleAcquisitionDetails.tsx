@@ -35,20 +35,33 @@ const VehicleAcquisitionDetails = ({ title, block, onFieldChange, values }: Prop
                             )}
                             <div className="grid grid-cols-1 md:grid-cols-1">
                                 {field.options.map((option, optionIdx) => {
-                                    // Get the current value for this field
                                     const currentValue = values[field.label] || "";
                                     return (
-                                        <RadioButton
-                                            key={`${fieldIdx}-${optionIdx}`}
-                                            label={option.name}
-                                            name={field.label}
-                                            value={option.value}
-                                            className="text-[12px]"
-                                            checked={currentValue === option.value}
-                                            onChange={() => onFieldChange(field.label, option.value)}
-                                        />
+                                        <div key={`${fieldIdx}-${optionIdx}`}>
+                                            <RadioButton
+                                                label={option.name}
+                                                name={field.label}
+                                                value={option.value}
+                                                className="text-[12px]"
+                                                checked={currentValue === option.value}
+                                                onChange={() => onFieldChange(field.label, option.value)}
+                                            />
+                                            {/* Conditionally render relationship input */}
+                                            {option.value === "family" && currentValue === "family" && (
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter relationship"
+                                                    className="mt-1 p-2 border border-gray-300 rounded w-full"
+                                                    value={values["family_relationship"] || ""}
+                                                    onChange={(e) =>
+                                                        onFieldChange("family_relationship", e.target.value)
+                                                    }
+                                                />
+                                            )}
+                                        </div>
                                     );
                                 })}
+
                             </div>
                         </React.Fragment>
                     ))}
