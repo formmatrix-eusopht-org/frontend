@@ -45,7 +45,7 @@ export const RegisteredOwnerDetails = ({
                     placeholder={field.placeholder}
                     options={states.map(({ label, value }) => ({ label: label, value }))}
                     value={ownersData[ownerIndex]?.[field.label] || ""}
-                    onChange={(val) => { console.log("Firing change", field.label, val); onFieldChange(ownerIndex, field.label, val) }}
+                    onChange={(val) => { onFieldChange(ownerIndex, field.label, val) }}
                   />
                 ))}
 
