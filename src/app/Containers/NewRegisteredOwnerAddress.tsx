@@ -35,8 +35,8 @@ export const NewRegisteredOwnerAddress = ({
   const addressFields = block.fields || [];
 
   const radioOptions = block.subOptions?.map((opt: any) => ({
-    label: opt.lable,
-    value: normalizeKey(opt.lable),
+    label: opt.label,
+    value: normalizeKey(opt.label),
   })) || [];
 
   const addressMap: Record<string, { sectionKey: "mailing" | "lessee" | "kept"; data: Record<string, string> }> = {
@@ -83,7 +83,7 @@ export const NewRegisteredOwnerAddress = ({
 
       {/* Dynamically Render Sub Address Sections */}
       {block.subOptions?.map((option: any) => {
-        const key = normalizeKey(option.lable);
+        const key = normalizeKey(option.label);
         const isVisible = selectedOptions.includes(key);
         const mapped = addressMap[key];
 
