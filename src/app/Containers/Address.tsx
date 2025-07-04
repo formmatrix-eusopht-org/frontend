@@ -24,8 +24,8 @@ export const OwnerAddress = ({
   // Extract fields from the block data
   const addressFields = block.fields || [];
   const radioOptions = block.subOption?.map((opt: any) => ({
-    label: opt.lable,
-    value: opt.lable.toLowerCase().replace(/\s+/g, '-')
+    label: opt.label,
+    value: opt.label.toLowerCase().replace(/\s+/g, '-')
   })) || [];
 
   return (
@@ -58,18 +58,23 @@ export const OwnerAddress = ({
       {isMailingDifferent && (
         <Section title="Mailing Address" subSection={true}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {addressFields.map((field: any) => (
-              <Input
-                key={`mailing-${field.label}`}
-                label={field.label}
-                placeholder={field.placeholder}
-                type={field.type === "dropdown" ? "dropdown" :
-                  field.type === "phone" ? "phone" : "text"}
-                options={field.type === "dropdown" ? states : []}
-                value={mailingAddress[field.label] || ""}
-                onChange={(val) => onAddressChange("mailing", field.label, val)}
-              />
-            ))}
+            {addressFields
+              .filter((field: any) => field.label !== "County")
+              .map((field: any) => (
+                <Input
+                  key={`mailing-${field.label}`}
+                  label={field.label}
+                  placeholder={field.placeholder}
+                  type={
+                    field.type === "dropdown" ? "dropdown" :
+                      field.type === "phone" ? "phone" : "text"
+                  }
+                  options={field.type === "dropdown" ? states : []}
+                  value={mailingAddress[field.label] || ""}
+                  onChange={(val) => onAddressChange("mailing", field.label, val)}
+                />
+              ))}
+
           </div>
         </Section>
       )}
