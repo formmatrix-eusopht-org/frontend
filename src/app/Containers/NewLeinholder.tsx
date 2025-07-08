@@ -61,7 +61,11 @@ export const NewLienHolder = ({
         subSection={true}
         allowToggle={true}
         useStyledRadio={true}
+        radioOptions={[{ label: "Mailing address is different", value: "mailing-different" }]}
+        selectedOptions={isMailingDifferent ? ["mailing-different"] : []}
+        onToggleOption={() => onToggleMailingAddress(!isMailingDifferent)}
       >
+
         {/* Primary Address Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {fields.map((field) => (
