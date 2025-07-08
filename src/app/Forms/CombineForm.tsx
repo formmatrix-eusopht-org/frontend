@@ -24,7 +24,7 @@ import { LicensePlateMissingBlock } from '../Containers/LicensePlate';
 import PlannedNonOperation from '../Containers/PlannedNon-OperationCertificate';
 import { VehicleStorageLocationDetails } from '../Containers/VehicleStorageLocation';
 import { handleOnSave } from "../Actions/save"
-import { handleOnPDF } from "../Actions/pdf"
+import { handleOnPDF } from "../Actions/pdfGenerates"
 import Options from '../Containers/Options';
 import { UserAuth } from '../Contexts/AuthContext';
 
@@ -77,7 +77,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const { user } = UserAuth();
     const { senerio } = useSenerioContext();
 
-
     const [isLoading, setIsLoading] = useState(false);
 
     const LOCAL_STORAGE_KEY = "formStates";
@@ -111,11 +110,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const [newOwnerMailingAddress, setNewOwnerMailingAddress] = useState<Record<string, string>>({});
     const [newOwnerLesseeAddress, setNewOwnerLesseeAddress] = useState<Record<string, string>>({});
     const [newOwnerKeptAddress, setNewOwnerKeptAddress] = useState<Record<string, string>>({});
-    // OLD:
-    const [selectedRadio, setSelectedRadio] = useState<string | null>(null);
-
     // NEW:
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const [selectedRadio, setSelectedRadio] = useState<string[]>([]);
 
     //Date Info
     const [dateValues, setDateValues] = useState<Record<string, Record<string, string>>>(getInitialDateValues());
@@ -163,7 +159,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         otherExplain: "",
         plateCount: [],
     });
-
 
     const [statementForSomgExemptionData, setStatementForSomgExemptionData] = useState<Record<string, string | boolean>>({});
     const [lienReleaseState, setLienReleaseState] = useState({
@@ -218,11 +213,43 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         }
     };
     const handleVehicleFieldChange = (label: string, value: string | boolean) => {
-        setVehicleInfoState(prev => {
-            const updated = { ...prev, [label]: value };
-            return updated;
-        });
+        if (label === "Mileage of Vehicle" && typeof value === "string") {
+            // Extract only digits
+            const digitsOnly = value.replace(/\D/g, "").slice(0, 6); // max 6 digits
+
+            // Allow only digits, commas, and spaces in input
+            const allowedInput = value.replace(/[^0-9,\s]/g, "");
+
+            // Reconstruct string up to the 6th digit, preserving commas/spaces
+            let digitCount = 0;
+            let formatted = "";
+
+            for (const char of allowedInput) {
+                if (/\d/.test(char)) {
+                    if (digitCount >= 6) break;
+                    digitCount++;
+                }
+                formatted += char;
+            }
+
+            setVehicleInfoState(prev => ({
+                ...prev,
+                [label]: formatted
+            }));
+        } else if (label === "Year of Vehicle" && typeof value === "string") {
+            const digitsOnly = value.replace(/\D/g, "").slice(0, 4);
+            setVehicleInfoState(prev => ({ ...prev, [label]: digitsOnly }));
+        } else if (label === "Vehicle/Hull Identification Number" && typeof value === "string") {
+            const digitsOnly = value.slice(0, 17);
+            setVehicleInfoState(prev => ({ ...prev, [label]: digitsOnly }));
+        } else {
+            setVehicleInfoState(prev => ({
+                ...prev,
+                [label]: value
+            }));
+        }
     };
+
     const handleOwnerCountChange = (count: number) => {
         setOwnerCount(count);
         setOwnersData((prev) => {
@@ -462,7 +489,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const handleToggleOption = (value: string) => {
         const isMutuallyExclusive = mutuallyExclusive.includes(value);
 
-        setSelectedOptions((prev) => {
+        setSelectedRadio((prev) => {
             const alreadySelected = prev.includes(value);
 
             // If already selected, deselect it and clear its data
@@ -611,6 +638,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             setItemRequestedWasState(parsed.itemRequestedWasState)
             setLicensePlateState(parsed.licensePlateState)
             setPlannedNonOperationState(parsed.plannedNonOperationState)
+            setVehicleStorageLocation(parsed.vehicleStorageLocation || {});
         }
     }, []);
 
@@ -647,7 +675,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             lienReleaseState,
             itemRequestedWasState,
             licensePlateState,
-            plannedNonOperationState
+            plannedNonOperationState,
+            vehicleStorageLocation
         };
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(combinedState));
@@ -679,7 +708,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         lienReleaseState,
         itemRequestedWasState,
         licensePlateState,
-        plannedNonOperationState
+        plannedNonOperationState,
+        vehicleStorageLocation
     ]);
     //validations for form
     const isMotorcycle = transactionSelections.includes("Is the Vehicle a Motorcycle");
@@ -710,6 +740,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     block={typeOfVehicleBlock}
                     selectedItems={typeOfVehicleSelection}
                     onChange={handleTypeOfVehicleChange}
+                />
+            )}
+            {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
+                <MissingTitleReason
+                    title="Missing Title Reason"
+                    selectedReason={missingReason}
+                    onReasonChange={setMissingReason}
                 />
             )}
 
@@ -761,13 +798,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     onToggleMailingAddress={toggleMailingAddress}
                 />
             )}
-            {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
-                <LegalOwnerOfRecord
-                    block={LegalOwnerOfRecordBlock}
-                    formState={LegalOwnerOfRecordData}
-                    onFieldChange={handleLegalOwnerFieldChange}
-                />
-            }
+
             {newRegisteredOwnerBlock && (
                 <NewRegisteredOwnerDetails
                     title="New Registered Owner(s)"
@@ -791,7 +822,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     newOwnerMailingAddress={newOwnerMailingAddress}
                     newOwnerLesseeAddress={newOwnerLesseeAddress}
                     newOwnerKeptAddress={newOwnerKeptAddress}
-                    selectedOptions={selectedOptions}
+                    selectedRadio={selectedRadio}
                     onToggleOption={handleToggleOption}
                     onAddressChange={handleNewOwnerAddressChange}
                 />
@@ -837,6 +868,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     onChange={handlePowerOfAttorneyChange}
                 />
             )}
+            {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
+                <LegalOwnerOfRecord
+                    block={LegalOwnerOfRecordBlock}
+                    formState={LegalOwnerOfRecordData}
+                    onFieldChange={handleLegalOwnerFieldChange}
+                />
+            }
             {itemRequestedWasBlock && (
                 <TheItemRequestedWasBlock
                     title="The Item Requested Was"
@@ -857,13 +895,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     selectedOption={licensePlateState}
                     handleSelectedOptionOnChange={handleLicensePlateChange} />
             }
-            {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
-                <MissingTitleReason
-                    title="Missing Title Reason"
-                    selectedReason={missingReason}
-                    onReasonChange={setMissingReason}
-                />
-            )}
 
             {LienReleaseBlock && (
                 <LeinRealease
@@ -894,8 +925,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     onMailingFieldChange={handleLienholderMailingFieldChange}
                     onToggleMailingAddress={toggleLienholderMailingAddress}
                 />
-
-
             )}
             {StatementForSmogExemptionBlock && isSmogExemption && (
                 <StatementForSmogExemption
