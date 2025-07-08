@@ -159,6 +159,36 @@ export const seneriosDetails = [
         }, {
             reference: "Legal Owner of Record",
             blockName: "Legal Owner of Record",
+            subOptions: [
+                {
+                    label: "If mailing address is different",
+                    fieldName: "Mailing Address",
+                    type: "radiocheckbox",
+                    subFields: [
+                        {
+                            label: 'Street',
+                            type: "input field",
+                            placeholder: 'Street'
+                        }, {
+                            label: 'APT./SPACE/STE.#',
+                            type: "input field",
+                            placeholder: 'APT./SPACE/STE.#'
+                        }, {
+                            label: 'City',
+                            type: "input field",
+                            placeholder: 'City'
+                        }, {
+                            label: 'State',
+                            type: "dropdown",
+                            placeholder: 'State'
+                        }, {
+                            label: 'ZIP Code',
+                            type: "input field",
+                            placeholder: 'ZIP Code'
+                        },
+                    ]
+                },
+            ],
             fields: [
                 {
                     label: 'Name of Bank, Finance Company, or Individual having a Lien on this Vehicle',
@@ -484,7 +514,11 @@ export const seneriosDetails = [
                     label: "It is being transferred from/between:",
                     type: "checkbox",
                     placeholder: "It is being transferred from/between:",
-                    subText: "The parent, grandparent, child, grandchild, brother, sister, spouse, or domestic partner (as defined in Family Code §297) of the transferee.*"
+                },
+                {
+                    label: "The parent, grandparent, child, grandchild, brother, sister, spouse, or domestic partner (as defined in Family Code §297) of the transferee.*",
+                    type: "checkbox",
+                    placeholder: "The parent, grandparent, child, grandchild, brother, sister, spouse, or domestic partner (as defined in Family Code §297) of the transferee.*",
                 },
                 {
                     label: "A sole proprietorship to the proprietor as owner.*",
