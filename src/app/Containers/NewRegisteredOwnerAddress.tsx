@@ -9,7 +9,7 @@ type AddressProps = {
   newOwnerMailingAddress: Record<string, string>;
   newOwnerLesseeAddress: Record<string, string>;
   newOwnerKeptAddress: Record<string, string>;
-  selectedOptions: string[]; // Multiple options
+  selectedRadio: string[]; // Multiple options
   onToggleOption: (val: string) => void;
   onAddressChange: (
     section: "residential" | "mailing" | "lessee" | "kept",
@@ -28,7 +28,7 @@ export const NewRegisteredOwnerAddress = ({
   newOwnerMailingAddress,
   newOwnerLesseeAddress,
   newOwnerKeptAddress,
-  selectedOptions,
+  selectedRadio,
   onToggleOption,
   onAddressChange,
 }: AddressProps) => {
@@ -60,7 +60,7 @@ export const NewRegisteredOwnerAddress = ({
         title={title}
         subSection={true}
         radioOptions={radioOptions}
-        selectedOptions={selectedOptions}
+        selectedOptions={selectedRadio}
         onToggleOption={onToggleOption}
         allowToggle={true}
         useStyledRadio={true}
@@ -84,7 +84,7 @@ export const NewRegisteredOwnerAddress = ({
       {/* Dynamically Render Sub Address Sections */}
       {block.subOptions?.map((option: any) => {
         const key = normalizeKey(option.label);
-        const isVisible = selectedOptions.includes(key);
+        const isVisible = selectedRadio?.includes(key);
         const mapped = addressMap[key];
 
         if (!isVisible || !mapped) return null;
