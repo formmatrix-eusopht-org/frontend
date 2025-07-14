@@ -670,13 +670,16 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     };
 };
 
+
 const mergeFilledPDFs = async (
     formTypes: string[],
     formData: FormData,
-    senerio: string
+    senerio: string,
+    multipleFormDataList: FormData[] = []  // optional for multiple transfer
 ): Promise<Uint8Array> => {
     const mergedPdf = await PDFDocument.create();
-    const fieldMapping = buildFieldMapping(formData, senerio);
+
+    let dmv262Index = 0; // for tracking multiple 262 forms
 
     for (const type of formTypes) {
         const pdfUrl = `/pdfs/${type}.pdf`;
@@ -694,11 +697,24 @@ const mergeFilledPDFs = async (
             const form = pdfDoc.getForm();
             const fields = form.getFields();
 
-            // First pass: Fill all fields with values
+            //  Select which data to use
+            let currentData: FormData;
+
+            if (type === "DMVREG262new" && multipleFormDataList.length > 0) {
+                // Use specific transfer data
+                currentData = multipleFormDataList[dmv262Index] || formData;
+                dmv262Index++;
+            } else {
+                // Use default formData
+                currentData = formData;
+            }
+
+            const fieldMapping = buildFieldMapping(currentData, senerio);
+
+            // Fill fields
             fields.forEach((field: PDFField) => {
                 const name = field.getName();
                 const value = fieldMapping[name];
-                // console.log(field.getName(), "field");
 
                 try {
                     if (field instanceof PDFTextField) {
@@ -716,6 +732,7 @@ const mergeFilledPDFs = async (
                 }
             });
 
+            // Make fields read-only
             fields.forEach((field: PDFField) => {
                 try {
                     if (typeof (field as any).enableReadOnly === 'function') {
@@ -739,14 +756,182 @@ const mergeFilledPDFs = async (
     return await mergedPdf.save();
 };
 
-export async function handleOnPDF(): Promise<void> {
+
+// ==> old Hassan code
+// const mergeFilledPDFs = async (
+//     formTypes: string[],
+//     formData: FormData,
+//     senerio: string
+// ): Promise<Uint8Array> => {
+//     const mergedPdf = await PDFDocument.create();
+//     const fieldMapping = buildFieldMapping(formData, senerio);
+
+//     for (const type of formTypes) {
+//         const pdfUrl = `/pdfs/${type}.pdf`;
+//         const res = await fetch(pdfUrl);
+
+//         if (!res.ok) {
+//             console.error(`❌ Failed to fetch PDF: ${pdfUrl}`);
+//             continue;
+//         }
+
+//         const pdfBytes = await res.arrayBuffer();
+//         const pdfDoc = await PDFDocument.load(pdfBytes);
+
+//         try {
+//             const form = pdfDoc.getForm();
+//             const fields = form.getFields();
+
+//             // First pass: Fill all fields with values
+//             fields.forEach((field: PDFField) => {
+//                 const name = field.getName();
+//                 const value = fieldMapping[name];
+//                 // console.log(field.getName(), "field");
+
+//                 try {
+//                     if (field instanceof PDFTextField) {
+//                         field.setText(value);
+//                         field.setFontSize(11);
+//                     } else if (field instanceof PDFCheckBox) {
+//                         if (value === true || value === 'true') {
+//                             field.check();
+//                         } else {
+//                             field.uncheck();
+//                         }
+//                     }
+//                 } catch (e: any) {
+//                     console.warn(`Could not fill field ${name}:`, e.message);
+//                 }
+//             });
+
+//             fields.forEach((field: PDFField) => {
+//                 try {
+//                     if (typeof (field as any).enableReadOnly === 'function') {
+//                         (field as any).enableReadOnly();
+//                     }
+//                 } catch (e: any) {
+//                     console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
+//                 }
+//             });
+
+//         } catch (err: any) {
+//             console.warn(`Error processing form in ${type}:`, err.message);
+//         }
+
+//         const finalBytes = await pdfDoc.save();
+//         const loadedFilledPdf = await PDFDocument.load(finalBytes);
+//         const pages = await mergedPdf.copyPages(loadedFilledPdf, loadedFilledPdf.getPageIndices());
+//         pages.forEach((page) => mergedPdf.addPage(page));
+//     }
+
+//     return await mergedPdf.save();
+// };
+
+
+// ===> Handle PDF Generation
+
+export async function handleOnPDF(activeTransferIndex: number): Promise<void> {
+    console.log("firstly activeTransferIndex:", activeTransferIndex);
     try {
         const savedForm = localStorage.getItem("formStates");
         const savedSenerio = localStorage.getItem("senerio");
+        const multipleForms = localStorage.getItem("multipleTransferStates");
 
         const form: FormData = JSON.parse(savedForm || "{}");
         const senerio: string = JSON.parse(savedSenerio || "{}");
+        const multipleTransfer = JSON.parse(multipleForms || "{}");
+
         let formTypes: string[] = [];
+
+        console.log("multipleTransfer ==>", multipleTransfer);
+        console.log("Transfer 01 ==>", multipleTransfer.multipleTransfer?.[0]?.transactionSelections);
+        console.log("Transfer 02 ==>", multipleTransfer.multipleTransfer?.[1]?.transactionSelections);
+        console.log("Transfer 03 ==>", multipleTransfer.multipleTransfer?.[2]?.transactionSelections);
+        console.log("Transfer 04 ==>", multipleTransfer.multipleTransfer?.[3]?.transactionSelections);
+        console.log("Transfer 05 ==>", multipleTransfer.multipleTransfer?.[4]?.transactionSelections);
+
+        // ====> MULTIPLE TRANSFER SCENARIO
+        
+        if (senerio.includes("Multiple Transfer")) {
+            formTypes.push('DMVREG262new', 'Reg227');
+
+            // ==> Correctly access transactionSelections array from the first form in multipleTransfer
+            let transactionSelections = multipleTransfer?.multipleTransfer?.[activeTransferIndex]?.transactionSelections || [];
+
+            // ==> Ensure it's always an array
+            if (!Array.isArray(transactionSelections)) {
+                transactionSelections = [transactionSelections];
+            }
+
+            // ==> Without Title: remove REG 227
+            if (transactionSelections.includes("Transaction with Vehicle Title")) {
+                formTypes = formTypes.filter(formType => formType !== "Reg227");
+            }
+
+            // ==> Out Of State Title: Add REG 343
+            if (transactionSelections.includes("Out of State Title")) {
+                formTypes.push("Reg343");
+            }
+
+            // ==> Current Lienholder: Add REG 227
+            if (transactionSelections.includes("There is a Current Lienholder")) {
+                formTypes.push("Reg227");
+            }
+
+            // ==> Gift / Family / Smog: Add REG 256
+            if (
+                transactionSelections.includes("Family Transfer") ||
+                transactionSelections.includes("Vehicle is a Gift") ||
+                transactionSelections.includes("Smog Exemption")
+            ) {
+                formTypes.push("Reg256");
+            }
+
+            console.log("log transactionSelections:", transactionSelections);
+        }
+
+        console.log("log formTypes after processing:", formTypes);
+        // if (senerio?.includes("Multiple Transfer")) {
+        //     formTypes.push('DMVREG262new', 'Reg227'); // Add DMVREG262new and Reg227 for multiple transfers
+        //     const allTransfers = multipleTransfer?.multipleTransfer || [];
+
+        //     //  Add DMVREG262new for each transfer
+        //     for (let i = 0; i < allTransfers.length; i++) {
+        //         formTypes.push('DMVREG262new');
+        //     }
+
+        //     //  Add only ONE Reg227
+        //     formTypes.push('Reg227');
+
+        //     // Loop through all transfers for selection-based forms
+        //     allTransfers.forEach((transfer: any, index: number) => {
+        //         let transactionSelections = transfer?.transactionSelections || [];
+        //         if (!Array.isArray(transactionSelections)) {
+        //             transactionSelections = [transactionSelections];
+        //         }
+
+        //         // ==> Remove Reg227 if Title is present
+        //         if (transactionSelections.includes("Transaction with Vehicle Title")) {
+        //             formTypes = formTypes.filter(form => form !== "Reg227");
+        //         }
+
+        //         if (transactionSelections.includes("Out of State Title")) {
+        //             formTypes.push("Reg343");
+        //         }
+
+        //         if (transactionSelections.includes("There is a Current Lienholder")) {
+        //             formTypes.push("Reg227");
+        //         }
+
+        //         if (
+        //             transactionSelections.includes("Family Transfer") ||
+        //             transactionSelections.includes("Vehicle is a Gift") ||
+        //             transactionSelections.includes("Smog Exemption")
+        //         ) {
+        //             formTypes.push("Reg256");
+        //         }
+        //     });
+        // }
 
         // ====> SIMPLE TRANSFER SCENARIO
         if (senerio?.includes("Simple Transfer")) {
