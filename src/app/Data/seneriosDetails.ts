@@ -1006,7 +1006,7 @@ export const seneriosDetails = [
                     ],
                 },
             ],
-        },  {
+        }, {
             reference: "Missing Title Reason",
             blockName: "Missing Title Reason",
             fields: [
@@ -1018,13 +1018,13 @@ export const seneriosDetails = [
             ]
         }
         ]
-    },{
+    }, {
         form: "Duplicate Registration",
         blocks: [{
             reference: "Transaction Details",
             blockName: "Transaction Details",
             fields: [
-                 {
+                {
                     label: 'Is the Vehicle a Motorcycle',
                     type: "checkbox",
                     placeholder: 'Is the Vehicle a Motorcycle'
@@ -1400,12 +1400,12 @@ export const seneriosDetails = [
             blockName: "Multiple Transfer",
             transfersNumber: 5,
             fields: [
-           {
-            Label: 'Transfer Numbers',
-           }
+                {
+                    Label: 'Transfer Numbers',
+                }
             ]
         },
-            {
+        {
             reference: "Transaction Details",
             blockName: "Transaction Details",
             fields: [
@@ -2147,18 +2147,6 @@ export const seneriosDetails = [
                     value: "PER CVC §4467",
                 }
             ]
-        }, {
-            reference: "License Plate",
-            blockName: "License Plate",
-            fields: [
-                {
-                    label: "One license plate missing (automobiles/two-plate commercial vehicles/pick-ups only)",
-                    value: "One license plate missing",
-                }, {
-                    label: "Two license plates are missing or one plate is missing for a single-plate commercial truck tractor, motorcycle, or trailer",
-                    value: "Two license plates are missing",
-                }
-            ]
         }
         ]
     }, {
@@ -2279,6 +2267,18 @@ export const seneriosDetails = [
                 }, {
                     label: "PER CVC §4467 – COPY OF A POLICE REPORT, COURT DOCUMENTATION, OR OTHER LAW ENFORCEMENT DOCUMENTATION REQUIRED.",
                     value: "PER CVC §4467",
+                }
+            ]
+        }, {
+            reference: "License Plate",
+            blockName: "License Plate",
+            fields: [
+                {
+                    label: "One license plate missing (automobiles/two-plate commercial vehicles/pick-ups only)",
+                    value: "One license plate missing",
+                }, {
+                    label: "Two license plates are missing or one plate is missing for a single-plate commercial truck tractor, motorcycle, or trailer",
+                    value: "Two license plates are missing",
                 }
             ]
         }
