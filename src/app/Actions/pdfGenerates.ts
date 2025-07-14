@@ -108,7 +108,7 @@ function formatSingleOwner(owner?: OwnerData): string {
     const first = owner['First Name'] || '';
     const middle = owner['Middle Name'] || '';
 
-    const fullName = [first, middle, last].filter(Boolean).join(' ');
+    const fullName = [first, middle, last].filter(Boolean).join(', ');
     return fullName;
 }
 function extractDateParts(dateStr?: string): { month: string, day: string, year: string } {
@@ -146,9 +146,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'MOTORCYCLE ENGINE NUMBER': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
         "DP number": '',
         "Engine number": formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        "True full name": owner1,
-        "Co owner": owner2,
-        "certification": owner1,
+        "True full name": newOwner1,
+        "Co owner": newOwner2,
+        "certification": newOwner3,
         "telephone number": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
         "title": formData.ownersData?.[0]?.['Title if Signing for a Company'] || '',
         "DL1": formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
@@ -167,10 +167,11 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "2DL6": formData.ownersData?.[1]?.['Driver License Number']?.split('')[5] || '',
         "2DL7": formData.ownersData?.[1]?.['Driver License Number']?.split('')[6] || '',
         "2DL8": formData.ownersData?.[1]?.['Driver License Number']?.split('')[7] || '',
-        "Physical address": formData.ownerAddress?.residential?.["Street"] || '',
+        "Physical address": formData.newOwnerAddress?.Street || '',
         "One license": formData.licensePlateState === "One license plate missing" ? true : false,
         "Two plates": formData.licensePlateState === "Two license plates are missing" ? true : false,
         "Apt #": formData.ownerAddress?.residential?.["APT./SPACE/STE.#"] || '',
+        "City": formData.ownerAddress?.residential?.City || '',
         'I/We': joinNames(owner1, owner2, owner3),
         'to': joinNames(newOwner1, newOwner2, newOwner3),
         "PRINTED NAME": formData.ownersData?.[0]?.['Last Name'] || '',
@@ -245,7 +246,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'License Plate/CF Number1': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         'Vehicle/Vessel ID/Number1': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'Year/Make': `${formData.vehicleInfoState?.['Year of Vehicle'] || ""} ${formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || ""}`,
-        '1 True Full Name, Last': joinNames(owner1, owner2, owner3),
+        '1 True Full Name, Last': owner1,
         '1 DL/ID Number-1.0': formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
         '1 DL/ID Number-1.1': formData.ownersData?.[0]?.['Driver License Number']?.split('')[1] || '',
         '1 DL/ID Number-1.2': formData.ownersData?.[0]?.['Driver License Number']?.split('')[2] || '',
@@ -360,7 +361,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "City-1": formData.newOwnerAddress?.["City"] || "",
         "6 States1": formData.newOwnerAddress?.["State"] || "",
         "6 Zip Code-1": formData.newOwnerAddress?.["ZIP Code"] || "",
-        "county residence or county where vehicle or vessle is princi.0": "",
+        "county residence or county where vehicle or vessle is princi.0": formData.newOwnerAddress?.County || '',
         "6 Mailing Address": formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street || '' : '',
         "6 Apt/Space Number-2": formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || '' : '',
         "6 City-2": formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City || '' : '',
@@ -756,80 +757,6 @@ const mergeFilledPDFs = async (
     return await mergedPdf.save();
 };
 
-
-// ==> old Hassan code
-// const mergeFilledPDFs = async (
-//     formTypes: string[],
-//     formData: FormData,
-//     senerio: string
-// ): Promise<Uint8Array> => {
-//     const mergedPdf = await PDFDocument.create();
-//     const fieldMapping = buildFieldMapping(formData, senerio);
-
-//     for (const type of formTypes) {
-//         const pdfUrl = `/pdfs/${type}.pdf`;
-//         const res = await fetch(pdfUrl);
-
-//         if (!res.ok) {
-//             console.error(`❌ Failed to fetch PDF: ${pdfUrl}`);
-//             continue;
-//         }
-
-//         const pdfBytes = await res.arrayBuffer();
-//         const pdfDoc = await PDFDocument.load(pdfBytes);
-
-//         try {
-//             const form = pdfDoc.getForm();
-//             const fields = form.getFields();
-
-//             // First pass: Fill all fields with values
-//             fields.forEach((field: PDFField) => {
-//                 const name = field.getName();
-//                 const value = fieldMapping[name];
-//                 // console.log(field.getName(), "field");
-
-//                 try {
-//                     if (field instanceof PDFTextField) {
-//                         field.setText(value);
-//                         field.setFontSize(11);
-//                     } else if (field instanceof PDFCheckBox) {
-//                         if (value === true || value === 'true') {
-//                             field.check();
-//                         } else {
-//                             field.uncheck();
-//                         }
-//                     }
-//                 } catch (e: any) {
-//                     console.warn(`Could not fill field ${name}:`, e.message);
-//                 }
-//             });
-
-//             fields.forEach((field: PDFField) => {
-//                 try {
-//                     if (typeof (field as any).enableReadOnly === 'function') {
-//                         (field as any).enableReadOnly();
-//                     }
-//                 } catch (e: any) {
-//                     console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
-//                 }
-//             });
-
-//         } catch (err: any) {
-//             console.warn(`Error processing form in ${type}:`, err.message);
-//         }
-
-//         const finalBytes = await pdfDoc.save();
-//         const loadedFilledPdf = await PDFDocument.load(finalBytes);
-//         const pages = await mergedPdf.copyPages(loadedFilledPdf, loadedFilledPdf.getPageIndices());
-//         pages.forEach((page) => mergedPdf.addPage(page));
-//     }
-
-//     return await mergedPdf.save();
-// };
-
-
-// ===> Handle PDF Generation
-
 export async function handleOnPDF(activeTransferIndex: number): Promise<void> {
     console.log("firstly activeTransferIndex:", activeTransferIndex);
     try {
@@ -851,7 +778,7 @@ export async function handleOnPDF(activeTransferIndex: number): Promise<void> {
         console.log("Transfer 05 ==>", multipleTransfer.multipleTransfer?.[4]?.transactionSelections);
 
         // ====> MULTIPLE TRANSFER SCENARIO
-        
+
         if (senerio.includes("Multiple Transfer")) {
             formTypes.push('DMVREG262new', 'Reg227');
 
@@ -964,25 +891,17 @@ export async function handleOnPDF(activeTransferIndex: number): Promise<void> {
             senerio?.includes("Duplicate Plates & Stickers")) {
             formTypes.push('Reg156');
         }
-        if (
-            senerio?.includes("Restoring PNO Vehicle to Operational")
-        ) {
+        if (senerio?.includes("Restoring PNO Vehicle to Operational")) {
             formTypes.push("Reg256");
         }
-        if (
-            senerio?.includes("Add Lienholder") ||
-            senerio?.includes("Remove Lienholder")
-        ) {
+        if (senerio?.includes("Add Lienholder") ||
+            senerio?.includes("Remove Lienholder")) {
             formTypes.push("Reg227");
         }
-        if (
-            senerio?.includes("Filing for Planned Non-Operation (PNO)")
-        ) {
+        if (senerio?.includes("Filing for Planned Non-Operation (PNO)")) {
             formTypes.push("Reg102");
         }
-        if (
-            senerio?.includes("Certificate of Non-Operation")
-        ) {
+        if (senerio?.includes("Certificate of Non-Operation")) {
             formTypes.push("Reg102");
         }
         //==> Remove duplicates just in case
