@@ -27,6 +27,7 @@ import { handleOnSave } from "../Actions/save"
 import { handleOnPDF } from "../Actions/pdfGenerates"
 import Options from '../Containers/Options';
 import { UserAuth } from '../Contexts/AuthContext';
+import MultipleTransfer from '../Containers/MultipleTransfer';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
 
@@ -52,6 +53,10 @@ interface AddressState {
 }
 const CombineForm = ({ formData }: CombineFormProps) => {
     const isInitialMount = useRef(true);
+        const schemaForMultipletransfer = {
+        "transferNumber": 1,
+        "Values": {}
+    }
     const getInitialDateValues = () => ({
         "DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):": {
             "Month": "",
@@ -123,6 +128,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         appointer: null,
         appointee: null
     });
+    const [multipleTransfer, setMultipleTransfer] = useState([schemaForMultipletransfer]);
+
     const [otherExplain, setOtherExplain] = useState("");
     // Missing title reason
     const [missingReason, setMissingReason] = useState("");
@@ -577,6 +584,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     // Find blocks by their reference names
     const transactionBlock = findBlock("Transaction Details");
+    const multipletransactionBlock = findBlock("Multiple Transfer");
     const typeOfVehicleBlock = findBlock("Type of Vehicle");
     const vehicleInfoBlock = findBlock("Vehicle Information");
     const registeredOwnerBlock = findBlock("Registered Owner(s)");
@@ -639,6 +647,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             setLicensePlateState(parsed.licensePlateState)
             setPlannedNonOperationState(parsed.plannedNonOperationState)
             setVehicleStorageLocation(parsed.vehicleStorageLocation || {});
+            setMultipleTransfer(parsed.multipleTransfer || [schemaForMultipletransfer]);
         }
     }, []);
 
@@ -722,99 +731,117 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const requestPNOCardFlag = transactionSelections.includes("Request PNO card");
     // const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
 
+        const handleTransferCountChange = (newCount: number) => {
+        const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
+            transferNumber: index + 1,
+            Values: multipleTransfer[index]?.Values || {},
+        }));
+        setMultipleTransfer(updatedTransfers);
+    };
+
     return (
-        <div className="space-y-6">
-            {transactionBlock && (
-                <TransactionDetails
-                    title="Transaction Details"
-                    block={transactionBlock}
-                    senerio={senerio}
-                    selectedItems={transactionSelections}
-                    onChange={handleTransactionChange}
+                <>
+            {senerio?.includes("Multiple Transfer") ?
+                <MultipleTransfer
+                    title="Multiple Transfer"
+                    block={multipletransactionBlock}
+                    formData={formData}
+                    state={multipleTransfer}
+                    setState={setMultipleTransfer}
+                    onTransferCountChange={handleTransferCountChange}
                 />
-            )}
+                :
+                <div className="space-y-6">
+                    {transactionBlock && (
+                        <TransactionDetails
+                            title="Transaction Details"
+                            block={transactionBlock}
+                            senerio={senerio}
+                            selectedItems={transactionSelections}
+                            onChange={handleTransactionChange}
+                        />
+                    )}
 
-            {typeOfVehicleBlock && isOutofStateTitle && (
-                <TypeOfVehicle
-                    title="Type of Vehicle"
-                    block={typeOfVehicleBlock}
-                    selectedItems={typeOfVehicleSelection}
-                    onChange={handleTypeOfVehicleChange}
-                />
-            )}
-            {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
-                <MissingTitleReason
-                    title="Missing Title Reason"
-                    selectedReason={missingReason}
-                    onReasonChange={setMissingReason}
-                />
-            )}
+                    {typeOfVehicleBlock && isOutofStateTitle && (
+                        <TypeOfVehicle
+                            title="Type of Vehicle"
+                            block={typeOfVehicleBlock}
+                            selectedItems={typeOfVehicleSelection}
+                            onChange={handleTypeOfVehicleChange}
+                        />
+                    )}
 
-            {vehicleInfoBlock && (
-                <VehicleInformationDetails
-                    title="Vehicle Information"
-                    block={{
-                        ...vehicleInfoBlock,
-                        fields: vehicleInfoBlock.fields
-                            ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
-                            ?.filter(field => isOutofStateTitle || field.label !== "If kilometers check this box")
-                            ?.filter(field => isTRAILERCOACH ||
-                                (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
-                            .map(field => ({
-                                ...field,
-                                type: field.type as "checkbox" | "input field" | "dropdown",
-                                value: vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
-                            }))
-                    }}
-                    onFieldChange={handleVehicleFieldChange}
-                />
-            )}
-            {vehicleStorageLocationBlock && (
-                <VehicleStorageLocationDetails
-                    title="Vehicle Storage Location"
-                    block={vehicleStorageLocationBlock}
-                    formState={vehicleStorageLocation}
-                    onFieldChange={handleVehicleStorageLocation}
-                />
-            )}
-            {registeredOwnerBlock && (
-                <RegisteredOwnerDetails
-                    title="Registered Owner(s)"
-                    block={registeredOwnerBlock}
-                    ownerCount={ownerCount}
-                    onOwnerCountChange={handleOwnerCountChange}
-                    ownersData={ownersData}
-                    onFieldChange={handleRegisteredOwnerFieldChange}
-                />
-            )}
-            {ownerAddressBlock && (
-                <OwnerAddress
-                    title="Address"
-                    block={ownerAddressBlock}
-                    residentialAddress={ownerAddress.residential}
-                    mailingAddress={ownerAddress.mailing}
-                    isMailingDifferent={ownerAddress.isMailingDifferent}
-                    onAddressChange={handleOwnerAddressChange}
-                    onToggleMailingAddress={toggleMailingAddress}
-                />
-            )}
-
-            {newRegisteredOwnerBlock && (
-                <NewRegisteredOwnerDetails
-                    title="New Registered Owner(s)"
-                    block={newRegisteredOwnerBlock}
-                    newOwnerCount={newOwnerCount}
-                    onNewOwnerCountChange={setNewOwnerCount}
-                    newOwnerData={newOwnerData}
-                    onNewOwnerFieldChange={handleNewOwnerFieldChange}
-                    NewOwnershipTypes={newOwnershipTypes}
-                    onNewOwnershipChange={handleNewOwnershipChange}
-                    isVehicleIsAGift={isVehickeIsAGift}
-                    isMotorcycle={isMotorcycle}
-                    isTRAILERCOACH={isTRAILERCOACH}
-                />
-            )}
-            {newRegisteredOwnerAddressBlock && (
+                    {vehicleInfoBlock && (
+                        <VehicleInformationDetails
+                            title="Vehicle Information"
+                            block={{
+                                ...vehicleInfoBlock,
+                                fields: vehicleInfoBlock.fields
+                                    ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
+                                    ?.filter(field => isOutofStateTitle || field.label !== "If kilometers check this box")
+                                    ?.filter(field => isTRAILERCOACH ||
+                                        (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
+                                    .map(field => ({
+                                        ...field,
+                                        type: field.type as "checkbox" | "input field" | "dropdown",
+                                        value: vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
+                                    }))
+                            }}
+                            onFieldChange={handleVehicleFieldChange}
+                        />
+                    )}
+                    {vehicleStorageLocationBlock && (
+                        <VehicleStorageLocationDetails
+                            title="Vehicle Storage Location"
+                            block={vehicleStorageLocationBlock}
+                            formState={vehicleStorageLocation}
+                            onFieldChange={handleVehicleStorageLocation}
+                        />
+                    )}
+                    {registeredOwnerBlock && (
+                        <RegisteredOwnerDetails
+                            title="Registered Owner(s)"
+                            block={registeredOwnerBlock}
+                            ownerCount={ownerCount}
+                            onOwnerCountChange={handleOwnerCountChange}
+                            ownersData={ownersData}
+                            onFieldChange={handleRegisteredOwnerFieldChange}
+                        />
+                    )}
+                    {ownerAddressBlock && (
+                        <OwnerAddress
+                            title="Address"
+                            block={ownerAddressBlock}
+                            residentialAddress={ownerAddress.residential}
+                            mailingAddress={ownerAddress.mailing}
+                            isMailingDifferent={ownerAddress.isMailingDifferent}
+                            onAddressChange={handleOwnerAddressChange}
+                            onToggleMailingAddress={toggleMailingAddress}
+                        />
+                    )}
+                    {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
+                        <LegalOwnerOfRecord
+                            block={LegalOwnerOfRecordBlock}
+                            formState={LegalOwnerOfRecordData}
+                            onFieldChange={handleLegalOwnerFieldChange}
+                        />
+                    }
+                    {newRegisteredOwnerBlock && (
+                        <NewRegisteredOwnerDetails
+                            title="New Registered Owner(s)"
+                            block={newRegisteredOwnerBlock}
+                            newOwnerCount={newOwnerCount}
+                            onNewOwnerCountChange={setNewOwnerCount}
+                            newOwnerData={newOwnerData}
+                            onNewOwnerFieldChange={handleNewOwnerFieldChange}
+                            NewOwnershipTypes={newOwnershipTypes}
+                            onNewOwnershipChange={handleNewOwnershipChange}
+                            isVehicleIsAGift={isVehickeIsAGift}
+                            isMotorcycle={isMotorcycle}
+                            isTRAILERCOACH={isTRAILERCOACH}
+                        />
+                    )}
+                      {newRegisteredOwnerAddressBlock && (
                 <NewRegisteredOwnerAddress
                     title="New Owner Address"
                     block={newRegisteredOwnerAddressBlock}
@@ -827,139 +854,380 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     onAddressChange={handleNewOwnerAddressChange}
                 />
             )}
-            {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (
-                <DateInformation
-                    title="DATE INFORMATION"
-                    block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
-                    dateValues={dateValues}
-                    onDateChange={handleDateChange}
-                />
-            )}
-            {vehicleStatusBlock && isOutofStateTitle && (
-                <VehicleStatusInformation
-                    title="Vehicle Status Information"
-                    block={vehicleStatusBlock}
-                    onFieldChange={handleVehicleStatusInfoFieldChange}
-                    values={vehicleStatusInfoData}
-                />
+                    {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (
+                        <DateInformation
+                            title="DATE INFORMATION"
+                            block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
+                            dateValues={dateValues}
+                            onDateChange={handleDateChange}
+                        />
+                    )}
+                    {vehicleStatusBlock && isOutofStateTitle && (
+                        <VehicleStatusInformation
+                            title="Vehicle Status Information"
+                            block={vehicleStatusBlock}
+                            onFieldChange={handleVehicleStatusInfoFieldChange}
+                            values={vehicleStatusInfoData}
+                        />
 
-            )}
-            {vehicleAcquisitionBlock && isOutofStateTitle && (
-                <VehicleAcquisitionDetails
-                    title={vehicleAcquisitionBlock.blockName}
-                    block={vehicleAcquisitionBlock}
-                    values={vehiclePurchaseInfo}
-                    onFieldChange={handleVehiclePurchaseInfoChange}
-                />
-            )}
-            {OutOfStateBlock && isOutofStateTitle &&
-                <OutOfStateVehicleSection
-                    values={outOfStateVehicle}
-                    onFieldChange={handleOutOfStateVehcileFieldChange}
-                    onPlateSelect={handleOutOfStateVehcilePlateSelect}
-                />
-            }
-            {powerOfAttorneyBlock && (
-                <PowerOfAttorneyDetails
-                    title="Power of Attorney"
-                    block={powerOfAttorneyBlock}
-                    appointer={powerOfAttorneyData.appointer}
-                    appointee={powerOfAttorneyData.appointee}
-                    onChange={handlePowerOfAttorneyChange}
-                />
-            )}
-            {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
-                <LegalOwnerOfRecord
-                    block={LegalOwnerOfRecordBlock}
-                    formState={LegalOwnerOfRecordData}
-                    onFieldChange={handleLegalOwnerFieldChange}
-                />
-            }
-            {itemRequestedWasBlock && (
-                <TheItemRequestedWasBlock
-                    title="The Item Requested Was"
-                    block={itemRequestedWasBlock}
-                    checkedItems={itemRequestedWasState.checked}
-                    otherExplain={itemRequestedWasState.otherExplain}
-                    onCheckChange={handleItemRequestedCheckChange}
-                    onOtherExplainChange={handleItemRequestedOtherExplainChange}
-                    plateCount={itemRequestedWasState.plateCount}
-                    onPlateCountChange={handleItemRequestedPlateCountChange}
-                />
+                    )}
+                    {vehicleAcquisitionBlock && isOutofStateTitle && (
+                        <VehicleAcquisitionDetails
+                            title={vehicleAcquisitionBlock.blockName}
+                            block={vehicleAcquisitionBlock}
+                            values={vehiclePurchaseInfo}
+                            onFieldChange={handleVehiclePurchaseInfoChange}
+                        />
+                    )}
+                    {OutOfStateBlock && isOutofStateTitle &&
+                        <OutOfStateVehicleSection
+                            values={outOfStateVehicle}
+                            onFieldChange={handleOutOfStateVehcileFieldChange}
+                            onPlateSelect={handleOutOfStateVehcilePlateSelect}
+                        />
+                    }
+                    {powerOfAttorneyBlock && (
+                        <PowerOfAttorneyDetails
+                            title="Power of Attorney"
+                            block={powerOfAttorneyBlock}
+                            appointer={powerOfAttorneyData.appointer}
+                            appointee={powerOfAttorneyData.appointee}
+                            onChange={handlePowerOfAttorneyChange}
+                        />
+                    )}
+                    {itemRequestedWasBlock && (
+                        <TheItemRequestedWasBlock
+                            title="The Item Requested Was"
+                            block={itemRequestedWasBlock}
+                            checkedItems={itemRequestedWasState.checked}
+                            otherExplain={itemRequestedWasState.otherExplain}
+                            onCheckChange={handleItemRequestedCheckChange}
+                            onOtherExplainChange={handleItemRequestedOtherExplainChange}
+                            plateCount={itemRequestedWasState.plateCount}
+                            onPlateCountChange={handleItemRequestedPlateCountChange}
+                        />
 
-            )}
-            {LicensePlateBlock &&
-                <LicensePlateMissingBlock
-                    title={LicensePlateBlock.blockName}
-                    block={LicensePlateBlock}
-                    selectedOption={licensePlateState}
-                    handleSelectedOptionOnChange={handleLicensePlateChange} />
-            }
+                    )}
+                    {LicensePlateBlock &&
+                        <LicensePlateMissingBlock
+                            title={LicensePlateBlock.blockName}
+                            block={LicensePlateBlock}
+                            selectedOption={licensePlateState}
+                            handleSelectedOptionOnChange={handleLicensePlateChange} />
+                    }
+                    {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
+                        <MissingTitleReason
+                            title="Missing Title Reason"
+                            selectedReason={missingReason}
+                            onReasonChange={setMissingReason}
+                        />
+                    )}
 
-            {LienReleaseBlock && (
-                <LeinRealease
-                    title="Lien Release"
-                    block={LienReleaseBlock}
-                    lienReleaseState={lienReleaseState}
-                    onLienReleaseChange={handleLienAddressChange}
-                    onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
-                />
-            )}
-            {plannedNonOperationCertificateBlock &&
-                <PlannedNonOperation
-                    title="Planned Non-Operation Certificate"
-                    vehicles={plannedNonOperationState}
-                    onChange={handlePlannedNonOperationChange}
-                    onAdd={handlePlannedNonOperationAdd}
-                    onRemove={handlePlannedNonOperationRemove}
-                    fields={plannedNonOperationCertificateBlock.fields}
-                />
-            }
-            {newLienHolderBlock && (
-                <NewLienHolder
-                    block={newLienHolderBlock}
-                    formState={newLienholder.address}
-                    mailingAddress={newLienholder.mailingAddress}
-                    isMailingDifferent={newLienholder.isMailingDifferent}
-                    onFieldChange={handleLienholderFieldChange}
-                    onMailingFieldChange={handleLienholderMailingFieldChange}
-                    onToggleMailingAddress={toggleLienholderMailingAddress}
-                />
-            )}
-            {StatementForSmogExemptionBlock && isSmogExemption && (
-                <StatementForSmogExemption
-                    title="Statement For Smog Exemption"
-                    block={StatementForSmogExemptionBlock}
-                    onFieldChange={handleStatementForSomgExemption}
-                    values={statementForSomgExemptionData}
-                />
-            )}
-            <Options
-                selected={optionsForValidation}
-                onChange={handleOptionsForValidations}
-            />
-            <FormActions
-                loading={isLoading}
-                onSave={async () => {
-                    setIsLoading(true);
-                    await handleOnSave(user);
-                    setIsLoading(false);
-                    window.location.reload();
+                    {LienReleaseBlock && (
+                        <LeinRealease
+                            title="Lien Release"
+                            block={LienReleaseBlock}
+                            lienReleaseState={lienReleaseState}
+                            onLienReleaseChange={handleLienAddressChange}
+                            onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
+                        />
+                    )}
+                    {plannedNonOperationCertificateBlock &&
+                        <PlannedNonOperation
+                            title="Planned Non-Operation Certificate"
+                            vehicles={plannedNonOperationState}
+                            onChange={handlePlannedNonOperationChange}
+                            onAdd={handlePlannedNonOperationAdd}
+                            onRemove={handlePlannedNonOperationRemove}
+                            fields={plannedNonOperationCertificateBlock.fields}
+                        />
+                    }
+                    {newLienHolderBlock && (
+                        <NewLienHolder
+                            block={newLienHolderBlock}
+                            formState={newLienholder.address}
+                            mailingAddress={newLienholder.mailingAddress}
+                            isMailingDifferent={newLienholder.isMailingDifferent}
+                            onFieldChange={handleLienholderFieldChange}
+                            onMailingFieldChange={handleLienholderMailingFieldChange}
+                            onToggleMailingAddress={toggleLienholderMailingAddress}
+                        />
 
-                }}
-                onPrint={async () => {
-                    setIsLoading(true);
-                    await handleOnPDF();
-                    setIsLoading(false);
-                }}
-                onInvoice={() => console.log('Generate Invoice clicked')}
-                onClear={() => {
-                    localStorage.removeItem(LOCAL_STORAGE_KEY);
-                    localStorage.removeItem("senerio");
-                    window.location.reload();
-                }}
-            />
-        </div>
+
+                    )}
+                    {StatementForSmogExemptionBlock && isSmogExemption && (
+                        <StatementForSmogExemption
+                            title="Statement For Smog Exemption"
+                            block={StatementForSmogExemptionBlock}
+                            onFieldChange={handleStatementForSomgExemption}
+                            values={statementForSomgExemptionData}
+                        />
+                    )}
+                    <Options
+                        selected={optionsForValidation}
+                        onChange={handleOptionsForValidations}
+                    />
+                    <FormActions
+                        loading={isLoading}
+                        onSave={async () => {
+                            setIsLoading(true);
+                            await handleOnSave(user);
+                            setIsLoading(false);
+                            window.location.reload();
+
+                        }}
+                        onPrint={async () => {
+                            setIsLoading(true);
+                            await handleOnPDF(activeTab);
+                            setIsLoading(false);
+                        }}
+                        onInvoice={() => console.log('Generate Invoice clicked')}
+                        onClear={() => {
+                            localStorage.removeItem(LOCAL_STORAGE_KEY);
+                            localStorage.removeItem("senerio");
+                            window.location.reload();
+                        }}
+                    />
+                </div>}
+
+        </>
+        // <div className="space-y-6">
+        //     {transactionBlock && (
+        //         <TransactionDetails
+        //             title="Transaction Details"
+        //             block={transactionBlock}
+        //             senerio={senerio}
+        //             selectedItems={transactionSelections}
+        //             onChange={handleTransactionChange}
+        //         />
+        //     )}
+
+        //     {typeOfVehicleBlock && isOutofStateTitle && (
+        //         <TypeOfVehicle
+        //             title="Type of Vehicle"
+        //             block={typeOfVehicleBlock}
+        //             selectedItems={typeOfVehicleSelection}
+        //             onChange={handleTypeOfVehicleChange}
+        //         />
+        //     )}
+        //     {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
+        //         <MissingTitleReason
+        //             title="Missing Title Reason"
+        //             selectedReason={missingReason}
+        //             onReasonChange={setMissingReason}
+        //         />
+        //     )}
+
+        //     {vehicleInfoBlock && (
+        //         <VehicleInformationDetails
+        //             title="Vehicle Information"
+        //             block={{
+        //                 ...vehicleInfoBlock,
+        //                 fields: vehicleInfoBlock.fields
+        //                     ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
+        //                     ?.filter(field => isOutofStateTitle || field.label !== "If kilometers check this box")
+        //                     ?.filter(field => isTRAILERCOACH ||
+        //                         (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
+        //                     .map(field => ({
+        //                         ...field,
+        //                         type: field.type as "checkbox" | "input field" | "dropdown",
+        //                         value: vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
+        //                     }))
+        //             }}
+        //             onFieldChange={handleVehicleFieldChange}
+        //         />
+        //     )}
+        //     {vehicleStorageLocationBlock && (
+        //         <VehicleStorageLocationDetails
+        //             title="Vehicle Storage Location"
+        //             block={vehicleStorageLocationBlock}
+        //             formState={vehicleStorageLocation}
+        //             onFieldChange={handleVehicleStorageLocation}
+        //         />
+        //     )}
+        //     {registeredOwnerBlock && (
+        //         <RegisteredOwnerDetails
+        //             title="Registered Owner(s)"
+        //             block={registeredOwnerBlock}
+        //             ownerCount={ownerCount}
+        //             onOwnerCountChange={handleOwnerCountChange}
+        //             ownersData={ownersData}
+        //             onFieldChange={handleRegisteredOwnerFieldChange}
+        //         />
+        //     )}
+        //     {ownerAddressBlock && (
+        //         <OwnerAddress
+        //             title="Address"
+        //             block={ownerAddressBlock}
+        //             residentialAddress={ownerAddress.residential}
+        //             mailingAddress={ownerAddress.mailing}
+        //             isMailingDifferent={ownerAddress.isMailingDifferent}
+        //             onAddressChange={handleOwnerAddressChange}
+        //             onToggleMailingAddress={toggleMailingAddress}
+        //         />
+        //     )}
+
+        //     {newRegisteredOwnerBlock && (
+        //         <NewRegisteredOwnerDetails
+        //             title="New Registered Owner(s)"
+        //             block={newRegisteredOwnerBlock}
+        //             newOwnerCount={newOwnerCount}
+        //             onNewOwnerCountChange={setNewOwnerCount}
+        //             newOwnerData={newOwnerData}
+        //             onNewOwnerFieldChange={handleNewOwnerFieldChange}
+        //             NewOwnershipTypes={newOwnershipTypes}
+        //             onNewOwnershipChange={handleNewOwnershipChange}
+        //             isVehicleIsAGift={isVehickeIsAGift}
+        //             isMotorcycle={isMotorcycle}
+        //             isTRAILERCOACH={isTRAILERCOACH}
+        //         />
+        //     )}
+        //     {newRegisteredOwnerAddressBlock && (
+        //         <NewRegisteredOwnerAddress
+        //             title="New Owner Address"
+        //             block={newRegisteredOwnerAddressBlock}
+        //             newOwnerAddress={newOwnerAddress}
+        //             newOwnerMailingAddress={newOwnerMailingAddress}
+        //             newOwnerLesseeAddress={newOwnerLesseeAddress}
+        //             newOwnerKeptAddress={newOwnerKeptAddress}
+        //             selectedRadio={selectedRadio}
+        //             onToggleOption={handleToggleOption}
+        //             onAddressChange={handleNewOwnerAddressChange}
+        //         />
+        //     )}
+        //     {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (
+        //         <DateInformation
+        //             title="DATE INFORMATION"
+        //             block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
+        //             dateValues={dateValues}
+        //             onDateChange={handleDateChange}
+        //         />
+        //     )}
+        //     {vehicleStatusBlock && isOutofStateTitle && (
+        //         <VehicleStatusInformation
+        //             title="Vehicle Status Information"
+        //             block={vehicleStatusBlock}
+        //             onFieldChange={handleVehicleStatusInfoFieldChange}
+        //             values={vehicleStatusInfoData}
+        //         />
+
+        //     )}
+        //     {vehicleAcquisitionBlock && isOutofStateTitle && (
+        //         <VehicleAcquisitionDetails
+        //             title={vehicleAcquisitionBlock.blockName}
+        //             block={vehicleAcquisitionBlock}
+        //             values={vehiclePurchaseInfo}
+        //             onFieldChange={handleVehiclePurchaseInfoChange}
+        //         />
+        //     )}
+        //     {OutOfStateBlock && isOutofStateTitle &&
+        //         <OutOfStateVehicleSection
+        //             values={outOfStateVehicle}
+        //             onFieldChange={handleOutOfStateVehcileFieldChange}
+        //             onPlateSelect={handleOutOfStateVehcilePlateSelect}
+        //         />
+        //     }
+        //     {powerOfAttorneyBlock && (
+        //         <PowerOfAttorneyDetails
+        //             title="Power of Attorney"
+        //             block={powerOfAttorneyBlock}
+        //             appointer={powerOfAttorneyData.appointer}
+        //             appointee={powerOfAttorneyData.appointee}
+        //             onChange={handlePowerOfAttorneyChange}
+        //         />
+        //     )}
+        //     {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
+        //         <LegalOwnerOfRecord
+        //             block={LegalOwnerOfRecordBlock}
+        //             formState={LegalOwnerOfRecordData}
+        //             onFieldChange={handleLegalOwnerFieldChange}
+        //         />
+        //     }
+        //     {itemRequestedWasBlock && (
+        //         <TheItemRequestedWasBlock
+        //             title="The Item Requested Was"
+        //             block={itemRequestedWasBlock}
+        //             checkedItems={itemRequestedWasState.checked}
+        //             otherExplain={itemRequestedWasState.otherExplain}
+        //             onCheckChange={handleItemRequestedCheckChange}
+        //             onOtherExplainChange={handleItemRequestedOtherExplainChange}
+        //             plateCount={itemRequestedWasState.plateCount}
+        //             onPlateCountChange={handleItemRequestedPlateCountChange}
+        //         />
+
+        //     )}
+        //     {LicensePlateBlock &&
+        //         <LicensePlateMissingBlock
+        //             title={LicensePlateBlock.blockName}
+        //             block={LicensePlateBlock}
+        //             selectedOption={licensePlateState}
+        //             handleSelectedOptionOnChange={handleLicensePlateChange} />
+        //     }
+
+        //     {LienReleaseBlock && (
+        //         <LeinRealease
+        //             title="Lien Release"
+        //             block={LienReleaseBlock}
+        //             lienReleaseState={lienReleaseState}
+        //             onLienReleaseChange={handleLienAddressChange}
+        //             onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
+        //         />
+        //     )}
+        //     {plannedNonOperationCertificateBlock &&
+        //         <PlannedNonOperation
+        //             title="Planned Non-Operation Certificate"
+        //             vehicles={plannedNonOperationState}
+        //             onChange={handlePlannedNonOperationChange}
+        //             onAdd={handlePlannedNonOperationAdd}
+        //             onRemove={handlePlannedNonOperationRemove}
+        //             fields={plannedNonOperationCertificateBlock.fields}
+        //         />
+        //     }
+        //     {newLienHolderBlock && (
+        //         <NewLienHolder
+        //             block={newLienHolderBlock}
+        //             formState={newLienholder.address}
+        //             mailingAddress={newLienholder.mailingAddress}
+        //             isMailingDifferent={newLienholder.isMailingDifferent}
+        //             onFieldChange={handleLienholderFieldChange}
+        //             onMailingFieldChange={handleLienholderMailingFieldChange}
+        //             onToggleMailingAddress={toggleLienholderMailingAddress}
+        //         />
+        //     )}
+        //     {StatementForSmogExemptionBlock && isSmogExemption && (
+        //         <StatementForSmogExemption
+        //             title="Statement For Smog Exemption"
+        //             block={StatementForSmogExemptionBlock}
+        //             onFieldChange={handleStatementForSomgExemption}
+        //             values={statementForSomgExemptionData}
+        //         />
+        //     )}
+        //     <Options
+        //         selected={optionsForValidation}
+        //         onChange={handleOptionsForValidations}
+        //     />
+        //     <FormActions
+        //         loading={isLoading}
+        //         onSave={async () => {
+        //             setIsLoading(true);
+        //             await handleOnSave(user);
+        //             setIsLoading(false);
+        //             window.location.reload();
+
+        //         }}
+        //         onPrint={async () => {
+        //             setIsLoading(true);
+        //             await handleOnPDF();
+        //             setIsLoading(false);
+        //         }}
+        //         onInvoice={() => console.log('Generate Invoice clicked')}
+        //         onClear={() => {
+        //             localStorage.removeItem(LOCAL_STORAGE_KEY);
+        //             localStorage.removeItem("senerio");
+        //             window.location.reload();
+        //         }}
+        //     />
+        // </div>
     );
 };
 
