@@ -39,9 +39,9 @@ export default function Section({
     : [];
 
   return (
-    <div className="mt-4">
+    <div className="mt-6">
       <div className="flex items-left gap-4 flex-wrap">
-        <h3 className="font-semibold text-lg mb-4">{title}</h3>
+        <h3 className="font-semibold text-lg ">{title}</h3>
 
         {dropdownValue !== undefined && onDropdownChange && dropdownOptions.length > 0 && (
           <div className="w-[4rem]">

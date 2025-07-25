@@ -17,7 +17,7 @@ type Props = {
 };
 
 const plateOptions = [
-  { value: "expired", label: "Expired, or will be or were" },
+  { value: "expired", label: "Expired" },
   { value: "surrendered", label: "Surrendered to CA MNV" },
   { value: "destroyed", label: "Destroyed" },
   { value: "retained", label: "Retained" },

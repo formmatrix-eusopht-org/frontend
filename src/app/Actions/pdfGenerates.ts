@@ -24,8 +24,14 @@ type PlannedNonOperationState = {
     fromMonth?: string;
 };
 
-type LegalOwnerOfRecordData = {
+type LegalOwnerAddress = {
     [key: string]: string | undefined;
+};
+
+type LegalOwnerOfRecordData = {
+    residential?: LegalOwnerAddress;
+    mailing?: LegalOwnerAddress;
+    showMailingAddress?: boolean;
 };
 
 type LienReleaseState = {
@@ -108,7 +114,17 @@ function formatSingleOwner(owner?: OwnerData): string {
     const first = owner['First Name'] || '';
     const middle = owner['Middle Name'] || '';
 
-    const fullName = [first, middle, last].filter(Boolean).join(', ');
+    const fullName = [first, middle, last].filter(Boolean).join(' ');
+    return fullName;
+}
+function formatSingleOwnerWithLastNameFirst(owner?: OwnerData): string {
+    if (!owner) return '';
+
+    const last = owner['Last Name'] || '';
+    const first = owner['First Name'] || '';
+    const middle = owner['Middle Name'] || '';
+
+    const fullName = [last, first, middle].filter(Boolean).join(', ');
     return fullName;
 }
 function extractDateParts(dateStr?: string): { month: string, day: string, year: string } {
@@ -128,8 +144,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     const newOwner1 = formatSingleOwner(formData.newOwnerData?.[0]);
     const newOwner2 = formatSingleOwner(formData.newOwnerData?.[1]);
     const newOwner3 = formatSingleOwner(formData.newOwnerData?.[2]);
-    console.log(extractDateParts(formData?.vehicleStorageLocation?.["FROM: MONTH, DAY, YEAR"])?.month);
-
+    const odoMeter = formData.vehicleInfoState?.['Mileage of Vehicle'] || '';
+    const reversedOdoMeter = odoMeter?.split('').reverse().join('');
     const joinNames = (...names: (string | undefined)[]) =>
         names.filter(name => name && name.trim()).join(', ');
     const rawDate = formData.ownersData?.[0]?.['Date of Sale'] || '';
@@ -146,9 +162,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'MOTORCYCLE ENGINE NUMBER': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
         "DP number": '',
         "Engine number": formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        "True full name": newOwner1,
-        "Co owner": newOwner2,
-        "certification": newOwner3,
+        "True full name": (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
+        "Co owner": (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
+        "certification": (formData.newOwnerCount ?? 2) > 0 ? newOwner3 : '',
         "telephone number": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
         "title": formData.ownersData?.[0]?.['Title if Signing for a Company'] || '',
         "DL1": formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
@@ -168,17 +184,21 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "2DL7": formData.ownersData?.[1]?.['Driver License Number']?.split('')[6] || '',
         "2DL8": formData.ownersData?.[1]?.['Driver License Number']?.split('')[7] || '',
         "Physical address": formData.newOwnerAddress?.Street || '',
-        "One license": formData.licensePlateState === "One license plate missing" ? true : false,
-        "Two plates": formData.licensePlateState === "Two license plates are missing" ? true : false,
+        "One license": senerio?.includes("Duplicate Plates & Stickers") ? formData.licensePlateState === "One license plate missing" ? true : false : false,
+        "Two plates": senerio?.includes("Duplicate Plates & Stickers") ? formData.licensePlateState === "Two license plates are missing" ? true : false : false,
         "Apt #": formData.ownerAddress?.residential?.["APT./SPACE/STE.#"] || '',
         "City": formData.ownerAddress?.residential?.City || '',
         'I/We': joinNames(owner1, owner2, owner3),
-        'to': joinNames(newOwner1, newOwner2, newOwner3),
-        "PRINTED NAME": formData.ownersData?.[0]?.['Last Name'] || '',
-        "FIRST NAME": formData.ownersData?.[0]?.['First Name'] || '',
-        "MIDDLE NAME": formData.ownersData?.[0]?.['Middle Name'] || '',
-        "App sign area code": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
-        "App sign phone no": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
+        'to': joinNames(
+            newOwner1,
+            (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
+            (formData.newOwnerCount ?? 0) > 2 ? newOwner3 : ''
+        ),
+        "PRINTED NAME": formData.newOwnerData?.[0]?.['Last Name'] || '',
+        "FIRST NAME": formData.newOwnerData?.[0]?.['First Name'] || '',
+        "MIDDLE NAME": formData.newOwnerData?.[0]?.['Middle Name'] || '',
+        "App sign area code": formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '',
+        "App sign phone no": formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '',
         "Signature date": rawDate || '',
         'sellingmonth': month || '',
         'sellingdate': day || '',
@@ -186,34 +206,34 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'sellingyear2': year[1] || '',
         'sellingyear3': year[2] || '',
         'sellingyear4': year[3] || '',
-        'giftvalue': formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData?.[0]?.['Gift Value'] || '' : '',
-        'sellingprice': formData.transactionSelections?.includes('Vehicle is a Gift') ? '' : formData.newOwnerData?.[0]?.['Purchase Price/Value'] || '',
+        'giftvalue': formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData?.[0]?.['Gift Value']?.replace(/[^0-9.]/g, '') || '' : '',
+        'sellingprice': formData.transactionSelections?.includes('Vehicle is a Gift') ? '' : formData.newOwnerData?.[0]?.['Purchase Price/Value']?.replace(/[^0-9.]/g, '') || '',
         'relation': formData.transactionSelections?.includes('Vehicle is a Gift') ? formData.newOwnerData?.[0]?.['Relationship with Gifter'] || '' : '',
-        "odometer1": formData.vehicleInfoState?.['Mileage of Vehicle']?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
-        "odometer2": formData.vehicleInfoState?.['Mileage of Vehicle']?.replace(/\D/g, "").slice(0, 6).split('')[1] || "",
-        "odometer3": formData.vehicleInfoState?.['Mileage of Vehicle']?.replace(/\D/g, "").slice(0, 6).split('')[2] || "",
-        "odometer4": formData.vehicleInfoState?.['Mileage of Vehicle']?.replace(/\D/g, "").slice(0, 6).split('')[3] || "",
-        "odometer5": formData.vehicleInfoState?.['Mileage of Vehicle']?.replace(/\D/g, "").slice(0, 6).split('')[4] || "",
-        "odometer6": formData.vehicleInfoState?.['Mileage of Vehicle']?.replace(/\D/g, "").slice(0, 6).split('')[5] || "",
-        "odometer7": formData.vehicleInfoState?.['Mileage of Vehicle']?.split('')[6] || "",
+        "odometer1": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[5] || "",
+        "odometer2": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[4] || "",
+        "odometer3": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[3] || "",
+        "odometer4": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[2] || "",
+        "odometer5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[1] || "",
+        "odometer6": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
+        // "odometer7": formData.vehicleInfoState?.['Mileage of Vehicle']?.split('')[6] || "",
         "notactualmileage": formData.vehicleInfoState?.["NOT Actual Mileage"],
         "mileageexceeds": formData.vehicleInfoState?.["Mileage Exceeds Mechanical Limit"],
         "PRINT BUYER'S NAME": (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
         "6 Purchase Price/Market Value": month,
         "Acquired Yr": year || '',
         "Date Purchased": day,
-        'Purchase price': formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.['Gift Value'] || '' : formData.newOwnerData?.[0]?.['Purchase Price/Value'] || "",
+        'Purchase price': formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.['Gift Value']?.replace(/[^0-9.]/g, '') || '' : formData.newOwnerData?.[0]?.['Purchase Price/Value']?.replace(/[^0-9.]/g, '') || "",
         'SIGNATUREx': "",
         'DL/ID OR DEALER/DISM #': formData.newOwnerData?.[0]?.['Driver License Number'] || '',
         "PRINT BUYER'S NAME_1": (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
         "SIGNATUREx_1": "",
         "DATE": rawDate,
         "DATE_1": (formData.newOwnerCount ?? 0) > 1 ? rawDate : '',
-        "DL/ID OR DEALER/DISM #_1": formData.newOwnerData?.[1]?.['Driver License Number'] || '',
+        "DL/ID OR DEALER/DISM #_1": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number'] || '' : '',
         "PRINT BUYER'S NAME_2": (formData.newOwnerCount ?? 0) > 2 ? newOwner3 : '',
         'SIGNATUREx_2': "",
         "DATE_2": (formData.newOwnerCount ?? 0) > 2 ? rawDate : '',
-        'DL/ID OR DEALER/DISM #_2': formData.newOwnerData?.[2]?.['Driver License Number'] || '',
+        'DL/ID OR DEALER/DISM #_2': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number'] || '' : '',
         'DAYTIME TELEPHONE NO': formData.newOwnerData?.[0]?.['Phone Number'] || '',
         "PRINTSELLER'S NAME": owner1,
         'SIGNATUREx_3': "",
@@ -226,8 +246,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "PRINT SELLER'S NAME_1": owner3,
         'SIGNATUREx_5': "",
         "DATE_5": (formData.ownerCount ?? 0) > 2 ? rawDate : '',
-        "DATE_6": rawDate,
-        "DATE_7": rawDate,
+        "DATE_6": (formData.ownerCount ?? 0) > 0 ? rawDate : '',
+        "DATE_7": (formData.ownerCount ?? 0) > 1 ? rawDate : '',
         'DL/ID OR DEALER/DISM #_5': formData.ownersData?.[2]?.['Driver License Number'] || '',
         'DAYTIME TELEPHONE NO_1': formData.ownersData?.[0]?.['Phone Number'] || '',
         'I/We_1': formData.powerOfAttorneyData?.appointer || '',
@@ -235,18 +255,18 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'CheckBox': "CheckBox",
         'CheckBox_1': "CheckBox",
         'CheckBox_2': "CheckBox",
-        'text_60czib': formData.newOwnerMailingAddress?.Street ? formData.newOwnerMailingAddress?.Street || '' : formData.newOwnerAddress?.Street || '',
+        'text_60czib': formData.newOwnerMailingAddress?.Street ? `${formData.newOwnerMailingAddress?.Street || ''} ${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || ''}` : `${formData.newOwnerAddress?.Street || ''} ${formData.newOwnerAddress?.["APT./SPACE/STE.#"] || ''}`,
         'text_61pxrx': formData.newOwnerMailingAddress?.City ? formData.newOwnerMailingAddress?.City || '' : formData.newOwnerAddress?.City || '',
         'text_62cqaf': formData.newOwnerMailingAddress?.State ? formData.newOwnerMailingAddress?.State || '' : formData.newOwnerAddress?.State || '',
         'text_63psgg': formData.newOwnerMailingAddress?.["ZIP Code"] ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : formData.newOwnerAddress?.["ZIP Code"] || '',
         'text_64xthv': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.["ZIP Code"] || '' : formData.ownerAddress?.residential?.["ZIP Code"] || '',
         'text_65bzof': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.["State"] || '' : formData.ownerAddress?.residential?.["State"] || '',
         'text_66evl': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.City || '' : formData.ownerAddress?.residential?.City || '',
-        'text_67vkky': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.["Street"] || '' : formData.ownerAddress?.residential?.["Street"] || '',
+        'text_67vkky': formData.ownerAddress?.isMailingDifferent === true ? `${formData.ownerAddress?.mailing?.["Street"] || ''} ${formData.ownerAddress?.mailing?.["APT./SPACE/STE.#"] || ''}` : `${formData.ownerAddress?.residential?.["Street"] || ''} ${formData.ownerAddress?.residential?.["APT./SPACE/STE.#"] || ''}`,
         'License Plate/CF Number1': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         'Vehicle/Vessel ID/Number1': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'Year/Make': `${formData.vehicleInfoState?.['Year of Vehicle'] || ""} ${formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || ""}`,
-        '1 True Full Name, Last': owner1,
+        '1 True Full Name, Last': formatSingleOwnerWithLastNameFirst(formData.ownersData?.[0]),
         '1 DL/ID Number-1.0': formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
         '1 DL/ID Number-1.1': formData.ownersData?.[0]?.['Driver License Number']?.split('')[1] || '',
         '1 DL/ID Number-1.2': formData.ownersData?.[0]?.['Driver License Number']?.split('')[2] || '',
@@ -257,7 +277,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         '1 DL/ID Number-1.7': formData.ownersData?.[0]?.['Driver License Number']?.split('')[7] || '',
         'state.1': formData.ownersData?.[0]?.['State'] || '',
         "state.0": formData.ownersData?.[1]?.['State'] || '',
-        "1 True Full Name, Last-2": owner2,
+        "1 True Full Name, Last-2": formatSingleOwnerWithLastNameFirst(formData.ownersData?.[1]),
         "1 DL/ID Number-2.0": formData.ownersData?.[1]?.['Driver License Number']?.[0] || '',
         "1 DL/ID Number-2.1": formData.ownersData?.[1]?.['Driver License Number']?.[1] || '',
         "1 DL/ID Number-2.2": formData.ownersData?.[1]?.['Driver License Number']?.[2] || '',
@@ -297,18 +317,18 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "CVC": formData.itemRequestedWasState?.checked?.includes("PER CVC §4467"),
         "other": formData.itemRequestedWasState?.checked?.includes("OTHER"),
         "Explanation": formData.itemRequestedWasState?.checked?.includes("OTHER") ? formData.itemRequestedWasState?.otherExplain || '' : '',
-        "Name of bank, finance company, or individual having a lien on this vehicle": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || 'NONE' : "NONE",
-        "2 Address": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.["Street"] || '' : "",
-        "2 Apt/Space Number": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.["APT./SPACE/STE.#"] || '' : "",
-        "2 City": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.["City"] || '' : "",
-        "2 States1": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.["State"] || '' : "",
-        "2 Zip Code": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.["ZIP Code"] || '' : "",
+        "Name of bank, finance company, or individual having a lien on this vehicle": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || 'NONE' : "NONE",
+        "2 Address": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["Street"] || '' : "",
+        "2 Apt/Space Number": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["APT./SPACE/STE.#"] || '' : "",
+        "2 City": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["City"] || '' : "",
+        "2 States1": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["State"] || '' : "",
+        "2 Zip Code": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["ZIP Code"] || '' : "",
         "3 Print Name Legal Owner.0": owner1,
         "3 Print Name Legal Owner.1": owner1,
         "3 Print Name Legal Owner.2.0": owner2,
         "3 Date.0": formData.ownersData?.[0]?.['Date of Sale'] || '',
         "date.0": formData.ownersData?.[0]?.['Date of Sale'] || '',
-        "4 Date-2": (formData.newOwnerCount ?? 0) > 1 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
+        "4 Date-2": (formData.ownerCount ?? 0) > 1 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
         "area code.0": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
         "area code": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
         "area": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
@@ -316,7 +336,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "3 Daytime Phone Number": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
         "4 Daytime Phone Number 1": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
         "4 Daytime Phone Number 2.0": formData.ownersData?.[1]?.['Phone Number']?.slice(5) || '',
-        "Printed name of authorized agent signing for company": senerio?.includes("Remove Lienholder") ? formData.lienReleaseState?.companyAddress?.["Name of bank, finance company, or individual(s) having a lien on this vehicle"] || "NONE" : formData.LegalOwnerOfRecordData?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || "NONE",
+        "Printed name of authorized agent signing for company": senerio?.includes("Remove Lienholder") ? formData.lienReleaseState?.companyAddress?.["Name of bank, finance company, or individual(s) having a lien on this vehicle"] || "NONE" : "NONE",
         "title of authorized agent signing for company": senerio?.includes("Remove Lienholder") ? formData.lienReleaseState?.companyAddress?.["Title of authorized agent signing for company"] || "" : '',
         "area code.1": senerio?.includes("Remove Lienholder") ? formData.lienReleaseState?.companyAddress?.["Phone number"]?.slice(1, 4) || "" : "",
         "4 Daytime Phone Number 2.1": senerio?.includes("Remove Lienholder") ? formData.lienReleaseState?.companyAddress?.["Phone number"]?.slice(5) || "" : "",
@@ -324,37 +344,37 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "License Plate/CF Number122": formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         "Vehicle/Vessel ID/Number211": formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         "Year/Make2": `${formData.vehicleInfoState?.['Year of Vehicle'] || ""} ${formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || ""}`,
-        "market value": formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.["Market Value"] || '' : '',
-        "true full name of new owner, last, first, middle, suffix, business name, or lessor": (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
-        "6 DL/ID Card Numer-1.0.1.0": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[0] || '',
-        "6 DL/ID Card Numer-1.0.1.1": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[1] || '',
-        "6 DL/ID Card Numer-1.0.1.2": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[2] || '',
-        "6 DL/ID Card Numer-1.0.1.3": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[3] || '',
-        "6 DL/ID Card Numer-1.0.1.4": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[4] || '',
-        "6 DL/ID Card Numer-1.0.1.5": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[5] || '',
-        "6 DL/ID Card Numer-1.0.1.6": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[6] || '',
-        "6 DL/ID Card Numer-1.0.1.7": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[7] || '',
-        "6 DL/ID Card Numer-1.0.0": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '',
-        "6 DL/ID Card Numer-1.1": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '',
-        "6 DL/ID Card Numer-1.2": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '',
-        "6 DL/ID Card Numer-1.3": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[3] || '',
-        "6 DL/ID Card Numer-1.4": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[4] || '',
-        "6 DL/ID Card Numer-1.5": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[5] || '',
-        "6 DL/ID Card Numer-1.6": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[6] || '',
-        "6 DL/ID Card Numer-1.7.0": formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[7] || '',
-        "6 DL/ID Card Numer-1.7.1": formData.newOwnerData?.[1]?.State || '',
-        "6 Name First-1": (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
-        "6 state": formData.newOwnerData?.[1]?.['State'] || '',
-        "6 Name Last-2": (formData.newOwnerCount ?? 0) > 2 ? newOwner3 : '',
-        "6 DL/ID CArd Number-2.0": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[0] || '',
-        "6 DL/ID CArd Number-2.1": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[1] || '',
-        "6 DL/ID CArd Number-2.2": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[2] || '',
-        "6 DL/ID CArd Number-2.3": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[3] || '',
-        "6 DL/ID CArd Number-2.4": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[4] || '',
-        "6 DL/ID CArd Number-2.5": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[5] || '',
-        "6 DL/ID CArd Number-2.6": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[6] || '',
-        "6 DL/ID CArd Number-2.7": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[7] || '',
-        "state-2.8": formData.newOwnerData?.[2]?.['State'] || '',
+        "market value": formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.["Market Value"]?.replace(/[^0-9.]/g, '') || '' : '',
+        "true full name of new owner, last, first, middle, suffix, business name, or lessor": (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0]) : '',
+        "6 DL/ID Card Numer-1.0.1.0": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[0] || '' : '',
+        "6 DL/ID Card Numer-1.0.1.1": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[1] || '' : "",
+        "6 DL/ID Card Numer-1.0.1.2": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[2] || '' : "",
+        "6 DL/ID Card Numer-1.0.1.3": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[3] || '' : "",
+        "6 DL/ID Card Numer-1.0.1.4": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[4] || '' : "",
+        "6 DL/ID Card Numer-1.0.1.5": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[5] || '' : "",
+        "6 DL/ID Card Numer-1.0.1.6": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[6] || '' : "",
+        "6 DL/ID Card Numer-1.0.1.7": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[7] || '' : "",
+        "6 DL/ID Card Numer-1.0.0": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '' : "",
+        "6 DL/ID Card Numer-1.1": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '' : "",
+        "6 DL/ID Card Numer-1.2": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '' : "",
+        "6 DL/ID Card Numer-1.3": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[3] || '' : "",
+        "6 DL/ID Card Numer-1.4": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[4] || '' : "",
+        "6 DL/ID Card Numer-1.5": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[5] || '' : "",
+        "6 DL/ID Card Numer-1.6": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[6] || '' : "",
+        "6 DL/ID Card Numer-1.7.0": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[7] || '' : "",
+        "6 DL/ID Card Numer-1.7.1": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.State || '' : "",
+        "6 Name First-1": (formData.newOwnerCount ?? 0) > 1 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1]) : '',
+        "6 state": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['State'] || '' : '',
+        "6 Name Last-2": (formData.newOwnerCount ?? 0) > 2 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[2]) : '',
+        "6 DL/ID CArd Number-2.0": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[0] || '' : '',
+        "6 DL/ID CArd Number-2.1": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[1] || '' : '',
+        "6 DL/ID CArd Number-2.2": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[2] || '' : '',
+        "6 DL/ID CArd Number-2.3": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[3] || '' : '',
+        "6 DL/ID CArd Number-2.4": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[4] || '' : '',
+        "6 DL/ID CArd Number-2.5": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[5] || '' : '',
+        "6 DL/ID CArd Number-2.6": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[6] || '' : '',
+        "6 DL/ID CArd Number-2.7": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[7] || '' : '',
+        "state-2.8": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
         "physical residence or business address.0": formData.newOwnerAddress?.["Street"] || "",
         "6 Apt/Space Number-1": formData.newOwnerAddress?.["APT./SPACE/STE.#"] || "",
         "6 City-1": formData.newOwnerAddress?.["City"] || "",
@@ -365,20 +385,20 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "6 Mailing Address": formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street || '' : '',
         "6 Apt/Space Number-2": formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || '' : '',
         "6 City-2": formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City || '' : '',
-        "date.123": rawDate || '',
-        "date 2": rawDate || '',
-        "date 3": rawDate || '',
+        "date.123": (formData.newOwnerCount ?? 0) > 0 ? rawDate || '' : '',
+        "date 2": (formData.newOwnerCount ?? 0) > 1 ? rawDate || '' : '',
+        "date 3": (formData.newOwnerCount ?? 0) > 2 ? rawDate || '' : '',
         '6 States 2.0': formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.State || '' : '',
         '6 Zip Code-2.0': formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : '',
-        'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.Street || ''} ${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''} ${formData.newOwnerLesseeAddress?.City || ''} ${formData.newOwnerLesseeAddress?.State || ''} `,
-        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.Street || ''} ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''} ${formData.newOwnerKeptAddress?.City || ''} ${formData.newOwnerKeptAddress?.State || ''} `,
+        'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.Street || ''}    ${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerLesseeAddress?.City || ''}    ${formData.newOwnerLesseeAddress?.State || ''} `,
+        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.Street || ''}    ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerKeptAddress?.City || ''}    ${formData.newOwnerKeptAddress?.State || ''} `,
         'county.0.0': formData.newOwnerKeptAddress?.County || '',
-        '6 area code 1': formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '',
-        'daytime telephone number': formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '',
-        'area code 2': formData.newOwnerData?.[1]?.['Phone Number']?.slice(1, 4) || '',
-        'daytime number 2': formData.newOwnerData?.[1]?.['Phone Number']?.slice(5) || '',
-        'area code 3': formData.newOwnerData?.[2]?.['Phone Number']?.slice(1, 4) || '',
-        'daytime number 3': formData.newOwnerData?.[2]?.['Phone Number']?.slice(5) || '',
+        '6 area code 1': (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
+        'daytime telephone number': (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : '',
+        'area code 2': (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Phone Number']?.slice(1, 4) || '' : '',
+        'daytime number 2': (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Phone Number']?.slice(5) || '' : '',
+        'area code 3': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Phone Number']?.slice(1, 4) || '' : '',
+        'daytime number 3': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Phone Number']?.slice(5) || '' : '',
         '7 Name New Legal Owner': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["True Full Name or Bank/Finance Company or Individual"] || "NONE" : "NONE",
         'Physical residence or business address.0': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["Street"] || "" : "",
         'mailing address': senerio.includes("Add Lienholder") ? formData.newLienholder?.mailingAddress?.["Street"] || "" : "",
@@ -414,13 +434,13 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text9.18": formData.vehicleInfoState?.['Vehicle/Hull Identification Number']?.split('')[17] || "",
         "Text9.19": formData.vehicleInfoState?.['Vehicle/Hull Identification Number']?.split('')[18] || "",
         'Text10': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
-        "Text11": `${formData.vehicleInfoState?.['Year of Vehicle'] || ""} ${formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || ""}`,
-        'Text62': (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
-        'Text73': (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
-        'Text81': (formData.newOwnerCount ?? 0) > 2 ? newOwner3 : '',
+        "Text11": formData.vehicleInfoState?.['Year of Vehicle'] || '',
+        'Text62': (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0]) : '',
+        'Text73': (formData.newOwnerCount ?? 0) > 1 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1]) : '',
+        'Text81': (formData.newOwnerCount ?? 0) > 2 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[2]) : '',
         "Text64": formData.newOwnerData?.[0]?.['State'] || '',
-        "Text74": formData.newOwnerData?.[1]?.['State'] || '',
-        "Text75": formData.newOwnerData?.[2]?.['State'] || '',
+        "Text74": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['State'] || '' : '',
+        "Text75": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
         'Owner DL no': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '',
         'owner second digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '',
         'owner third digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '',
@@ -429,22 +449,22 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'owner sixth digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[5] || '',
         'owner seventh digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[6] || '',
         'owner eighth digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[7] || '',
-        "first co owner dl no": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[0] || '',
-        "first co owner second digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[1] || '',
-        "first co owner third digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[2] || '',
-        "first co owner fourth digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[3] || '',
-        "first co owner fifth digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[4] || '',
-        "first co owner sixth digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[5] || '',
-        "first co owner seventh digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[6] || '',
-        "first co owner eighth digit": formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[7] || '',
-        "second co owner": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[0] || '',
-        "second co owner second digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[1] || '',
-        "second co owner third digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[2] || '',
-        "second co owner fourth digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[3] || '',
-        "second co owner fifth digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[4] || '',
-        "second co owner sixth digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[5] || '',
-        "second co owner seventh digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[6] || '',
-        "second co owner eighth digit": formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[7] || '',
+        "first co owner dl no": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[0] || '' : '',
+        "first co owner second digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[1] || '' : '',
+        "first co owner third digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[2] || '' : '',
+        "first co owner fourth digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[3] || '' : '',
+        "first co owner fifth digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[4] || '' : '',
+        "first co owner sixth digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[5] || '' : '',
+        "first co owner seventh digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[6] || '' : '',
+        "first co owner eighth digit": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Driver License Number']?.split('')[7] || '' : '',
+        "second co owner": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[0] || '' : '',
+        "second co owner second digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[1] || '' : '',
+        "second co owner third digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[2] || '' : '',
+        "second co owner fourth digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[3] || '' : '',
+        "second co owner fifth digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[4] || '' : '',
+        "second co owner sixth digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[5] || '' : '',
+        "second co owner seventh digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[6] || '' : '',
+        "second co owner eighth digit": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Driver License Number']?.split('')[7] || '' : '',
         'Text82': formData.newOwnerAddress?.Street || '',
         'Text83': formData.newOwnerAddress?.["APT./SPACE/STE.#"] || '',
         "Text85": formData.newOwnerAddress?.City || '',
@@ -467,18 +487,18 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text115": formData.newOwnerKeptAddress?.City || '',
         "Text116": formData.newOwnerKeptAddress?.State || '',
         "Text117": formData.newOwnerKeptAddress?.["ZIP Code"] || '',
-        "Text118": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || '' : 'NONE',
-        "Text119": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.["ELT Number (3 digits)"] || '' : '',
-        "Text120": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.Street || '' : '',
-        "Text121": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.["APT./SPACE/STE.#"] || '' : '',
-        "Text122": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.City || '' : '',
-        "Text123": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.State || '' : '',
-        "Text124": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.["ZIP Code"] || '' : '',
-        "Text125": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.Street || '' : '',
-        "Text126": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.["APT./SPACE/STE.#"] || '' : '',
-        "Text127": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.City || '' : '',
-        "Text128": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.State || '' : '',
-        "Text129": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.["ZIP Code"] || '' : '',
+        "Text118": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || '' : 'NONE',
+        "Text119": formData.transactionSelections?.includes('There is a Current Lienholder') && formData.transactionSelections?.includes('Out of State Title') ? formData.LegalOwnerOfRecordData?.residential?.["ELT Number (3 digits)"] || '' : '',
+        "Text120": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.Street || '' : '',
+        "Text121": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.["APT./SPACE/STE.#"] || '' : '',
+        "Text122": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.City || '' : '',
+        "Text123": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.State || '' : '',
+        "Text124": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.["ZIP Code"] || '' : '',
+        "Text125": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.showMailingAddress ? formData.LegalOwnerOfRecordData?.mailing?.Street || '' : '' : '',
+        "Text126": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.showMailingAddress ? formData.LegalOwnerOfRecordData?.mailing?.["APT./SPACE/STE.#"] || '' : '' : '',
+        "Text127": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.showMailingAddress ? formData.LegalOwnerOfRecordData?.mailing?.City || '' : '' : '',
+        "Text128": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.showMailingAddress ? formData.LegalOwnerOfRecordData?.mailing?.State || '' : '' : '',
+        "Text129": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.showMailingAddress ? formData.LegalOwnerOfRecordData?.mailing?.["ZIP Code"] || '' : '' : '',
         "Text137": formData.dateValues?.["DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):"].Month || '',
         "Text138": formData.dateValues?.["DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):"].Day || '',
         "Text139": formData.dateValues?.["DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):"].Year || '',
@@ -492,45 +512,45 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text148": formData.dateValues?.["DATE VEHICLE WAS PURCHASED OR ACQUIRED:"].Day || '',
         "Text149": formData.dateValues?.["DATE VEHICLE WAS PURCHASED OR ACQUIRED:"].Year || '',
         "Current Market Value 1": '',
-        "Powered by other 2": formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.Other || '' : '',
-        "Text132.0": formData.vehicleInfoState?.["Mileage of Vehicle"]?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
-        "Text132.1": formData.vehicleInfoState?.["Mileage of Vehicle"]?.replace(/\D/g, "").slice(0, 6).split('')[1] || "",
-        "Text132.2": formData.vehicleInfoState?.["Mileage of Vehicle"]?.replace(/\D/g, "").slice(0, 6).split('')[2] || "",
-        "Text132.3": formData.vehicleInfoState?.["Mileage of Vehicle"]?.replace(/\D/g, "").slice(0, 6).split('')[3] || "",
-        "Text132.4": formData.vehicleInfoState?.["Mileage of Vehicle"]?.replace(/\D/g, "").slice(0, 6).split('')[4] || "",
-        "Text132.5": formData.vehicleInfoState?.["Mileage of Vehicle"]?.replace(/\D/g, "").slice(0, 6).split('')[5] || "",
+        "Powered by other 2": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.Other || '' : '' : '',
+        "Text132.0": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[5] || "",
+        "Text132.1": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[4] || "",
+        "Text132.2": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[3] || "",
+        "Text132.3": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[2] || "",
+        "Text132.4": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[1] || "",
+        "Text132.5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
         //Reg343
         "Text12": `${formData.statementForSomgExemptionData?.diesel ? 'Diesel' : formData.statementForSomgExemptionData?.electricity ? 'Electricity' : formData.statementForSomgExemptionData?.Other || ''}`,
-        "Text18": formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        "Text29": formData.vehicleInfoState?.['Length (IN)'] || '',
-        "Text30": formData.vehicleInfoState?.['Width (IN)'] || '',
+        "Text18": formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
+        "Text29": formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Length (IN)'] || '' : '',
+        "Text30": formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Width (IN)'] || '' : '',
 
         //check boxes
         "App for2": true,
-        "Check Box1": formData.missingReason === 'Lost' ? true : false,
-        "Check Box2": formData.missingReason === 'Stolen' ? true : false,
-        "Check Box4": formData.missingReason === 'Not Recive From Prior Owner' ? true : false,
-        "Check Box5": formData.missingReason === 'Not Recive From DMV(Allow 30 dys from issue date)' ? true : false,
-        "Check Box6": formData.missingReason === 'Illegile/Mutilated(Attach old title)' ? true : false,
+        "Check Box1": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Lost' ? true : false,
+        "Check Box2": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Stolen' ? true : false,
+        "Check Box4": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Not Recive From Prior Owner' ? true : false,
+        "Check Box5": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Not Recive From DMV(Allow 30 dys from issue date)' ? true : false,
+        "Check Box6": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Illegile/Mutilated(Attach old title)' ? true : false,
         "Gift Box": formData.transactionSelections?.includes("Vehicle is a Gift") ? true : false,
         // "Gift Box1": formData.transactionSelections?.includes("Vehicle is a Gift") ? false : true,
-        "And Box.0": formData.newOwnershipTypes?.[1] === 'and' ? true : false,
-        "And Box.1": formData.newOwnershipTypes?.[2] === 'and' ? true : false,
-        "And Box1.0": formData.newOwnershipTypes?.[1] === 'or' ? true : false,
-        "And Box1.1": formData.newOwnershipTypes?.[2] === 'or' ? true : false,
-        "Biennial Smog cert box": formData.statementForSomgExemptionData?.["The last smog certification was obtained within the last 90 days"] ? true : false,
-        "Powered by box": formData.statementForSomgExemptionData?.["It is powered by"] ? true : false,
-        "Powered by electricity box": formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.electricity ? true : false : false,
-        "Powered by diesel box": formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.diesel ? true : false : false,
-        "Powered by other box": formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.Other ? true : false : false,
-        "Located outside CA box1": formData.statementForSomgExemptionData?.["It is located outside the State of California. (Exception: Nevada and Mexico)"] ? true : false,
-        "transferred from/between": formData.statementForSomgExemptionData?.["It is being transferred from/between:"] ? true : false,
-        "Paren, grandparent, etc box": formData.statementForSomgExemptionData?.["The parent, grandparent, child, grandchild, brother, sister, spouse, or domestic partner (as defined in Family Code §297) of the transferee.*"] ? true : false,
-        "Companies leasing vehicle box": formData.statementForSomgExemptionData?.["A sole proprietorship to the proprietor as owner.*"] ? true : false,
-        "Companies whose principal business": formData.statementForSomgExemptionData?.["Companies whose principal business is leasing vehicles. There is no change in lessee or operator.*"] ? true : false,
-        "Lessor/lessee operator box": formData.statementForSomgExemptionData?.["Lessor and lessee of vehicle, and no change in the lessee or operator of the vehicle.*"] ? true : false,
-        "Lessor and person": formData.statementForSomgExemptionData?.["Lessor and person who has been lessee's operator of the vehicle for at least one year.*"] ? true : false,
-        "Individual as registered own box.1": formData.statementForSomgExemptionData?.["Individual(s) being added as registered owner(s).*"] ? true : false,
+        "And Box.0": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'and' ? true : false : false,
+        "And Box.1": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnershipTypes?.[2] === 'and' ? true : false : false,
+        "And Box1.0": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'or' ? true : false : false,
+        "And Box1.1": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnershipTypes?.[2] === 'or' ? true : false : false,
+        "Biennial Smog cert box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["The last smog certification was obtained within the last 90 days"] ? true : false : false,
+        "Powered by box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is powered by"] ? true : false : false,
+        "Powered by electricity box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.electricity ? true : false : false : false,
+        "Powered by diesel box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.diesel ? true : false : false : false,
+        "Powered by other box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is powered by"] ? formData.statementForSomgExemptionData?.Other ? true : false : false : false,
+        "Located outside CA box1": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is located outside the State of California. (Exception: Nevada and Mexico)"] ? true : false : false,
+        "transferred from/between": formData.transactionSelections?.includes("Family Transfer") ? true : formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is being transferred from/between:"] ? true : false : false,
+        "Paren, grandparent, etc box": formData.transactionSelections?.includes("Family Transfer") ? true : formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["It is being transferred from/between:"] ? true : false : false,
+        "Companies leasing vehicle box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["A sole proprietorship to the proprietor as owner.*"] ? true : false : false,
+        "Companies whose principal business": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["Companies whose principal business is leasing vehicles. There is no change in lessee or operator.*"] ? true : false : false,
+        "Lessor/lessee operator box": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["Lessor and lessee of vehicle, and no change in the lessee or operator of the vehicle.*"] ? true : false : false,
+        "Lessor and person": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["Lessor and person who has been lessee's operator of the vehicle for at least one year.*"] ? true : false : false,
+        "Individual as registered own box.1": formData.transactionSelections?.includes("Smog Exemption") ? formData.statementForSomgExemptionData?.["Individual(s) being added as registered owner(s).*"] ? true : false : false,
         "Check Box133": formData.vehicleInfoState?.["If kilometers check this box"] ? true : false,
         "Check Box134": formData.vehicleInfoState?.["NOT Actual Mileage"] ? true : false,
         "Check Box135": formData.vehicleInfoState?.["Mileage Exceeds Mechanical Limit"] ? true : false,
@@ -547,35 +567,48 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Check Box154": formData.vehicleStatusInfoData?.["Purchase Location"] === "OUTSIDE CA" ? true : false,
         //form 343
         "Check Box155": formData.transactionSelections?.includes("Vehicle is a Gift") ? false : true,
-        "Text156": formData.transactionSelections?.includes("Vehicle is a Gift") ? "" : formData.newOwnerData?.[0]?.["Purchase Price/Value"] || '',
+        "Text156": formData.transactionSelections?.includes("Vehicle is a Gift") ? "" : formData.newOwnerData?.[0]?.["Purchase Price/Value"]?.replace(/[^0-9.]/g, '') || '',
         "Check Box157": formData.transactionSelections?.includes("Vehicle is a Gift") ? true : false,
-        "Text158": formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.["Market Value"] || '' : '',
-        "Text165": formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.["Relationship with Gifter"] || '' : '',
+        "Text158": formData.transactionSelections?.includes("Vehicle is a Gift") ? formData.newOwnerData?.[0]?.["Market Value"]?.replace(/[^0-9.]/g, '') || '' : '',
         "Check Box161": formData.vehiclePurchaseInfo?.["VEHICLE WAS PURCHASED OR ACQUIRED FROM:"] === "dealer" ? true : false,
         "Check Box162": formData.vehiclePurchaseInfo?.["VEHICLE WAS PURCHASED OR ACQUIRED FROM:"] === "private party" ? true : false,
         "Check Box163": formData.vehiclePurchaseInfo?.["VEHICLE WAS PURCHASED OR ACQUIRED FROM:"] === "dismantler" ? true : false,
         "Check Box164": formData.vehiclePurchaseInfo?.["VEHICLE WAS PURCHASED OR ACQUIRED FROM:"] === "family" ? true : false,
+        "Text165": formData.vehiclePurchaseInfo?.["VEHICLE WAS PURCHASED OR ACQUIRED FROM:"] === "family" ? formData.vehiclePurchaseInfo?.["family_relationship"] || '' : '',
         "Check Box166": formData.vehiclePurchaseInfo?.["Vehicle Modifications"] === "yes" ? true : false,
         "Check Box167": formData.vehiclePurchaseInfo?.["Vehicle Modifications"] === "no" ? true : false,
-        "Check Box169": formData.outOfStateVehicle?.salesTaxPaid === "n/a" ? true : false,
-        "Check Box170": formData.outOfStateVehicle?.salesTaxPaid === "yes" ? true : false,
-        "Check Box171": formData.outOfStateVehicle?.salesTaxPaid === "no" ? true : false,
-        "Text172": formData.outOfStateVehicle?.salesTaxPaidAmount ? formData.outOfStateVehicle?.salesTaxPaidAmount || '' : '',
-        "Check Box175": formData.outOfStateVehicle?.outOfStatePlates?.value === "expired" ? true : false,
-        "Check Box176": formData.outOfStateVehicle?.outOfStatePlates?.value === "surrendered" ? true : false,
-        "Check Box177": formData.outOfStateVehicle?.outOfStatePlates?.value === "destroyed" ? true : false,
-        "Check Box178": formData.outOfStateVehicle?.outOfStatePlates?.value === "retained" ? true : false,
-        "Check Box179": formData.outOfStateVehicle?.outOfStatePlates?.value === "returned" ? true : false,
-        'Check Box70': formData.newOwnershipTypes?.[1] === 'and' ? true : false,
-        'Check Box71': formData.newOwnershipTypes?.[1] === 'or' ? true : false,
-        'Check Box77': formData.newOwnershipTypes?.[2] === 'and' ? true : false,
-        'Check Box80': formData.newOwnershipTypes?.[2] === 'or' ? true : false,
+        "Check Box169": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.salesTaxPaid === "n/a" ? true : false : false,
+        "Check Box170": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.salesTaxPaid === "yes" ? true : false : false,
+        "Check Box171": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.salesTaxPaid === "no" ? true : false : false,
+        "Text172": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.salesTaxPaid === "yes" ? formData.outOfStateVehicle?.salesTaxPaidAmount || '' : '' : '',
+        "Check Box175": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.outOfStatePlates?.value === "expired" ? true : false : false,
+        "Check Box176": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.outOfStatePlates?.value === "surrendered" ? true : false : false,
+        "Check Box177": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.outOfStatePlates?.value === "destroyed" ? true : false : false,
+        "Check Box178": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.outOfStatePlates?.value === "retained" ? true : false : false,
+        "Check Box179": formData.transactionSelections?.includes("Out of State Title") ? formData.outOfStateVehicle?.outOfStatePlates?.value === "returned" ? true : false : false,
+        'Check Box70': (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'and' ? true : false : false,
+        'Check Box71': (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'or' ? true : false : false,
+        'Check Box77': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnershipTypes?.[2] === 'and' ? true : false : false,
+        'Check Box80': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnershipTypes?.[2] === 'or' ? true : false : false,
         "Check Box181": true,
         "Check Box183": true,
-        "7 ELT #.0": formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[0] || '',
-        "7 ELT #.1.0": formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[1] || '',
-        "7 ELT #.1.1": formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[2] || '',
-
+        "Text184": (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwner(formData.newOwnerData?.[0]) : '',
+        "Text185": (formData.newOwnerCount ?? 0) > 0 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
+        "Text186": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
+        "Text187": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : '',
+        "Text188": (formData.newOwnerCount ?? 0) > 1 ? formatSingleOwner(formData.newOwnerData?.[1]) : '',
+        "Text189": (formData.newOwnerCount ?? 0) > 1 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
+        "Text190": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Phone Number']?.slice(1, 4) || '' : '',
+        "Text191": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['Phone Number']?.slice(5) || '' : '',
+        "Text192": (formData.newOwnerCount ?? 0) > 2 ? formatSingleOwner(formData.newOwnerData?.[2]) : '',
+        "Text193": (formData.newOwnerCount ?? 0) > 2 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
+        "Text194": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Phone Number']?.slice(1, 4) || '' : '',
+        "Text195": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Phone Number']?.slice(5) || '' : '',
+        "7 ELT #.0": senerio?.includes("Add Lienholder") ? formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[0] || '' : '',
+        "7 ELT #.1.0": senerio?.includes("Add Lienholder") ? formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[1] || '' : '',
+        "7 ELT #.1.1": senerio?.includes("Add Lienholder") ? formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[2] || '' : '',
+        "gift box": formData.transactionSelections?.includes("Vehicle is a Gift"),
+        "Family transfer box": formData.transactionSelections?.includes("Family Transfer"),
         //Reg102
         "veh lic plate #.0": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? formData?.plannedNonOperationState?.[0]?.plate || '' : '',
         "veh id #.0": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? formData?.plannedNonOperationState?.[0]?.vin || '' : '',
@@ -667,7 +700,15 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "address": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.Address || '' : '',
         "city": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.City || '' : '',
         "State_VSL": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.State || '' : '',
-        "zip": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.["ZIP Code"] || '' : ''
+        "zip": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.["ZIP Code"] || '' : '',
+
+        "Check Box34": formData.transactionSelections?.includes("Out of State Title") ? true : false,
+        "Check Box36": formData.transactionSelections?.includes("Out of State Title") ? true : false,
+
+
+        //reg 156
+        "license year": senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : false,
+        "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false
     };
 };
 
@@ -716,6 +757,7 @@ const mergeFilledPDFs = async (
             fields.forEach((field: PDFField) => {
                 const name = field.getName();
                 const value = fieldMapping[name];
+                console.log(name, value);
 
                 try {
                     if (field instanceof PDFTextField) {
@@ -757,7 +799,7 @@ const mergeFilledPDFs = async (
     return await mergedPdf.save();
 };
 
-export async function handleOnPDF(activeTransferIndex: number): Promise<void> {
+export async function handleOnPDF(activeTransferIndex?: number): Promise<void> {
     console.log("firstly activeTransferIndex:", activeTransferIndex);
     try {
         const savedForm = localStorage.getItem("formStates");
@@ -770,96 +812,62 @@ export async function handleOnPDF(activeTransferIndex: number): Promise<void> {
 
         let formTypes: string[] = [];
 
-        console.log("multipleTransfer ==>", multipleTransfer);
-        console.log("Transfer 01 ==>", multipleTransfer.multipleTransfer?.[0]?.transactionSelections);
-        console.log("Transfer 02 ==>", multipleTransfer.multipleTransfer?.[1]?.transactionSelections);
-        console.log("Transfer 03 ==>", multipleTransfer.multipleTransfer?.[2]?.transactionSelections);
-        console.log("Transfer 04 ==>", multipleTransfer.multipleTransfer?.[3]?.transactionSelections);
-        console.log("Transfer 05 ==>", multipleTransfer.multipleTransfer?.[4]?.transactionSelections);
+        // console.log("multipleTransfer ==>", multipleTransfer);
+        // console.log("Transfer 01 ==>", multipleTransfer.multipleTransfer?.[0]?.transactionSelections);
+        // console.log("Transfer 02 ==>", multipleTransfer.multipleTransfer?.[1]?.transactionSelections);
+        // console.log("Transfer 03 ==>", multipleTransfer.multipleTransfer?.[2]?.transactionSelections);
+        // console.log("Transfer 04 ==>", multipleTransfer.multipleTransfer?.[3]?.transactionSelections);
+        // console.log("Transfer 05 ==>", multipleTransfer.multipleTransfer?.[4]?.transactionSelections);
 
         // ====> MULTIPLE TRANSFER SCENARIO
 
-        if (senerio.includes("Multiple Transfer")) {
-            formTypes.push('DMVREG262new', 'Reg227');
-
-            // ==> Correctly access transactionSelections array from the first form in multipleTransfer
-            let transactionSelections = multipleTransfer?.multipleTransfer?.[activeTransferIndex]?.transactionSelections || [];
-
-            // ==> Ensure it's always an array
-            if (!Array.isArray(transactionSelections)) {
-                transactionSelections = [transactionSelections];
-            }
-
-            // ==> Without Title: remove REG 227
-            if (transactionSelections.includes("Transaction with Vehicle Title")) {
-                formTypes = formTypes.filter(formType => formType !== "Reg227");
-            }
-
-            // ==> Out Of State Title: Add REG 343
-            if (transactionSelections.includes("Out of State Title")) {
-                formTypes.push("Reg343");
-            }
-
-            // ==> Current Lienholder: Add REG 227
-            if (transactionSelections.includes("There is a Current Lienholder")) {
-                formTypes.push("Reg227");
-            }
-
-            // ==> Gift / Family / Smog: Add REG 256
-            if (
-                transactionSelections.includes("Family Transfer") ||
-                transactionSelections.includes("Vehicle is a Gift") ||
-                transactionSelections.includes("Smog Exemption")
-            ) {
-                formTypes.push("Reg256");
-            }
-
-            console.log("log transactionSelections:", transactionSelections);
-        }
-
-        console.log("log formTypes after processing:", formTypes);
         // if (senerio?.includes("Multiple Transfer")) {
-        //     formTypes.push('DMVREG262new', 'Reg227'); // Add DMVREG262new and Reg227 for multiple transfers
-        //     const allTransfers = multipleTransfer?.multipleTransfer || [];
+        //     formTypes.push('DMVREG262new', 'Reg227');
 
-        //     //  Add DMVREG262new for each transfer
-        //     for (let i = 0; i < allTransfers.length; i++) {
-        //         formTypes.push('DMVREG262new');
+        //     // ==> Correctly access transactionSelections array from the first form in multipleTransfer
+        //     let transactionSelections = [];
+        //     if (
+        //         typeof activeTransferIndex === "number" &&
+        //         multipleTransfer?.multipleTransfer &&
+        //         Array.isArray(multipleTransfer.multipleTransfer) &&
+        //         multipleTransfer.multipleTransfer[activeTransferIndex]
+        //     ) {
+        //         transactionSelections = multipleTransfer.multipleTransfer[activeTransferIndex]?.transactionSelections || [];
         //     }
 
-        //     //  Add only ONE Reg227
-        //     formTypes.push('Reg227');
+        //     // ==> Ensure it's always an array
+        //     if (!Array.isArray(transactionSelections)) {
+        //         transactionSelections = [transactionSelections];
+        //     }
 
-        //     // Loop through all transfers for selection-based forms
-        //     allTransfers.forEach((transfer: any, index: number) => {
-        //         let transactionSelections = transfer?.transactionSelections || [];
-        //         if (!Array.isArray(transactionSelections)) {
-        //             transactionSelections = [transactionSelections];
-        //         }
+        //     // ==> Without Title: remove REG 227
+        //     if (transactionSelections?.includes("Transaction with Vehicle Title")) {
+        //         formTypes = formTypes.filter(formType => formType !== "Reg227");
+        //     }
 
-        //         // ==> Remove Reg227 if Title is present
-        //         if (transactionSelections.includes("Transaction with Vehicle Title")) {
-        //             formTypes = formTypes.filter(form => form !== "Reg227");
-        //         }
+        //     // ==> Out Of State Title: Add REG 343
+        //     if (transactionSelections?.includes("Out of State Title")) {
+        //         formTypes.push("Reg343");
+        //     }
 
-        //         if (transactionSelections.includes("Out of State Title")) {
-        //             formTypes.push("Reg343");
-        //         }
+        //     // ==> Current Lienholder: Add REG 227
+        //     if (transactionSelections.includes("There is a Current Lienholder")) {
+        //         formTypes.push("Reg227");
+        //     }
 
-        //         if (transactionSelections.includes("There is a Current Lienholder")) {
-        //             formTypes.push("Reg227");
-        //         }
+        //     // ==> Gift / Family / Smog: Add REG 256
+        //     if (
+        //         transactionSelections.includes("Family Transfer") ||
+        //         transactionSelections.includes("Vehicle is a Gift") ||
+        //         transactionSelections.includes("Smog Exemption")
+        //     ) {
+        //         formTypes.push("Reg256");
+        //     }
 
-        //         if (
-        //             transactionSelections.includes("Family Transfer") ||
-        //             transactionSelections.includes("Vehicle is a Gift") ||
-        //             transactionSelections.includes("Smog Exemption")
-        //         ) {
-        //             formTypes.push("Reg256");
-        //         }
-        //     });
+        //     console.log("log transactionSelections:", transactionSelections);
         // }
 
+        // console.log("log formTypes after processing:", formTypes);
         // ====> SIMPLE TRANSFER SCENARIO
         if (senerio?.includes("Simple Transfer")) {
             formTypes.push('DMVREG262new', 'Reg227');
