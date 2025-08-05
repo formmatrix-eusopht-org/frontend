@@ -39,7 +39,19 @@ export const LeinRealease = ({
                 title={title}
                 subSection
                 useStyledRadio
+                radioOptions={radioOptions}
+                selectedOptions={
+                    lienReleaseState.isMailingDifferent
+                        ? [radioOptions[0]?.value]
+                        : []
+                }
+                allowToggle={true}
+                onToggleOption={(val) => {
+                    const isSelected = lienReleaseState.isMailingDifferent;
+                    onToggleMailingDifferent(!isSelected); // toggle the state
+                }}
             >
+
                 {addressFields[0] && (
                     <Input
                         key={addressFields[0].label}

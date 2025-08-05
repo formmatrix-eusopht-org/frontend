@@ -27,6 +27,15 @@ import { handleOnSave } from "../Actions/save"
 import { handleOnPDF } from "../Actions/pdfGenerates"
 import Options from '../Containers/Options';
 import { UserAuth } from '../Contexts/AuthContext';
+import VehicleBodyChange from '../Containers/StatementForVehicleBodyChange';
+import CommercialVehicleInfo from '../Containers/CommertialVehicle';
+import CertificateOfLicensePlateDisposition from '../Containers/CertifiacteOf LicensePlateDisposition';
+import SalvageCertificate from '../Containers/SalvageCertificate';
+import VehicleDeclarationEntry from '../Containers/VehicleDeclarationEntry';
+import DpPlacardSection from '../Containers/DisablePersion';
+import DisablePersonVehicleInfo from '../Containers/DisablePersonVehicleInfo';
+// import { PlatesSelection } from '../Containers/PersonalizePlates';
+// import SelectConfiguration from '../Containers/Configration';
 // import MultipleTransfer from '../Containers/MultipleTransfer';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
@@ -42,7 +51,17 @@ interface FormBlock {
         value?: string | boolean;
     }[];
 }
-
+type DpState = {
+    selectedPlacard: string;
+    issuedPreviously: "yes" | "no" | "";
+    plate: string;
+};
+type DpVehicleInfo = {
+    plate: string;
+    vin: string;
+    make: string;
+    year: string;
+};
 interface CombineFormProps {
     formData: FormBlock[];
 }
@@ -51,12 +70,11 @@ interface AddressState {
     mailing: Record<string, string>;
     isMailingDifferent: boolean;
 }
+type SalvageCertificateState = {
+    [key: string]: string;
+};
 const CombineForm = ({ formData }: CombineFormProps) => {
     const isInitialMount = useRef(true);
-    const schemaForMultipletransfer = {
-        "transferNumber": 1,
-        "Values": {}
-    }
     const getInitialDateValues = () => ({
         "DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):": {
             "Month": "",
@@ -180,8 +198,46 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         isMailingDifferent: false,
     });
     const [licensePlateState, setLicensePlateState] = useState('');
+    const [platesSelectionState, setPlatesSelectionState] = useState({
+        selectedPlate: "",
+        veteranCode: "",
+        duplicatePlate: ""
+    });
+    const [certificateOfLicensePlateDispositionState, setCertificateOfLicensePlateDispositionState] = useState<{
+        licensePlatesAssignedTo: string;
+        platesSurrendered: string;
+        occupationalLicenseNumber: string;
+    }>({
+        licensePlatesAssignedTo: "", // only one value allowed from options
+        platesSurrendered: "",        // e.g., "Surrendered", "Lost", etc.
+        occupationalLicenseNumber: ""
+    });
+    const [vehicleDeclarationEntryData, setVehicleDeclarationEntryData] = useState<Record<string, string>[]>([]);
+
+    // const [selectConfigState, setSelectConfigState] = useState({
+    //     assignedTo: '',
+    //     assignedFor: "",
+    //     licensePlateNumber: "",
+    //     vehicleIdentificationNumber: "",
+    //     plateChoices: [{ text: "", meaning: "" }, { text: "", meaning: "" }, { text: "", meaning: "" }],
+    // });
     const [plannedNonOperationState, setPlannedNonOperationState] = useState([{ ...initialVehicle }]);
     const [vehicleStorageLocation, setVehicleStorageLocation] = useState<Record<string, string>>({});
+    const [vehicleBodyState, setVehicleBodyState] = useState<Record<string, any>>({});
+    const [commercialInfo, setCommercialInfo] = useState<Record<string, any>>({});
+    const [dpState, setDpState] = useState<DpState>({
+        selectedPlacard: "",
+        issuedPreviously: "",
+        plate: ''
+    });
+    const [dpVehicleInfoState, setDpVehicleInfoState] = useState<DpVehicleInfo>({
+        plate: "",
+        vin: "",
+        make: "",
+        year: "",
+    });
+    const [salvageCertificateState, setSalvageCertificateState] = useState<SalvageCertificateState>({});
+
     // Handlers for various form interactions
     const handleTransactionChange = (label: string, checked: boolean) => {
         setTransactionSelections((prev) => {
@@ -464,6 +520,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         });
     };
 
+
     const handleItemRequestedOtherExplainChange = (val: string) => {
         setItemRequestedWasState((prev) => ({ ...prev, otherExplain: val }));
     };
@@ -571,6 +628,60 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const handleOptionsForValidations = (options: string[] = []) => {
         setOptionsForValidation(options);
     }
+    const handleVehicleBodyChange = (label: string, value: any) => {
+        setVehicleBodyState((prev) => ({
+            ...prev,
+            [label]: value,
+        }));
+    };
+    const handleCommercialChange = (label: string, value: any) => {
+        setCommercialInfo((prev) => ({ ...prev, [label]: value }));
+    };
+
+    const handleCertificateOfLicensePlateDispositionChange = (
+        label: string,
+        value: string | boolean
+    ) => {
+        setCertificateOfLicensePlateDispositionState((prev) => ({
+            ...prev,
+            [label]: value
+        }));
+    };
+    const handleSalvageCertificateChange = (label: string, value: string) => {
+        setSalvageCertificateState((prev) => ({
+            ...prev,
+            [label]: value,
+        }));
+    };
+    const handleVehicleDeclarationEntryFieldChange = (index: number, label: string, value: string) => {
+        setVehicleDeclarationEntryData((prev) => {
+            const updated = [...prev];
+            if (!updated[index]) updated[index] = {};
+            updated[index][label] = value;
+            return updated;
+        });
+    };
+    const handleTrimEntries = (trimmed: Record<string, string>[]) => {
+        setVehicleDeclarationEntryData(trimmed);
+    };
+
+    // const handlePlateChange = (label: string) => {
+    //     setPlatesSelectionState((prev) => ({
+    //         ...prev,
+    //         selectedPlate: label,
+    //         // Reset dependent fields when switching options
+    //         veteranCode: label === "Veterans' Organization" ? prev.veteranCode : "",
+    //         duplicatePlate: label === "Duplicate Decal" ? prev.duplicatePlate : "",
+    //     }));
+    // };
+
+    // const handleInputChange = (field: "veteranCode" | "duplicatePlate", value: string) => {
+    //     setPlatesSelectionState((prev) => ({
+    //         ...prev,
+    //         [field]: value
+    //     }));
+    // };
+
     useEffect(() => {
         const owner = ownersData[0];
         const newOwner = newOwnerData[0];
@@ -627,6 +738,15 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const LicensePlateBlock = findBlock("License Plate");
     const plannedNonOperationCertificateBlock = findBlock("PLANNED NON-OPERATION CERTIFICATE");
     const vehicleStorageLocationBlock = findBlock("Vehicle Storage Location");
+    const statementForVehicleBodyChangeBlock = findBlock("Statement for Vehicle Body Change");
+    const forCommercialVehicleOnlyBlock = findBlock("For Commercial Vehicle Only");
+    const CertificateOfLicensePlateDispositionBlock = findBlock("Certification of License Plate Disposition");
+    const SalvageCertificateBlock = findBlock("Salvage Certificate");
+    const VehicleDeclarationEntryBlock = findBlock("Vehicle Declaration Entry");
+    const disablePersonTypeBlock = findBlock("Type of Disabled Person Parking Placard(S) or License Plates");
+    const disablePersonVehicleInfoBlock = findBlock("DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION");
+    // const platesSelectionBlock = findBlock("Plates Selection");
+    // const selectConfigurationBlock = findBlock("Select Configuration");
 
     useEffect(() => {
         const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -673,6 +793,27 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             setLicensePlateState(parsed.licensePlateState)
             setPlannedNonOperationState(parsed.plannedNonOperationState)
             setVehicleStorageLocation(parsed.vehicleStorageLocation || {});
+            setPlatesSelectionState(parsed.platesSelectionState || {
+                selectedPlate: "",
+                veteranCode: "",
+                duplicatePlate: ""
+            });
+            setVehicleBodyState(parsed.vehicleBodyState || {});
+            setCommercialInfo(parsed.commercialInfo || {});
+            setCertificateOfLicensePlateDispositionState(parsed.certificateOfLicensePlateDispositionState || {});
+            setSalvageCertificateState(parsed.salvageCertificateState || {});
+            setVehicleDeclarationEntryData(parsed.vehicleDeclarationEntryData || {});
+            setDpState(parsed.dpState || {
+                selectedPlacard: "",
+                issuedPreviously: "",
+                plate: ''
+            })
+            setDpVehicleInfoState(parsed.dpVehicleInfoState || {
+                licensePlate: "",
+                vinNumber: "",
+                vehicleMake: "",
+                vehicleYear: "",
+            })
             // setMultipleTransfer(parsed.multipleTransfer || [schemaForMultipletransfer]);
         }
     }, []);
@@ -711,7 +852,15 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             itemRequestedWasState,
             licensePlateState,
             plannedNonOperationState,
-            vehicleStorageLocation
+            vehicleStorageLocation,
+            platesSelectionState,
+            vehicleBodyState,
+            commercialInfo,
+            certificateOfLicensePlateDispositionState,
+            salvageCertificateState,
+            vehicleDeclarationEntryData,
+            dpState,
+            dpVehicleInfoState
         };
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(combinedState));
@@ -744,17 +893,28 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         itemRequestedWasState,
         licensePlateState,
         plannedNonOperationState,
-        vehicleStorageLocation
+        vehicleStorageLocation,
+        platesSelectionState,
+        vehicleBodyState,
+        commercialInfo,
+        certificateOfLicensePlateDispositionState,
+        salvageCertificateState,
+        vehicleDeclarationEntryData,
+        dpState,
+        dpVehicleInfoState
     ]);
     //validations for form
     const isMotorcycle = transactionSelections?.includes("Is the Vehicle a Motorcycle");
-    const isTransactionWithVehicleTitle = transactionSelections?.includes("Transaction with Vehicle Title");
+    const isTransactionWithVehicleTitle = transactionSelections?.includes("Transaction with Vehicle Title") || transactionSelections?.includes("With Title");
     const isTRAILERCOACH = typeOfVehicleSelection === "TRAILER COACH";
     const isOutofStateTitle = transactionSelections?.includes("Out of State Title");
     const isThereIsACurrentLeinHolder = transactionSelections?.includes("There is a Current Lienholder");
     const isVehickeIsAGift = transactionSelections?.includes("Vehicle is a Gift");
     const isSmogExemption = transactionSelections?.includes("Smog Exemption");
     const requestPNOCardFlag = transactionSelections?.includes("Request PNO card");
+    const isCommercialVehicle = transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)");
+
+    const comercialVehicleFlag = senerio?.includes("Commercial Vehicle");
     // const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
 
     // const handleTransferCountChange = (newCount: number) => {
@@ -796,6 +956,15 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         onChange={handleTypeOfVehicleChange}
                     />
                 )}
+                {forCommercialVehicleOnlyBlock && (
+                    <CommercialVehicleInfo
+                        title={forCommercialVehicleOnlyBlock.blockName}
+                        block={{}}
+                        isCommercialVehicle={isCommercialVehicle} // optional
+                        values={commercialInfo}
+                        onChange={handleCommercialChange}
+                    />
+                )}
                 {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
                     <MissingTitleReason
                         title="Missing Title Reason"
@@ -803,7 +972,14 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         onReasonChange={setMissingReason}
                     />
                 )}
-
+                {SalvageCertificateBlock && (
+                    <SalvageCertificate
+                        title={SalvageCertificateBlock.blockName}
+                        block={SalvageCertificateBlock} // ✅ pass metadata
+                        values={salvageCertificateState} // ✅ pass current field values
+                        onFieldChange={handleSalvageCertificateChange}
+                    />
+                )}
                 {vehicleInfoBlock && (
                     <VehicleInformationDetails
                         title="Vehicle Information"
@@ -811,7 +987,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             ...vehicleInfoBlock,
                             fields: vehicleInfoBlock.fields
                                 ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
-                                ?.filter(field => isOutofStateTitle || field.label !== "If kilometers check this box")
+                                ?.filter(field => (isOutofStateTitle || comercialVehicleFlag) || field.label !== "If kilometers check this box")
                                 ?.filter(field => isTRAILERCOACH ||
                                     (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
                                 .map(field => ({
@@ -821,14 +997,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                                 }))
                         }}
                         onFieldChange={handleVehicleFieldChange}
-                    />
-                )}
-                {vehicleStorageLocationBlock && (
-                    <VehicleStorageLocationDetails
-                        title="Vehicle Storage Location"
-                        block={vehicleStorageLocationBlock}
-                        formState={vehicleStorageLocation}
-                        onFieldChange={handleVehicleStorageLocation}
                     />
                 )}
                 {registeredOwnerBlock && (
@@ -867,6 +1035,16 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         isOutofStateTitle={isOutofStateTitle}
                     />
                 }
+                {VehicleDeclarationEntryBlock && (
+                    <VehicleDeclarationEntry
+                        title={VehicleDeclarationEntryBlock.blockName}
+                        block={VehicleDeclarationEntryBlock}
+                        values={vehicleDeclarationEntryData}
+                        onFieldChange={handleVehicleDeclarationEntryFieldChange}
+                        onTrimEntries={handleTrimEntries}
+                    />
+                )}
+
                 {newRegisteredOwnerBlock && (
                     <NewRegisteredOwnerDetails
                         title="New Registered Owner(s)"
@@ -904,7 +1082,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         onChange={handlePowerOfAttorneyChange}
                     />
                 )}
-                {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (
+                {(comercialVehicleFlag || isOutofStateTitle) && dateInformationBlock && dateInformationBlock.reference && (
                     <DateInformation
                         title="DATE INFORMATION"
                         block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
@@ -912,7 +1090,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         onDateChange={handleDateChange}
                     />
                 )}
-                {vehicleStatusBlock && isOutofStateTitle && (
+                {vehicleStatusBlock && (comercialVehicleFlag || isOutofStateTitle) && (
                     <VehicleStatusInformation
                         title="Vehicle Status Information"
                         block={vehicleStatusBlock}
@@ -921,7 +1099,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     />
 
                 )}
-                {vehicleAcquisitionBlock && isOutofStateTitle && (
+                {vehicleAcquisitionBlock && (comercialVehicleFlag || isOutofStateTitle) && (
                     <VehicleAcquisitionDetails
                         title={vehicleAcquisitionBlock.blockName}
                         block={vehicleAcquisitionBlock}
@@ -936,6 +1114,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         onPlateSelect={handleOutOfStateVehcilePlateSelect}
                     />
                 }
+                {statementForVehicleBodyChangeBlock && (
+                    <VehicleBodyChange
+                        title={statementForVehicleBodyChangeBlock.blockName}
+                        values={vehicleBodyState}
+                        onChange={handleVehicleBodyChange}
+                    />
+                )}
                 {itemRequestedWasBlock && (
                     <TheItemRequestedWasBlock
                         title="The Item Requested Was"
@@ -976,6 +1161,14 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         fields={plannedNonOperationCertificateBlock.fields}
                     />
                 }
+                {vehicleStorageLocationBlock && (
+                    <VehicleStorageLocationDetails
+                        title="Vehicle Storage Location"
+                        block={vehicleStorageLocationBlock}
+                        formState={vehicleStorageLocation}
+                        onFieldChange={handleVehicleStorageLocation}
+                    />
+                )}
                 {newLienHolderBlock && (
                     <NewLienHolder
                         block={newLienHolderBlock}
@@ -995,6 +1188,47 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         block={StatementForSmogExemptionBlock}
                         onFieldChange={handleStatementForSomgExemption}
                         values={statementForSomgExemptionData}
+                    />
+                )}
+                {/* {platesSelectionBlock && (
+                    <PlatesSelection
+                        block={platesSelectionBlock}
+                        plateInfo={platesSelectionState}
+                        onPlateChange={handlePlateChange}
+                        onInputChange={handleInputChange}
+                    />
+                )}
+                {selectConfigurationBlock && (
+                    <SelectConfiguration
+                        block={selectConfigurationBlock}
+                        value={selectConfigState}
+                        onChange={setSelectConfigState}
+                    />
+                )} */}
+                {CertificateOfLicensePlateDispositionBlock && (
+                    <CertificateOfLicensePlateDisposition
+                        title={CertificateOfLicensePlateDispositionBlock.blockName}
+                        block={{
+                            ...CertificateOfLicensePlateDispositionBlock,
+                            reference: CertificateOfLicensePlateDispositionBlock.reference || "CertificateReference",
+                        }}
+                        values={certificateOfLicensePlateDispositionState}
+                        onChange={handleCertificateOfLicensePlateDispositionChange}
+                    />
+                )}
+                {disablePersonTypeBlock && (
+                    <DpPlacardSection
+                        title={disablePersonTypeBlock.blockName}
+                        values={dpState}
+                        onChange={setDpState}
+                    />
+                )}
+                {disablePersonVehicleInfoBlock && (
+                    <DisablePersonVehicleInfo
+                        title={disablePersonVehicleInfoBlock.blockName}
+                        values={dpVehicleInfoState}
+                        onChange={setDpVehicleInfoState}
+                        fields={disablePersonVehicleInfoBlock.fields}
                     />
                 )}
                 <Options
@@ -1022,247 +1256,10 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         window.location.reload();
                     }}
                 />
-            </div>
+            </div >
             {/* } */}
 
         </>
-        // <div className="space-y-6">
-        //     {transactionBlock && (
-        //         <TransactionDetails
-        //             title="Transaction Details"
-        //             block={transactionBlock}
-        //             senerio={senerio}
-        //             selectedItems={transactionSelections}
-        //             onChange={handleTransactionChange}
-        //         />
-        //     )}
-
-        //     {typeOfVehicleBlock && isOutofStateTitle && (
-        //         <TypeOfVehicle
-        //             title="Type of Vehicle"
-        //             block={typeOfVehicleBlock}
-        //             selectedItems={typeOfVehicleSelection}
-        //             onChange={handleTypeOfVehicleChange}
-        //         />
-        //     )}
-        //     {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
-        //         <MissingTitleReason
-        //             title="Missing Title Reason"
-        //             selectedReason={missingReason}
-        //             onReasonChange={setMissingReason}
-        //         />
-        //     )}
-
-        //     {vehicleInfoBlock && (
-        //         <VehicleInformationDetails
-        //             title="Vehicle Information"
-        //             block={{
-        //                 ...vehicleInfoBlock,
-        //                 fields: vehicleInfoBlock.fields
-        //                     ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
-        //                     ?.filter(field => isOutofStateTitle || field.label !== "If kilometers check this box")
-        //                     ?.filter(field => isTRAILERCOACH ||
-        //                         (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
-        //                     .map(field => ({
-        //                         ...field,
-        //                         type: field.type as "checkbox" | "input field" | "dropdown",
-        //                         value: vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
-        //                     }))
-        //             }}
-        //             onFieldChange={handleVehicleFieldChange}
-        //         />
-        //     )}
-        //     {vehicleStorageLocationBlock && (
-        //         <VehicleStorageLocationDetails
-        //             title="Vehicle Storage Location"
-        //             block={vehicleStorageLocationBlock}
-        //             formState={vehicleStorageLocation}
-        //             onFieldChange={handleVehicleStorageLocation}
-        //         />
-        //     )}
-        //     {registeredOwnerBlock && (
-        //         <RegisteredOwnerDetails
-        //             title="Registered Owner(s)"
-        //             block={registeredOwnerBlock}
-        //             ownerCount={ownerCount}
-        //             onOwnerCountChange={handleOwnerCountChange}
-        //             ownersData={ownersData}
-        //             onFieldChange={handleRegisteredOwnerFieldChange}
-        //         />
-        //     )}
-        //     {ownerAddressBlock && (
-        //         <OwnerAddress
-        //             title="Address"
-        //             block={ownerAddressBlock}
-        //             residentialAddress={ownerAddress.residential}
-        //             mailingAddress={ownerAddress.mailing}
-        //             isMailingDifferent={ownerAddress.isMailingDifferent}
-        //             onAddressChange={handleOwnerAddressChange}
-        //             onToggleMailingAddress={toggleMailingAddress}
-        //         />
-        //     )}
-
-        //     {newRegisteredOwnerBlock && (
-        //         <NewRegisteredOwnerDetails
-        //             title="New Registered Owner(s)"
-        //             block={newRegisteredOwnerBlock}
-        //             newOwnerCount={newOwnerCount}
-        //             onNewOwnerCountChange={setNewOwnerCount}
-        //             newOwnerData={newOwnerData}
-        //             onNewOwnerFieldChange={handleNewOwnerFieldChange}
-        //             NewOwnershipTypes={newOwnershipTypes}
-        //             onNewOwnershipChange={handleNewOwnershipChange}
-        //             isVehicleIsAGift={isVehickeIsAGift}
-        //             isMotorcycle={isMotorcycle}
-        //             isTRAILERCOACH={isTRAILERCOACH}
-        //         />
-        //     )}
-        //     {newRegisteredOwnerAddressBlock && (
-        //         <NewRegisteredOwnerAddress
-        //             title="New Owner Address"
-        //             block={newRegisteredOwnerAddressBlock}
-        //             newOwnerAddress={newOwnerAddress}
-        //             newOwnerMailingAddress={newOwnerMailingAddress}
-        //             newOwnerLesseeAddress={newOwnerLesseeAddress}
-        //             newOwnerKeptAddress={newOwnerKeptAddress}
-        //             selectedRadio={selectedRadio}
-        //             onToggleOption={handleToggleOption}
-        //             onAddressChange={handleNewOwnerAddressChange}
-        //         />
-        //     )}
-        //     {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (
-        //         <DateInformation
-        //             title="DATE INFORMATION"
-        //             block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
-        //             dateValues={dateValues}
-        //             onDateChange={handleDateChange}
-        //         />
-        //     )}
-        //     {vehicleStatusBlock && isOutofStateTitle && (
-        //         <VehicleStatusInformation
-        //             title="Vehicle Status Information"
-        //             block={vehicleStatusBlock}
-        //             onFieldChange={handleVehicleStatusInfoFieldChange}
-        //             values={vehicleStatusInfoData}
-        //         />
-
-        //     )}
-        //     {vehicleAcquisitionBlock && isOutofStateTitle && (
-        //         <VehicleAcquisitionDetails
-        //             title={vehicleAcquisitionBlock.blockName}
-        //             block={vehicleAcquisitionBlock}
-        //             values={vehiclePurchaseInfo}
-        //             onFieldChange={handleVehiclePurchaseInfoChange}
-        //         />
-        //     )}
-        //     {OutOfStateBlock && isOutofStateTitle &&
-        //         <OutOfStateVehicleSection
-        //             values={outOfStateVehicle}
-        //             onFieldChange={handleOutOfStateVehcileFieldChange}
-        //             onPlateSelect={handleOutOfStateVehcilePlateSelect}
-        //         />
-        //     }
-        //     {powerOfAttorneyBlock && (
-        //         <PowerOfAttorneyDetails
-        //             title="Power of Attorney"
-        //             block={powerOfAttorneyBlock}
-        //             appointer={powerOfAttorneyData.appointer}
-        //             appointee={powerOfAttorneyData.appointee}
-        //             onChange={handlePowerOfAttorneyChange}
-        //         />
-        //     )}
-        //     {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
-        //         <LegalOwnerOfRecord
-        //             block={LegalOwnerOfRecordBlock}
-        //             formState={LegalOwnerOfRecordData}
-        //             onFieldChange={handleLegalOwnerFieldChange}
-        //         />
-        //     }
-        //     {itemRequestedWasBlock && (
-        //         <TheItemRequestedWasBlock
-        //             title="The Item Requested Was"
-        //             block={itemRequestedWasBlock}
-        //             checkedItems={itemRequestedWasState.checked}
-        //             otherExplain={itemRequestedWasState.otherExplain}
-        //             onCheckChange={handleItemRequestedCheckChange}
-        //             onOtherExplainChange={handleItemRequestedOtherExplainChange}
-        //             plateCount={itemRequestedWasState.plateCount}
-        //             onPlateCountChange={handleItemRequestedPlateCountChange}
-        //         />
-
-        //     )}
-        //     {LicensePlateBlock &&
-        //         <LicensePlateMissingBlock
-        //             title={LicensePlateBlock.blockName}
-        //             block={LicensePlateBlock}
-        //             selectedOption={licensePlateState}
-        //             handleSelectedOptionOnChange={handleLicensePlateChange} />
-        //     }
-
-        //     {LienReleaseBlock && (
-        //         <LeinRealease
-        //             title="Lien Release"
-        //             block={LienReleaseBlock}
-        //             lienReleaseState={lienReleaseState}
-        //             onLienReleaseChange={handleLienAddressChange}
-        //             onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
-        //         />
-        //     )}
-        //     {plannedNonOperationCertificateBlock &&
-        //         <PlannedNonOperation
-        //             title="Planned Non-Operation Certificate"
-        //             vehicles={plannedNonOperationState}
-        //             onChange={handlePlannedNonOperationChange}
-        //             onAdd={handlePlannedNonOperationAdd}
-        //             onRemove={handlePlannedNonOperationRemove}
-        //             fields={plannedNonOperationCertificateBlock.fields}
-        //         />
-        //     }
-        //     {newLienHolderBlock && (
-        //         <NewLienHolder
-        //             block={newLienHolderBlock}
-        //             formState={newLienholder.address}
-        //             mailingAddress={newLienholder.mailingAddress}
-        //             isMailingDifferent={newLienholder.isMailingDifferent}
-        //             onFieldChange={handleLienholderFieldChange}
-        //             onMailingFieldChange={handleLienholderMailingFieldChange}
-        //             onToggleMailingAddress={toggleLienholderMailingAddress}
-        //         />
-        //     )}
-        //     {StatementForSmogExemptionBlock && isSmogExemption && (
-        //         <StatementForSmogExemption
-        //             title="Statement For Smog Exemption"
-        //             block={StatementForSmogExemptionBlock}
-        //             onFieldChange={handleStatementForSomgExemption}
-        //             values={statementForSomgExemptionData}
-        //         />
-        //     )}
-        //     <Options
-        //         selected={optionsForValidation}
-        //         onChange={handleOptionsForValidations}
-        //     />
-        //     <FormActions
-        //         loading={isLoading}
-        //         onSave={async () => {
-        //             setIsLoading(true);
-        //             await handleOnSave(user);
-        //             setIsLoading(false);
-        //             window.location.reload();
-
-        //         }}
-        //         onPrint={async () => {
-        //             setIsLoading(true);
-        //             await handleOnPDF();
-        //             setIsLoading(false);
-        //         }}
-        //         onInvoice={() => console.log('Generate Invoice clicked')}
-        //         onClear={() => {
-        //             localStorage.removeItem(LOCAL_STORAGE_KEY);
-        //             localStorage.removeItem("senerio");
-        //             window.location.reload();
-        //         }}
-        //     />
-        // </div>
     );
 };
 

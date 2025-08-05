@@ -86,8 +86,6 @@ export const sidebarSections = [
       {
         label: "Personalized Plates",
         disabledWhen: ["Duplicate Plates & Stickers", "Disabled Person Placards/Plates"],
-        radio: true,
-        subOptions: ['Order', 'Replace', 'Reassign/Retain', 'Exchange']
       },
       {
         label: "Disabled Person Placards/Plates",

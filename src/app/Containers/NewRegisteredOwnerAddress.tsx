@@ -1,3 +1,4 @@
+import Checkbox from "../Components/CheckBox";
 import Section from "../Components/FieldSection";
 import Input from "../Components/InputControl";
 import { states } from "../Data/statesData";
@@ -66,22 +67,49 @@ export const NewRegisteredOwnerAddress = ({
         useStyledRadio={true}
       >
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {addressFields.map((field: any) => (
-            <Input
-              key={field.label}
-              label={field.label}
-              placeholder={field.placeholder}
-              type={field.type === "dropdown" ? "dropdown" :
-                    field.type === "phone" ? "phone" : "text"}
-              options={field.type === "dropdown" ? states : []}
-              value={newOwnerAddress[field.label] || ""}
-              onChange={(val) => onAddressChange("residential", field.label, val)}
-            />
-          ))}
+          {addressFields.map((field: any) => {
+            if (field.type === "checkbox") {
+              return (
+                <div key={field.label} className="md:col-span-4">
+                  <Checkbox
+                    label={field.label}
+                    checked={newOwnerAddress[field.label] === "true"}
+                    onChange={() =>
+                      onAddressChange(
+                        "residential",
+                        field.label,
+                        newOwnerAddress[field.label] === "true" ? "false" : "true"
+                      )
+                    }
+                  />
+                </div>
+              );
+            }
+
+            return (
+              <Input
+                key={field.label}
+                label={field.label}
+                placeholder={field.placeholder}
+                type={
+                  field.type === "dropdown"
+                    ? "dropdown"
+                    : field.type === "phone"
+                      ? "phone"
+                      : "text"
+                }
+                options={field.type === "dropdown" ? states : []}
+                value={newOwnerAddress[field.label] || ""}
+                onChange={(val) =>
+                  onAddressChange("residential", field.label, val)
+                }
+              />
+            );
+          })}
         </div>
       </Section>
 
-      {/* Dynamically Render Sub Address Sections */}
+      {/* Sub Address Sections */}
       {block.subOptions?.map((option: any) => {
         const key = normalizeKey(option.label);
         const isVisible = selectedRadio?.includes(key);
@@ -107,11 +135,7 @@ export const NewRegisteredOwnerAddress = ({
                   options={field.type === "dropdown" ? states : []}
                   value={mapped.data[field.label] || ""}
                   onChange={(val) =>
-                    onAddressChange(
-                      mapped.sectionKey,
-                      field.label,
-                      val
-                    )
+                    onAddressChange(mapped.sectionKey, field.label, val)
                   }
                 />
               ))}

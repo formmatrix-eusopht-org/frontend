@@ -36,7 +36,7 @@ export const RegisteredOwnerDetails = ({
             <h4 className="font-medium mb-1">Registered Owner {ownerIndex + 1}</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {registeredOwnerFields
-                .filter((field: { label: string; type: string; placeholder?: string }) => field.label !== "Date of Sale" || ownerIndex === 0)
+                .filter((field: { label: string; type: string; placeholder?: string }) => (field.label !== "Date of Sale" || ownerIndex === 0) && (field.label !== "Agent Name"))
                 .map((field: { label: string; type: string; placeholder?: string }, index: number) => (
                   <Input
                     key={`${ownerIndex}-${index}`}
@@ -52,6 +52,15 @@ export const RegisteredOwnerDetails = ({
             </div>
           </div>
         ))}
+        {registeredOwnerFields.find((f: { label: string; type: string; placeholder?: string }) => f.label === "Agent Name") && (
+          <Input
+            label="Agent Name"
+            placeholder="Agent Name"
+            type="text"
+            value={ownersData[0]?.["Agent Name"] || ""}
+            onChange={(val) => onFieldChange(0, "Agent Name", val)}
+          />
+        )}
       </Section>
       {block.commonFields && (
         <div className=" px-2">

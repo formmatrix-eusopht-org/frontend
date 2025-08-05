@@ -343,6 +343,10 @@ export const seneriosDetails = [
                             type: "input field",
                             placeholder: 'City'
                         }, {
+                            label: 'County',
+                            type: "input field",
+                            placeholder: 'County'
+                        }, {
                             label: 'State',
                             type: "dropdown",
                             placeholder: 'State'
@@ -2789,6 +2793,965 @@ export const seneriosDetails = [
                 { label: "Equipment Number (Optional)", key: "equipment", placeholder: "Equipment number" },
             ]
         }
+        ]
+    },
+    // {
+    //     form: "Personalized Plates",
+    //     blocks: [{
+    //         reference: "Transaction Details",
+    //         blockName: "Transaction Details",
+    //         fields: [
+    //             {
+    //                 label: 'Order',
+    //                 type: "checkbox",
+    //                 placeholder: 'Order'
+    //             }, {
+    //                 label: 'Replace',
+    //                 type: "checkbox",
+    //                 placeholder: 'Replace'
+    //             }, {
+    //                 label: 'Reassign/Retain',
+    //                 type: "checkbox",
+    //                 placeholder: 'Reassign/Retain'
+    //             }, {
+    //                 label: 'Exchange',
+    //                 type: "checkbox",
+    //                 placeholder: 'Exchange'
+    //             },
+    //         ]
+    //     }, {
+    //         reference: "Plates Selection",
+    //         blockName: "Plates Selection",
+    //         fields: [{
+    //             label: "Plates allowed 2-6 Characters",
+    //             fields: [
+    //                 {
+    //                     label: "Breast Cancer Awareness",
+    //                     type: "checkbox",
+    //                     placeholder: "Breast Cancer Awareness",
+    //                 },
+    //                 {
+    //                     label: "California Arts Council",
+    //                     type: "checkbox",
+    //                     placeholder: "California Arts Council",
+    //                 }, {
+    //                     label: "California Agricultural (CalAg)",
+    //                     type: "checkbox",
+    //                     placeholder: "California Agricultural (CalAg)",
+    //                 },
+    //                 {
+    //                     label: "California Memorial",
+    //                     type: "checkbox",
+    //                     placeholder: "California Memorial",
+    //                 }, {
+    //                     label: "California Museums (Snoopy)",
+    //                     type: "checkbox",
+    //                     placeholder: "California Museums (Snoopy)",
+    //                 },
+    //                 {
+    //                     label: "Collegiate (only UCLA is available)",
+    //                     type: "checkbox",
+    //                     placeholder: "Collegiate (only UCLA is available)",
+    //                 }, {
+    //                     label: "Kids - Child Health and Safety Funds",
+    //                     type: "checkbox",
+    //                     placeholder: "Kids - Child Health and Safety Funds",
+    //                 },
+    //                 {
+    //                     label: "Pet Lovers",
+    //                     type: "checkbox",
+    //                     placeholder: "Pet Lovers",
+    //                 }, {
+    //                     label: "Veterans' Organization",
+    //                     type: "checkbox",
+    //                     placeholder: "Veterans' Organization",
+    //                 }
+    //             ],
+    //         }, {
+    //             label: "Plates allowed 2-7 Characters",
+    //             fields: [
+    //                 {
+    //                     label: "Environmental License Plate (ELP)",
+    //                     type: "checkbox",
+    //                     placeholder: "Environmental License Plate (ELP)",
+    //                 },
+    //                 {
+    //                     label: "California Coastal Commission (Whale Tail)",
+    //                     type: "checkbox",
+    //                     placeholder: "California Coastal Commission (Whale Tail)",
+    //                 }, {
+    //                     label: "Lake Tahoe Conservancy",
+    //                     type: "checkbox",
+    //                     placeholder: "Lake Tahoe Conservancy",
+    //                 },
+    //                 {
+    //                     label: "Yosemite Foundation",
+    //                     type: "checkbox",
+    //                     placeholder: "Yosemite Foundation",
+    //                 }, {
+    //                     label: "California 1960s Legacy",
+    //                     type: "checkbox",
+    //                     placeholder: "California 1960s Legacy",
+    //                 }
+    //             ],
+    //         }, {
+    //             label: "Other Options",
+    //             fields: [
+    //                 {
+    //                     label: "Honoring Veterans Plate",
+    //                     type: "checkbox",
+    //                     placeholder: "Honoring Veterans Plate",
+    //                 },
+    //                 {
+    //                     label: "Duplicate Decal",
+    //                     type: "checkbox",
+    //                     placeholder: "Duplicate Decal",
+    //                 }
+    //             ],
+    //         },]
+    //     }, {
+    //         reference: "Select Configuration",
+    //         blockName: "Select Configuration",
+    //         fields: [
+    //             { label: "Automobile", type: "checkbox" },
+    //             { label: "Commercial", type: "checkbox" },
+    //             { label: "Trailer", type: "checkbox" },
+    //             { label: "Motorcycle", type: "checkbox" },
+    //         ],
+    //     }
+    //     ]
+    // },
+    {
+        form: "Commercial Vehicle",
+        blocks: [{
+            reference: "Transaction Details",
+            blockName: "Transaction Details",
+            fields: [
+                {
+                    label: 'Commercial Vehicle(BUS/LIMO/TAXI)',
+                    type: "checkbox",
+                    placeholder: 'Commercial Vehicle(BUS/LIMO/TAXI)'
+                }, {
+                    label: 'There is a Current Lienholder',
+                    type: "checkbox",
+                    placeholder: 'There is a Current Lienholder'
+                }
+            ]
+        }, {
+            blockName: "Commercial Vehicle Information",
+            fields: [
+                {
+                    label: "Number of axles",
+                    type: "input field",
+                    placeholder: "Enter number",
+                },
+                {
+                    label: "Unladen weight",
+                    type: "input field",
+                    placeholder: "Enter weight",
+                },
+                {
+                    label: "Body Model Type",
+                    type: "dropdown",
+                    options: [
+                        { value: "type1", name: "Body type 1" },
+                        { value: "type2", name: "Body type 2" },
+                        { value: "type3", name: "Body type 3" },
+                    ],
+                },
+            ],
+            checkboxGroups: [
+                {
+                    question: "",
+                    options: [
+                        { label: "ACTUAL", value: "ACTUAL" },
+                        {
+                            label: "ESTIMATED (VEHICLES OVER 10,001 LBS. ONLY)",
+                            value: "ESTIMATED",
+                            subtext: "For vehicles over 10,001 lbs only",
+                        },
+                    ],
+                },
+                {
+                    question:
+                        "Will this vehicle be used for the transportation of persons for hire, compensation, or profit (e.g. limousine, taxi, bus, etc.)?",
+                    options: [
+                        { label: "Yes", value: "transportationForHireYes" },
+                        { label: "No", value: "transportationForHireNo" },
+                    ],
+                },
+                {
+                    question:
+                        "Is this a commercial vehicle that operates at 10,001 lbs. or more (or is a pickup exceeding 8,001 lbs. unladen and/or 11,499 lbs. Gross Vehicle Weight Rating (GVWR)?",
+                    options: [
+                        { label: "Yes", value: "commercialVehicleYes" },
+                        { label: "No", value: "commercialVehicleNo" },
+                    ],
+                },
+            ],
+        }, {
+            reference: "Vehicle Information",
+            blockName: "Vehicle Information",
+            fields: [
+                {
+                    label: 'Motorcycle Engine Number',
+                    type: "input field",
+                    placeholder: 'Motorcycle Engine Number'
+                }, {
+                    label: 'Vehicle/Hull Identification Number',
+                    type: "input field",
+                    placeholder: 'Vehicle/Hull Identification Number'
+                }, {
+                    label: 'Vehicle License Plate or Vessel CF Number',
+                    type: "input field",
+                    placeholder: 'Vehicle License Plate or Vessel CF Number'
+                }, {
+                    label: 'Year of Vehicle',
+                    type: "input field",
+                    placeholder: 'Year of Vehicle'
+                }, {
+                    label: 'Make of Vehicle OR Vessel Builder',
+                    type: "input field",
+                    placeholder: 'Make of Vehicle OR Vessel Builder'
+                }, {
+                    label: 'Length (IN)',
+                    type: "input field",
+                    placeholder: 'Length (IN)'
+                }, {
+                    label: 'Width (IN)',
+                    type: "input field",
+                    placeholder: 'Width (IN)'
+                }, {
+                    label: 'Mileage of Vehicle',
+                    type: "input field",
+                    placeholder: 'Mileage of Vehicle'
+                }, {
+                    label: 'NOT Actual Mileage',
+                    type: "checkbox",
+                    placeholder: 'NOT Actual Mileage'
+                }, {
+                    label: 'Mileage Exceeds Mechanical Limit',
+                    type: "checkbox",
+                    placeholder: 'Mileage Exceeds Mechanical Limit'
+                }, {
+                    label: 'If kilometers check this box',
+                    type: "checkbox",
+                    placeholder: 'If kilometers check this box'
+                }
+            ]
+        }, {
+            reference: "Vehicle Declaration Entry",
+            blockName: "Vehicle Declaration Entry",
+            numberOfEntry: 2,
+            fields: [
+                { label: "Vehicle License Number", type: "text", placeholder: "ENTER LICENSE NUMBER" },
+                { label: "Vehicle Identification Number", type: "text", placeholder: "Enter VIN" },
+                { label: "Vehicle Make", type: "text", placeholder: "Enter Vehicle Make" },
+                {
+                    label: "GVW Weight Range", type: "dropdown", placeholder: "Select GVW range",
+                    options: [
+                        { label: "Under 10,001", value: "Under 10,001" },
+                        { label: "10,001-15,000", value: "10,001-15,000" },
+                        { label: "15,001-20,000", value: "15,001-20,000" },
+                        { label: "20,001-26,000", value: "20,001-26,000" },
+                        { label: "26,001-30,000", value: "26,001-30,000" },
+                        { label: "30,001-35,000", value: "30,001-35,000" },
+                        { label: "35,001-40,000", value: "35,001-40,000" },
+                        { label: "40,001-45,000", value: "40,001-45,000" },
+                        { label: "45,001-50,000", value: "45,001-50,000" },
+                        { label: "50,001-54,999", value: "50,001-54,999" },
+                        { label: "55,000-60,000", value: "55,000-60,000" },
+                        { label: "60,001-65,000", value: "60,001-65,000" },
+                        { label: "65,001-70,000", value: "65,001-70,000" },
+                        { label: "70,001-75,000", value: "70,001-75,000" },
+                        { label: "75,001-80,000", value: "75,001-80,000" },
+                    ]
+                },
+                {
+                    label: "CGW Weight Range", type: "dropdown", placeholder: "Select CGW range",
+                    options: [
+                        { label: "Under 10,001", value: "Under 10,001" },
+                        { label: "10,001-15,000", value: "10,001-15,000" },
+                        { label: "15,001-20,000", value: "15,001-20,000" },
+                        { label: "20,001-26,000", value: "20,001-26,000" },
+                        { label: "26,001-30,000", value: "26,001-30,000" },
+                        { label: "30,001-35,000", value: "30,001-35,000" },
+                        { label: "35,001-40,000", value: "35,001-40,000" },
+                        { label: "40,001-45,000", value: "40,001-45,000" },
+                        { label: "45,001-50,000", value: "45,001-50,000" },
+                        { label: "50,001-54,999", value: "50,001-54,999" },
+                        { label: "55,000-60,000", value: "55,000-60,000" },
+                        { label: "60,001-65,000", value: "60,001-65,000" },
+                        { label: "65,001-70,000", value: "65,001-70,000" },
+                        { label: "70,001-75,000", value: "70,001-75,000" },
+                        { label: "75,001-80,000", value: "75,001-80,000" },
+                    ]
+                },
+                { label: "Date Operated", type: "datepicker", placeholder: "dd-mm-yyyy" },
+            ],
+        }, {
+            reference: "Registered Owner(s)",
+            blockName: "Registered Owner(s)",
+            ownersNumber: 3,
+            fields: [
+                { label: 'First Name', type: 'text', placeholder: 'First Name' },
+                { label: 'Middle Name', type: 'text', placeholder: 'Middle Name' },
+                { label: 'Last Name', type: 'text', placeholder: 'Last Name' },
+                { label: 'Driver License Number', type: 'text', placeholder: 'Driver License Number' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' }
+            ]
+        }, {
+            reference: "Owner Address",
+            blockName: "Address",
+            subOption: [
+                {
+                    label: "If mailing address is different",
+                    type: "radiocheckbox",
+                }
+            ],
+            fields: [
+                {
+                    label: 'Street',
+                    type: "input field",
+                    placeholder: 'Street'
+                }, {
+                    label: 'APT./SPACE/STE.#',
+                    type: "input field",
+                    placeholder: 'APT./SPACE/STE.#'
+                }, {
+                    label: 'City',
+                    type: "input field",
+                    placeholder: 'City'
+                }, {
+                    label: 'County',
+                    type: "input field",
+                    placeholder: 'County'
+                }, {
+                    label: 'State',
+                    type: "dropdown",
+                    placeholder: 'State'
+                }, {
+                    label: 'ZIP Code',
+                    type: "input field",
+                    placeholder: 'ZIP Code'
+                }
+            ]
+        }, {
+            reference: "New Registered Owner(s)",
+            blockName: "New Registered Owner(s)",
+            ownersNumber: 3,
+            fields: [
+                {
+                    label: 'First Name',
+                    type: "input field",
+                    placeholder: 'First Name'
+                }, {
+                    label: 'Middle Name',
+                    type: "input field",
+                    placeholder: 'Middle Name'
+                }, {
+                    label: 'Last Name',
+                    type: "input field",
+                    placeholder: 'Last Name'
+                }, {
+                    label: 'Driver License Number',
+                    type: "input field",
+                    placeholder: 'Driver License Number'
+                }, {
+                    label: 'State',
+                    type: "dropdown",
+                    placeholder: 'State'
+                }, {
+                    label: 'Phone Number',
+                    type: "phone",
+                    placeholder: 'Phone Number'
+                }, {
+                    label: 'Purchase Price/Value',
+                    type: "input field",
+                    placeholder: 'Enter Amount'
+                }, {
+                    label: 'Market Value',
+                    type: "input field",
+                    placeholder: 'Enter Market Value'
+                }, {
+                    label: 'Relationship with Gifter',
+                    type: "input field",
+                    placeholder: 'Enter Relationship'
+                }, {
+                    label: 'Gift Value',
+                    type: "input field",
+                    placeholder: 'Enter Gift Value '
+                }
+            ]
+        }, {
+            reference: "New Registered Owner Address",
+            blockName: "Address",
+            subOptions: [
+                {
+                    label: "If mailing address is different",
+                    fieldName: "Mailing Address",
+                    type: "radiocheckbox",
+                    subFields: [
+                        {
+                            label: 'Street',
+                            type: "input field",
+                            placeholder: 'Street'
+                        }, {
+                            label: 'APT./SPACE/STE.#',
+                            type: "input field",
+                            placeholder: 'APT./SPACE/STE.#'
+                        }, {
+                            label: 'City',
+                            type: "input field",
+                            placeholder: 'City'
+                        }, {
+                            label: 'State',
+                            type: "dropdown",
+                            placeholder: 'State'
+                        }, {
+                            label: 'ZIP Code',
+                            type: "input field",
+                            placeholder: 'ZIP Code'
+                        },
+                    ]
+                }, {
+                    label: "If lessee address is different",
+                    fieldName: "Lessee Address",
+                    type: "radiocheckbox",
+                    subFields: [
+                        {
+                            label: 'Street',
+                            type: "input field",
+                            placeholder: 'Street'
+                        }, {
+                            label: 'APT./SPACE/STE.#',
+                            type: "input field",
+                            placeholder: 'APT./SPACE/STE.#'
+                        }, {
+                            label: 'City',
+                            type: "input field",
+                            placeholder: 'City'
+                        }, {
+                            label: 'State',
+                            type: "dropdown",
+                            placeholder: 'State'
+                        }, {
+                            label: 'ZIP Code',
+                            type: "input field",
+                            placeholder: 'ZIP Code'
+                        },
+                    ]
+                }, {
+                    label: "Trailer/Vessel location",
+                    fieldName: "Vessel or Trailer Coach Principally Kept At",
+                    type: "radiocheckbox",
+                    subFields: [
+                        {
+                            label: 'Street',
+                            type: "input field",
+                            placeholder: 'Street'
+                        }, {
+                            label: 'APT./SPACE/STE.#',
+                            type: "input field",
+                            placeholder: 'APT./SPACE/STE.#'
+                        }, {
+                            label: 'City',
+                            type: "input field",
+                            placeholder: 'City'
+                        }, {
+                            label: 'County',
+                            type: "input field",
+                            placeholder: 'County'
+                        }, {
+                            label: 'State',
+                            type: "dropdown",
+                            placeholder: 'State'
+                        }, {
+                            label: 'ZIP Code',
+                            type: "input field",
+                            placeholder: 'ZIP Code'
+                        },
+                    ]
+                }
+            ],
+            fields: [
+                {
+                    label: 'Street',
+                    type: "input field",
+                    placeholder: 'Street'
+                }, {
+                    label: 'APT./SPACE/STE.#',
+                    type: "input field",
+                    placeholder: 'APT./SPACE/STE.#'
+                }, {
+                    label: 'City',
+                    type: "input field",
+                    placeholder: 'City'
+                }, {
+                    label: 'State',
+                    type: "dropdown",
+                    placeholder: 'State'
+                }, {
+                    label: 'ZIP Code',
+                    type: "input field",
+                    placeholder: 'ZIP Code'
+                }, {
+                    label: 'County',
+                    type: "input field",
+                    placeholder: 'County'
+                }, {
+                    label: 'If no California county and used out-of-state, check this box',
+                    type: "checkbox",
+                    placeholder: 'If no California county and used out-of-state, check this box'
+                },
+            ]
+        }, {
+            reference: "Legal Owner of Record",
+            blockName: "Legal Owner of Record",
+            subOptions: [
+                {
+                    label: "If mailing address is different",
+                    fieldName: "Mailing Address",
+                    type: "radiocheckbox",
+                    subFields: [
+                        {
+                            label: 'Street',
+                            type: "input field",
+                            placeholder: 'Street'
+                        }, {
+                            label: 'APT./SPACE/STE.#',
+                            type: "input field",
+                            placeholder: 'APT./SPACE/STE.#'
+                        }, {
+                            label: 'City',
+                            type: "input field",
+                            placeholder: 'City'
+                        }, {
+                            label: 'State',
+                            type: "dropdown",
+                            placeholder: 'State'
+                        }, {
+                            label: 'ZIP Code',
+                            type: "input field",
+                            placeholder: 'ZIP Code'
+                        },
+                    ]
+                },
+            ],
+            fields: [
+                {
+                    label: 'Name of Bank, Finance Company, or Individual having a Lien on this Vehicle',
+                    type: "input field",
+                    placeholder: 'Name of Bank, Finance Company, or Individual having a Lien on this Vehicle'
+                }, {
+                    label: 'ELT Number (3 digits)',
+                    type: "input field",
+                    placeholder: 'ELT Number (3 digits)'
+                }, {
+                    label: 'Street',
+                    type: "input field",
+                    placeholder: 'Street'
+                }, {
+                    label: 'APT./SPACE/STE.#',
+                    type: "input field",
+                    placeholder: 'APT./SPACE/STE.#'
+                }, {
+                    label: 'City',
+                    type: "input field",
+                    placeholder: 'City'
+                }, {
+                    label: 'State',
+                    type: "dropdown",
+                    placeholder: 'State'
+                }, {
+                    label: 'ZIP Code',
+                    type: "input field",
+                    placeholder: 'ZIP Code'
+                }
+            ]
+        }, {
+            reference: "DATE INFORMATION",
+            blockName: "DATE INFORMATION",
+            fields: [
+                {
+                    label: 'DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):',
+                    subFields: [
+                        {
+                            label: "Month",
+                            type: "date input field",
+                            placeholder: "MM"
+                        }, {
+                            label: "Day",
+                            type: "date input field",
+                            placeholder: "DD"
+                        }, {
+                            label: "Year",
+                            type: "date input field",
+                            placeholder: "YYYY"
+                        },
+                    ]
+                }, {
+                    label: 'DATE VEHICLE FIRST OPERATED IN CALIFORNIA:',
+                    subFields: [
+                        {
+                            label: "Month",
+                            type: "date input field",
+                            placeholder: "MM"
+                        }, {
+                            label: "Day",
+                            type: "date input field",
+                            placeholder: "DD"
+                        }, {
+                            label: "Year",
+                            type: "date input field",
+                            placeholder: "YYYY"
+                        },
+                    ]
+                }, {
+                    label: 'DATE YOU WENT TO WORK IN CALIFORNIA, OBTAINED A CA DRIVER LICENSE, OR BECAME A RESIDENT:',
+                    subFields: [
+                        {
+                            label: "Month",
+                            type: "date input field",
+                            placeholder: "MM"
+                        }, {
+                            label: "Day",
+                            type: "date input field",
+                            placeholder: "DD"
+                        }, {
+                            label: "Year",
+                            type: "date input field",
+                            placeholder: "YYYY"
+                        },
+                    ]
+                }, {
+                    label: 'DATE VEHICLE WAS PURCHASED OR ACQUIRED:',
+                    subFields: [
+                        {
+                            label: "Month",
+                            type: "date input field",
+                            placeholder: "MM"
+                        }, {
+                            label: "Day",
+                            type: "date input field",
+                            placeholder: "DD"
+                        }, {
+                            label: "Year",
+                            type: "date input field",
+                            placeholder: "YYYY"
+                        },
+                    ]
+                },
+            ]
+        }, {
+            reference: "Vehicle Status Information",
+            blockName: "Vehicle Status Information",
+            fields: [
+                {
+                    label:
+                        "IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:",
+                    type: "checkbox",
+                    placeholder:
+                        "IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:",
+                },
+                {
+                    label: "IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:",
+                    type: "checkbox",
+                    placeholder: "IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:",
+                },
+                {
+                    label: "Vehicle Condition",
+                    type: "radiobutton",
+                    options: [
+                        { value: "NEW", name: "NEW" },
+                        { value: "USED", name: "USED" },
+                    ],
+                },
+                {
+                    label: "Purchase Location",
+                    type: "radiobutton",
+                    options: [
+                        { value: "INSIDE CA", name: "INSIDE CA" },
+                        { value: "OUTSIDE CA", name: "OUTSIDE CA" },
+                    ],
+                }
+            ],
+        }, {
+            blockName: "VEHICLE WAS PURCHASED OR ACQUIRED FROM:",
+            reference: "VEHICLE WAS PURCHASED OR ACQUIRED FROM:",
+            fields: [
+                {
+                    label: "VEHICLE WAS PURCHASED OR ACQUIRED FROM:",
+                    type: "radiobutton",
+                    options: [
+                        { value: "dealer", name: "DEALER" },
+                        { value: "private party", name: "PRIVATE PARTY" },
+                        { value: "dismantler", name: "DISMANTLER" },
+                        { value: "family", name: "IMMEDIATE FAMILY MEMBER – STATE RELATIONSHIP:" },
+                    ],
+                },
+                {
+                    label: "Vehicle Modifications",
+                    type: "radiobutton",
+                    options: [
+                        { value: "yes", name: "YES" },
+                        { value: "no", name: "NO" },
+                    ],
+                },
+            ],
+        }, {
+            blockName: "Statement for Vehicle Body Change",
+            reference: "Statement for Vehicle Body Change",
+            fields: [], // no dynamic fields, hardcoded in component
+        }, {
+            blockName: "For Commercial Vehicle Only",
+            reference: "For Commercial Vehicle Only",
+            fields: [], // no dynamic fields, hardcoded in component
+        }
+        ]
+    }, {
+        form: "Salvage",
+        blocks: [
+            {
+                reference: "Transaction Details",
+                blockName: "Transaction Details",
+                fields: [
+                    {
+                        label: 'Orginal',
+                        type: "checkbox",
+                        placeholder: 'Orginal'
+                    }, {
+                        label: 'Duplicate',
+                        type: "checkbox",
+                        placeholder: 'Duplicate'
+                    }
+                ]
+            }, {
+                reference: "Salvage Certificate",
+                blockName: "Salvage Certificate",
+                fields: [
+                    {
+                        label: 'State of last Registeration',
+                        type: "input field",
+                        placeholder: 'Enter State'
+                    }, {
+                        label: 'Date of Registeration Expires',
+                        type: "date",
+                        placeholder: 'MM/DD/YYYY'
+                    }, {
+                        label: 'Cost/value',
+                        type: "input field",
+                        placeholder: 'Enter Cost/value'
+                    }, {
+                        label: 'Claim number',
+                        type: "input field",
+                        placeholder: 'Enter Claim number'
+                    }, {
+                        label: 'Date wrecked',
+                        type: "date",
+                        placeholder: 'Enter Date wrecked'
+                    }, {
+                        label: 'Date stolen',
+                        type: "date",
+                        placeholder: 'Enter Date stolen'
+                    }, {
+                        label: 'Date recovered',
+                        type: "date",
+                        placeholder: 'Enter Date recovered'
+                    },
+                ]
+            }, {
+                reference: "Vehicle Information",
+                blockName: "Vehicle Information",
+                fields: [
+                    {
+                        label: 'Vehicle/Hull Identification Number',
+                        type: "input field",
+                        placeholder: 'Vehicle/Hull Identification Number'
+                    }, {
+                        label: 'Vehicle License Plate or Vessel CF Number',
+                        type: "input field",
+                        placeholder: 'Vehicle License Plate or Vessel CF Number'
+                    }, {
+                        label: 'Year of Vehicle',
+                        type: "input field",
+                        placeholder: 'Year of Vehicle'
+                    }, {
+                        label: 'Make of Vehicle OR Vessel Builder',
+                        type: "input field",
+                        placeholder: 'Make of Vehicle OR Vessel Builder'
+                    },
+                ]
+            }, {
+                reference: "Registered Owner(s)",
+                blockName: "Registered Owner(s)",
+                ownersNumber: 3,
+                fields: [
+                    { label: 'First Name', type: 'text', placeholder: 'First Name' },
+                    { label: 'Middle Name', type: 'text', placeholder: 'Middle Name' },
+                    { label: 'Last Name', type: 'text', placeholder: 'Last Name' },
+                    { label: 'Driver License Number', type: 'text', placeholder: 'Driver License Number' },
+                    { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                    { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
+                    { label: 'Agent Name', type: 'text', placeholder: 'Agent Name' },
+                ]
+            }, {
+                reference: "Owner Address",
+                blockName: "Address",
+                fields: [
+                    {
+                        label: 'Street',
+                        type: "input field",
+                        placeholder: 'Street'
+                    }, {
+                        label: 'APT./SPACE/STE.#',
+                        type: "input field",
+                        placeholder: 'APT./SPACE/STE.#'
+                    }, {
+                        label: 'City',
+                        type: "input field",
+                        placeholder: 'City'
+                    }, {
+                        label: 'County',
+                        type: "input field",
+                        placeholder: 'County'
+                    }, {
+                        label: 'State',
+                        type: "dropdown",
+                        placeholder: 'State'
+                    }, {
+                        label: 'ZIP Code',
+                        type: "input field",
+                        placeholder: 'ZIP Code'
+                    }
+                ]
+            }, {
+                reference: "Certification of License Plate Disposition",
+                blockName: "Certification of License Plate Disposition",
+                fields: [
+                    { label: "ARE BEING SURRENDERED", type: "checkbox" },
+                    { label: "HAVE BEEN LOST", type: "checkbox" },
+                    { label: "HAVE BEEN DESTROYED (OCCUPATIONAL LICENSEES ONLY)", type: "checkbox" },
+                    { label: "PLATE WITH OWNER - RETAINED BY OWNER FOR REASSIGNMENT", type: "checkbox" }
+                ]
+            }
+        ]
+    }, {
+        form: "Disabled Person Placards/Plates",
+        blocks: [
+            {
+                reference: "New Registered Owner(s)",
+                blockName: "New Registered Owner(s)",
+                fields: [
+                    { label: 'First Name', type: 'text', placeholder: 'First Name' },
+                    { label: 'Middle Name', type: 'text', placeholder: 'Middle Name' },
+                    { label: 'Last Name', type: 'text', placeholder: 'Last Name' },
+                    { label: 'Driver License Number', type: 'text', placeholder: 'Driver License Number' },
+                    { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                    { label: 'Date of Birth', type: 'date', placeholder: 'MM/DD/YYYY' },
+                    { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
+                ]
+            }, {
+                reference: "New Registered Owner Address",
+                blockName: "Address",
+                subOptions: [
+                    {
+                        label: "If mailing address is different",
+                        fieldName: "Mailing Address",
+                        type: "radiocheckbox",
+                        subFields: [
+                            {
+                                label: 'Street',
+                                type: "input field",
+                                placeholder: 'Street'
+                            }, {
+                                label: 'APT./SPACE/STE.#',
+                                type: "input field",
+                                placeholder: 'APT./SPACE/STE.#'
+                            }, {
+                                label: 'City',
+                                type: "input field",
+                                placeholder: 'City'
+                            }, {
+                                label: 'State',
+                                type: "dropdown",
+                                placeholder: 'State'
+                            }, {
+                                label: 'ZIP Code',
+                                type: "input field",
+                                placeholder: 'ZIP Code'
+                            },
+                        ]
+                    },],
+                fields: [
+                    {
+                        label: 'Street',
+                        type: "input field",
+                        placeholder: 'Street'
+                    }, {
+                        label: 'APT./SPACE/STE.#',
+                        type: "input field",
+                        placeholder: 'APT./SPACE/STE.#'
+                    }, {
+                        label: 'City',
+                        type: "input field",
+                        placeholder: 'City'
+                    }, {
+                        label: 'County',
+                        type: "input field",
+                        placeholder: 'County'
+                    }, {
+                        label: 'State',
+                        type: "dropdown",
+                        placeholder: 'State'
+                    }, {
+                        label: 'ZIP Code',
+                        type: "input field",
+                        placeholder: 'ZIP Code'
+                    }
+                ]
+            }, {
+                reference: "Type of Disabled Person Parking Placard(S) or License Plates",
+                blockName: "Type of Disabled Person Parking Placard(S) or License Plates",
+                fields: [
+                    {
+                        label: 'Street',
+                        type: "input field",
+                        placeholder: 'Street'
+                    }, {
+                        label: 'APT./SPACE/STE.#',
+                        type: "input field",
+                        placeholder: 'APT./SPACE/STE.#'
+                    }, {
+                        label: 'City',
+                        type: "input field",
+                        placeholder: 'City'
+                    }, {
+                        label: 'County',
+                        type: "input field",
+                        placeholder: 'County'
+                    }, {
+                        label: 'State',
+                        type: "dropdown",
+                        placeholder: 'State'
+                    }, {
+                        label: 'ZIP Code',
+                        type: "input field",
+                        placeholder: 'ZIP Code'
+                    }
+                ]
+            },
+            {
+                reference: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
+                blockName: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
+                fields: [
+                    { label: "License Plate", key: "plate", placeholder: "License plate" },
+                    { label: "VEHICLE IDENTIFICATION NUMBER", key: "vin", placeholder: "VEHICLE IDENTIFICATION NUMBER" },
+                    { label: "VEHICLE MAKE", key: "make", placeholder: "VEHICLE MAKE" },
+                    { label: "VEHICLE YEAR", key: "year", placeholder: "VEHICLE YEAR" },
+                ]
+            }
         ]
     },
 

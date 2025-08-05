@@ -41,6 +41,7 @@ type LienReleaseState = {
 type NewLienholder = {
     address?: { [key: string]: string | undefined };
     mailingAddress?: { [key: string]: string | undefined };
+    isMailingDifferent?: boolean;
 };
 
 type StatementForSomgExemptionData = {
@@ -64,10 +65,38 @@ type DateValues = {
     [key: string]: { Month?: string; Day?: string; Year?: string };
 };
 
+type SalvageCertificateState = {
+    'State of last Registeration'?: string;
+    'Date of Registeration Expires'?: string;
+    'Cost/value'?: string;
+    'Claim number'?: string;
+    'Date wrecked'?: string;
+    'Date stolen'?: string;
+    'Date recovered'?: string;
+};
+
 type FormData = {
+    vehicleBodyState?: {
+        ["Axles Checked"]?: boolean;
+        ["Body Type Checked"]?: boolean;
+        ["Change Cost"]?: string;
+        ["Change Date"]?: string;
+        ["Market Value"]?: string;
+        ["Motive Power Checked"]?: boolean;
+        ["Statement of Facts"]?: string;
+        ["Unladen Weight Checked"]?: boolean;
+        ["Unladen Weight Reason"]?: boolean;
+        ["Motive Power From"]: string;
+        ["Motive Power To"]: string;
+        ["Body Type From"]: string;
+        ["Body Type To"]: string;
+        ["Axles From"]: string;
+        ["Axles To"]: string;
+    };
     ownersData?: OwnerData[];
     newOwnerData?: OwnerData[];
     vehicleInfoState?: { [key: string]: string | undefined };
+    dpVehicleInfoState?: { plate?: string; vin?: string; make?: string; year?: string };
     ownerAddress?: AddressData;
     licensePlateState?: string;
     newOwnerMailingAddress?: { [key: string]: string | undefined };
@@ -104,6 +133,28 @@ type FormData = {
         City?: string;
         State?: string;
         ["ZIP Code"]?: string;
+    };
+    commercialInfo?: { [key: string]: string | boolean | undefined }
+    vehicleDeclarationEntryData?: {
+        [index: number]: {
+            "Vehicle License Number"?: string;
+            "Vehicle Identification Number"?: string;
+            "Vehicle Make"?: string;
+            "GVW Weight Range"?: string;
+            "CGW Weight Range"?: string;
+            "Date Operated"?: string;
+        };
+    };
+    salvageCertificateState?: SalvageCertificateState;
+    certificateOfLicensePlateDispositionState?: {
+        licensePlatesAssignedTo?: string; // e.g. "ARE BEING SURRENDERED"
+        platesSurrendered?: "ONE" | "TWO" | string;
+        occupationalLicenseNumber?: string;
+    };
+    dpState?: {
+        selectedPlacard?: "permanent" | "temporary" | "travel" | "plates" | "reassign";
+        issuedPreviously?: "yes" | "no";
+        plate?: string;
     };
 };
 
@@ -162,9 +213,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'MOTORCYCLE ENGINE NUMBER': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
         "DP number": '',
         "Engine number": formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        "True full name": (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
-        "Co owner": (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
-        "certification": (formData.newOwnerCount ?? 2) > 0 ? newOwner3 : '',
+        "True full name": (formData.ownerCount ?? 0) > 0 ? owner1 : '',
+        "Co owner": (formData.ownerCount ?? 1) > 1 ? owner2 : '',
+        "certification": (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
         "telephone number": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
         "title": formData.ownersData?.[0]?.['Title if Signing for a Company'] || '',
         "DL1": formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
@@ -184,6 +235,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "2DL7": formData.ownersData?.[1]?.['Driver License Number']?.split('')[6] || '',
         "2DL8": formData.ownersData?.[1]?.['Driver License Number']?.split('')[7] || '',
         "Physical address": formData.newOwnerAddress?.Street || '',
+        "County": formData.newOwnerAddress?.County || '',
         "One license": senerio?.includes("Duplicate Plates & Stickers") ? formData.licensePlateState === "One license plate missing" ? true : false : false,
         "Two plates": senerio?.includes("Duplicate Plates & Stickers") ? formData.licensePlateState === "Two license plates are missing" ? true : false : false,
         "Apt #": formData.ownerAddress?.residential?.["APT./SPACE/STE.#"] || '',
@@ -255,7 +307,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'CheckBox': "CheckBox",
         'CheckBox_1': "CheckBox",
         'CheckBox_2': "CheckBox",
-        'text_60czib': formData.newOwnerMailingAddress?.Street ? `${formData.newOwnerMailingAddress?.Street || ''} ${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || ''}` : `${formData.newOwnerAddress?.Street || ''} ${formData.newOwnerAddress?.["APT./SPACE/STE.#"] || ''}`,
+        'text_60czib': formData.newOwnerMailingAddress?.Street ? `${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || ''}   ${formData.newOwnerMailingAddress?.Street || ''}` : `${formData.newOwnerAddress?.["APT./SPACE/STE.#"] || ''}   ${formData.newOwnerAddress?.Street || ''}`,
         'text_61pxrx': formData.newOwnerMailingAddress?.City ? formData.newOwnerMailingAddress?.City || '' : formData.newOwnerAddress?.City || '',
         'text_62cqaf': formData.newOwnerMailingAddress?.State ? formData.newOwnerMailingAddress?.State || '' : formData.newOwnerAddress?.State || '',
         'text_63psgg': formData.newOwnerMailingAddress?.["ZIP Code"] ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : formData.newOwnerAddress?.["ZIP Code"] || '',
@@ -390,8 +442,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "date 3": (formData.newOwnerCount ?? 0) > 2 ? rawDate || '' : '',
         '6 States 2.0': formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.State || '' : '',
         '6 Zip Code-2.0': formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : '',
-        'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.Street || ''}    ${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerLesseeAddress?.City || ''}    ${formData.newOwnerLesseeAddress?.State || ''} `,
-        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.Street || ''}    ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerKeptAddress?.City || ''}    ${formData.newOwnerKeptAddress?.State || ''} `,
+        'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerLesseeAddress?.Street || ''}    ${formData.newOwnerLesseeAddress?.City || ''}    ${formData.newOwnerLesseeAddress?.State || ''} `,
+        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerKeptAddress?.Street || ''}    ${formData.newOwnerKeptAddress?.City || ''}    ${formData.newOwnerKeptAddress?.State || ''} `,
         'county.0.0': formData.newOwnerKeptAddress?.County || '',
         '6 area code 1': (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
         'daytime telephone number': (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : '',
@@ -401,19 +453,20 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'daytime number 3': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['Phone Number']?.slice(5) || '' : '',
         '7 Name New Legal Owner': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["True Full Name or Bank/Finance Company or Individual"] || "NONE" : "NONE",
         'Physical residence or business address.0': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["Street"] || "" : "",
-        'mailing address': senerio.includes("Add Lienholder") ? formData.newLienholder?.mailingAddress?.["Street"] || "" : "",
+        'mailing address': senerio.includes("Add Lienholder") ? formData.newLienholder?.isMailingDifferent ? formData.newLienholder?.mailingAddress?.["Street"] || "" : "" : "",
         '7 Apt/Space Number.0': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["APT./SPACE/STE.#"] || "" : "",
-        '7 Apt/Space Number.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.mailingAddress?.["APT./SPACE/STE.#"] || "" : "",
+        '7 Apt/Space Number.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.isMailingDifferent ? formData.newLienholder?.mailingAddress?.["APT./SPACE/STE.#"] || "" : "" : "",
         '7 City.0': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["City"] || "" : "",
-        '7 City.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.mailingAddress?.["City"] || "" : "",
+        '7 City.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.isMailingDifferent ? formData.newLienholder?.mailingAddress?.["City"] || "" : "" : "",
         '7 State.0': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["State"] || "" : "",
-        '7 State.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.mailingAddress?.["State"] || "" : "",
+        '7 State.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.isMailingDifferent ? formData.newLienholder?.mailingAddress?.["State"] || "" : "" : '',
         '7 Zip Code.0': senerio.includes("Add Lienholder") ? formData.newLienholder?.address?.["ZIP Code"] || "" : "",
-        '7 Zip Code.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.mailingAddress?.["ZIP Code"] || "" : "",
+        '7 Zip Code.1': senerio.includes("Add Lienholder") ? formData.newLienholder?.isMailingDifferent ? formData.newLienholder?.mailingAddress?.["ZIP Code"] || "" : "" : '',
         "License Plate/CF Number": formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         "Veh/Vessel ID Number": formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
-        'text_70xghh': "",
-        'text_71tqjp': "",
+        'text_70xghh': senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Market Value"] || '' : '',
+        'text_71tqjp': senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Change Cost"] || '' : '',
+        'text_72knux': senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Change Date"] || '' : '',
         "Text9.1": formData.vehicleInfoState?.['Vehicle/Hull Identification Number']?.split('')[0] || "",
         "Text9.2": formData.vehicleInfoState?.['Vehicle/Hull Identification Number']?.split('')[1] || "",
         "Text9.3": formData.vehicleInfoState?.['Vehicle/Hull Identification Number']?.split('')[2] || "",
@@ -482,7 +535,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text110": formData.newOwnerLesseeAddress?.City || '',
         "Text111": formData.newOwnerLesseeAddress?.State || '',
         "Text112": formData.newOwnerLesseeAddress?.["ZIP Code"] || '',
-        "Text113": formData.newOwnerKeptAddress?.Street || '',
+        "Text113": `${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}   ${formData.newOwnerKeptAddress?.Street || ''}`,
         "Text114": formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || '',
         "Text115": formData.newOwnerKeptAddress?.City || '',
         "Text116": formData.newOwnerKeptAddress?.State || '',
@@ -609,7 +662,10 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "7 ELT #.1.1": senerio?.includes("Add Lienholder") ? formData.newLienholder?.address?.["ELT Number (3 digits)"]?.split('')[2] || '' : '',
         "gift box": formData.transactionSelections?.includes("Vehicle is a Gift"),
         "Family transfer box": formData.transactionSelections?.includes("Family Transfer"),
+        "textarea_69crqf": senerio?.includes("Restoring PNO Vehicle to Operational") ? " The vehicle was previously placed on Planned Non Operation (PNO) status I now intend to operate it on public roads and I am submitting payment for registration fees and for any late fees penalities." :
+            senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Statement of Facts"] || '' : '',
         //Reg102
+        "PNO": formData?.transactionSelections?.includes('60 days before registration expires or 90 days after') ? true : false,
         "veh lic plate #.0": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? formData?.plannedNonOperationState?.[0]?.plate || '' : '',
         "veh id #.0": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? formData?.plannedNonOperationState?.[0]?.vin || '' : '',
         "veh make.0": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? formData?.plannedNonOperationState?.[0]?.make || '' : '',
@@ -708,7 +764,151 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
         //reg 156
         "license year": senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : false,
-        "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false
+        "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false,
+
+        "Text49": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Number of axles"] || '' : '',
+        "Text50": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Unladen weight"] || '' : '',
+        "Check Box51": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Weight Actual"] || '' : '',
+        "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Weight Estimated"] || '' : '',
+
+        //reg 4008
+
+        "Name": senerio?.includes("Commercial Vehicle") ? owner1 || '' : '',
+        "text_31jsfn": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.Street || '' : '',
+        "text_32olri": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.["APT./SPACE/STE.#"] || '' : '',
+        "City.0": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.City || '' : '',
+        "States1.0": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.State || '' : '',
+        "Zip Code.0": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.["ZIP Code"] || '' : '',
+        "Address.0.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.County || '' : '',
+        "Check Box 1": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.["If no California county and used out-of-state, check this box"] || false : false,
+
+        "text_30xebc": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.Street || '' : '',
+        "text_33mpyh": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.["APT./SPACE/STE.#"] || '' : '',
+        "City.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.City || '' : '',
+        "States1.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.State || '' : '',
+        "Zip Code.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.["ZIP Code"] || '' : '',
+
+        "License- 1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle License Number"] || '' : '',
+        "VIN- 1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Identification Number"] || '' : '',
+        "Make -1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Make"] || '' : '',
+        // "Under 10,001 pounds.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["GVW Weight Range"] || '' : '',
+        "GVW -1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["GVW Weight Range"] || '' : '',
+        "CGW -1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["CGW Weight Range"] || '' : '',
+        "Date 1st operated-1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Date Operated"] || '' : '',
+
+        "License- 1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle License Number"] || '' : '',
+        "VIN- 1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Identification Number"] || '' : '',
+        "Make -1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Make"] || '' : '',
+        // "Under 10,001 pounds.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["GVW Weight Range"] || '' : '',
+        "GVW -1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["GVW Weight Range"] || '' : '',
+        "CGW -1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["CGW Weight Range"] || '' : '',
+        "Date 1st operated-1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Date Operated"] || '' : '',
+
+        "checkbox_76bcix": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Unladen Weight Checked"] === true || false : false,
+        "UNLADEN WEIGHT": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Unladen Weight Checked"] === true ? formData?.vehicleBodyState?.["Unladen Weight Reason"] || '' : '' : '',
+        "checkbox_80yjyf": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Motive Power Checked"] === true || false : false,
+        "text_70ywcs": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Motive Power Checked"] === true ? formData?.vehicleBodyState?.["Motive Power From"] || '' : '' : '',
+        "text_71qeb": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Motive Power Checked"] === true ? formData?.vehicleBodyState?.["Motive Power To"] || '' : '' : '',
+        "checkbox_81iyuu": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Body Type Checked"] === true || false : false,
+        "text_72cghv": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Body Type Checked"] === true ? formData?.vehicleBodyState?.["Body Type From"] || '' : '' : '',
+        "text_73edpt": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Body Type Checked"] === true ? formData?.vehicleBodyState?.["Body Type To"] || '' : '' : '',
+        "checkbox_82vosg": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Axles Checked"] === true || false : false,
+        "text_74aiyr": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Axles Checked"] === true ? formData?.vehicleBodyState?.["Axles From"] || '' : '' : '',
+        "text_75aiwg": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Axles Checked"] === true ? formData?.vehicleBodyState?.["Axles To"] || '' : '' : '',
+
+        //reg 590
+        "Vehicle identification number": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
+        "Text2": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
+        "Text3": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
+        "Check Box 4": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Bus" ? true : false || false : false : false,
+        "Check Box 5": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Taxicab" ? true : false || false : false : false,
+        "Check Box 6": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Rental Limousine" ? true : false || false : false : false,
+        "Check Box 7": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Ambulance" ? true : false || false : false : false,
+        "Check Box 8": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Station Wagon" ? true : false || false : false : false,
+        "Check Box9": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["The owner of this vehicle and it is registered in my name"] === true ? true : false || false : false : false,
+        "Check Box10": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["Employee of a business which required me to own and operate a station wagon which is registered in my name"] === true ? true : false || false : false : false,
+        "Text14": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["commercialStartDate"] || '' : '' : '',
+
+        //reg 488c
+        "original": senerio?.includes("Salvage") ? formData.transactionSelections?.includes("Orginal") ? true : false : false,
+        "duplicate": senerio?.includes("Salvage") ? formData.transactionSelections?.includes("Duplicate") ? true : false : false,
+        "VEHICLE LICENSE NUMBER": senerio?.includes("Salvage") ? formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "" : '',
+        "MAKE1": senerio?.includes("Salvage") ? formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "" : '',
+        "YEAR1": senerio?.includes("Salvage") ? formData.vehicleInfoState?.['Year of Vehicle'] || "" : '',
+        "STATE OF LAST REGISTRATION1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['State of last Registeration'] || "" : '',
+        "DATE REGISTRATION EXPIRES1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date of Registeration Expires'] || "" : '',
+        "CLAIM NUMBER1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Cost/value'] || "" : '',
+        "COST/VALUE1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Claim number'] || "" : '',
+        "DATE WRECKED OR DESTROYED1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date wrecked'] || "" : '',
+        "DATE STOLEN1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date stolen'] || "" : '',
+        "DATE RECOVERED1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date recovered'] || "" : '',
+        "PRINTED NAME OF INSURANCE CO. OR APPLICANT1": senerio?.includes("Salvage") ? owner1 : '',
+        "DL OR ID NUMBER1": senerio?.includes("Salvage") ? formData.ownersData?.[0]?.['Driver License Number'] : '',
+        "STREET ADDRESS": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.Street : '',
+        "CITY": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.City : '',
+        "STATE": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.State : '',
+        "ZIP CODE": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.["ZIP Code"] : '',
+        "PRINTED NAME OF AGENT": senerio?.includes("Salvage") ? formData.ownersData?.[0]?.["Agent Name"] || '' : '',
+
+
+        "Are Being Surrendered": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "ARE BEING SURRENDERED" ? true : false : false,
+        "surrendedone": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "ARE BEING SURRENDERED" ? formData.certificateOfLicensePlateDispositionState?.platesSurrendered === "ONE" ? true : false : false : false,
+        "surrendedtwo": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "ARE BEING SURRENDERED" ? formData.certificateOfLicensePlateDispositionState?.platesSurrendered === "TWO" ? true : false : false : false,
+        "have been lost": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "HAVE BEEN LOST" ? true : false : false,
+        "have been destroyed": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "HAVE BEEN DESTROYED (OCCUPATIONAL LICENSEES ONLY)" ? true : false : false,
+        "plate with owner": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "PLATE WITH OWNER - RETAINED BY OWNER FOR REASSIGNMENT" ? true : false : false,
+        "OL NUMBER 3": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "HAVE BEEN DESTROYED (OCCUPATIONAL LICENSEES ONLY)" ? formData.certificateOfLicensePlateDispositionState?.occupationalLicenseNumber : "" : "",
+
+        //Reg 195
+        "Name or organization name": senerio?.includes("Disabled Person Placards/Plates") ? newOwner1 || '' : '',
+        "DL No.0": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '' : '',
+        "DL No.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '' : '',
+        "DL No.2": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '' : '',
+        "DL No.3": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[3] || '' : '',
+        "DL No.4": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[4] || '' : '',
+        "DL No.5": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[5] || '' : '',
+        "DL No.6": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[6] || '' : '',
+        "DL No.7": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[7] || '' : '',
+
+        "DOB-Mo1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[0] || '' : '',
+        "DOB-Mo2": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[1] || '' : '',
+        "DOB-Day.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[3] || '' : '',
+        "DOB-Day.2": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[4] || '' : '',
+        "DOB-Yr.1.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[6] || '' : '',
+        "DOB-Yr.1.2": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[7] || '' : '',
+        "DOB-Yr.1.0": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[8] || '' : '',
+        "DOB-Yr.0": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Date of Birth']?.split('')[9] || '' : '',
+
+        "Residence or organization address": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerAddress?.Street || '' : '',
+        "Apt/Space.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerAddress?.["APT./SPACE/STE.#"] || '' : '',
+        "city.1.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerAddress?.City || '' : '',
+        "county": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerAddress?.County || '' : '',
+        "Applicant-State": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerAddress?.State || '' : '',
+        "Applicant-Zip Code": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerAddress?.["ZIP Code"] || '' : '',
+        "Residence or organization address if different": senerio?.includes("Disabled Person Placards/Plates") ? formData.selectedRadio?.includes('if-mailing-address-is-different') ? formData.newOwnerMailingAddress?.Street || '' : '' : '',
+        "Apt/Space.2": senerio?.includes("Disabled Person Placards/Plates") ? formData.selectedRadio?.includes('if-mailing-address-is-different') ? formData.newOwnerMailingAddress?.['APT./SPACE/STE.#'] || '' : '' : '',
+        "city2": senerio?.includes("Disabled Person Placards/Plates") ? formData.selectedRadio?.includes('if-mailing-address-is-different') ? formData.newOwnerMailingAddress?.City || '' : '' : '',
+        "county2": senerio?.includes("Disabled Person Placards/Plates") ? formData.selectedRadio?.includes('if-mailing-address-is-different') ? formData.newOwnerAddress?.County || '' : '' : '',
+        "State2": senerio?.includes("Disabled Person Placards/Plates") ? formData.selectedRadio?.includes('if-mailing-address-is-different') ? formData.newOwnerMailingAddress?.State || '' : '' : '',
+        "Zip Code2": senerio?.includes("Disabled Person Placards/Plates") ? formData.selectedRadio?.includes('if-mailing-address-is-different') ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : '' : '',
+        "Area Code": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
+        "Daytime phone no": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : '',
+
+        "Perm Park Placard.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.selectedPlacard === "permanent" ? true : false : false,
+        "Temp Park Placard.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.selectedPlacard === "temporary" ? true : false : false,
+        "Perm Park Placard.0": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.selectedPlacard === "travel" ? true : false : false,
+        "DP License plates": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.selectedPlacard === "plates" ? true : false : false,
+        "DP License plates reassignment": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.selectedPlacard === "reassign" ? true : false : false,
+
+        "Yes.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.issuedPreviously === "yes" ? true : false : false,
+        "No.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.issuedPreviously === "no" ? true : false : false,
+        "Lic Plate/Perm Placard": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.issuedPreviously === "yes" ? formData.dpState?.plate || '' : '' : '',
+
+        "Lic Plate no": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.plate || '' : '',
+        "VIN.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.vin || '' : '',
+        "Veh Make": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.make || '' : '',
+        "Veh Year": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.year || '' : '',
+
     };
 };
 
@@ -904,13 +1104,32 @@ export async function handleOnPDF(activeTransferIndex?: number): Promise<void> {
         }
         if (senerio?.includes("Add Lienholder") ||
             senerio?.includes("Remove Lienholder")) {
-            formTypes.push("Reg227");
+            if (form.transactionSelections?.includes("With Title")) {
+                formTypes = formTypes?.filter(formType => formType !== "Reg227");
+            } else {
+                formTypes.push("Reg227");
+            }
         }
         if (senerio?.includes("Filing for Planned Non-Operation (PNO)")) {
             formTypes.push("Reg102");
+            if (form.transactionSelections?.includes('60 days before registration expires or 90 days after')) {
+                formTypes.push("Reg156");
+            }
         }
         if (senerio?.includes("Certificate of Non-Operation")) {
             formTypes.push("Reg102");
+        }
+        if (senerio?.includes("Commercial Vehicle")) {
+            formTypes.push("Reg343");
+            formTypes.push("Reg4008");
+            formTypes.push("Reg256");
+            formTypes.push("Reg590");
+        }
+        if (senerio?.includes("Salvage")) {
+            formTypes.push("Reg488c");
+        }
+        if (senerio?.includes("Disabled Person Placards/Plates")) {
+            formTypes.push("REG195");
         }
         //==> Remove duplicates just in case
         formTypes = [...new Set(formTypes)];
