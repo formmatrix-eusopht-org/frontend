@@ -76,7 +76,7 @@ export const LegalOwnerOfRecord = ({
         useStyledRadio={true}
       >
         {/* First field - Full width */}
-        {fields[0] && (
+        {fields?.[0] && (
           <div className="mb-4">
             <Input
               key={fields[0]?.label}
@@ -90,7 +90,7 @@ export const LegalOwnerOfRecord = ({
               }
               placeholder={fields[0]?.placeholder ?? ""}
               options={fields[0]?.type === "dropdown" ? states : []}
-              value={legalOwnerAddress[fields[0]?.label] || ""}
+              value={legalOwnerAddress?.[fields[0]?.label] || ""}
               onChange={(val) =>
                 onAddressChange("residential", fields[0]?.label, val)
               }
@@ -113,7 +113,7 @@ export const LegalOwnerOfRecord = ({
               }
               placeholder={field?.placeholder ?? ""}
               options={field?.type === "dropdown" ? states : []}
-              value={legalOwnerAddress[field?.label] || ""}
+              value={legalOwnerAddress?.[field?.label] || ""}
               onChange={(val) =>
                 onAddressChange("residential", field?.label, val)
               }
@@ -147,7 +147,7 @@ export const LegalOwnerOfRecord = ({
                         : "text"
                   }
                   options={field?.type === "dropdown" ? states : []}
-                  value={mapped?.data[field?.label] || ""}
+                  value={mapped?.data?.[field?.label] || ""}
                   onChange={(val) =>
                     onAddressChange(mapped?.sectionKey, field?.label, val)
                   }

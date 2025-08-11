@@ -998,77 +998,9 @@ const mergeFilledPDFs = async (
 
     return await mergedPdf.save();
 };
-
-export async function handleOnPDF(activeTransferIndex?: number): Promise<void> {
-    console.log("firstly activeTransferIndex:", activeTransferIndex);
+async function handleOnPDF(form: any, senerio: any) {
     try {
-        const savedForm = localStorage.getItem("formStates");
-        const savedSenerio = localStorage.getItem("senerio");
-        const multipleForms = localStorage.getItem("multipleTransferStates");
-
-        const form: FormData = JSON.parse(savedForm || "{}");
-        const senerio: string = JSON.parse(savedSenerio || "{}");
-        const multipleTransfer = JSON.parse(multipleForms || "{}");
-
         let formTypes: string[] = [];
-
-        // console.log("multipleTransfer ==>", multipleTransfer);
-        // console.log("Transfer 01 ==>", multipleTransfer.multipleTransfer?.[0]?.transactionSelections);
-        // console.log("Transfer 02 ==>", multipleTransfer.multipleTransfer?.[1]?.transactionSelections);
-        // console.log("Transfer 03 ==>", multipleTransfer.multipleTransfer?.[2]?.transactionSelections);
-        // console.log("Transfer 04 ==>", multipleTransfer.multipleTransfer?.[3]?.transactionSelections);
-        // console.log("Transfer 05 ==>", multipleTransfer.multipleTransfer?.[4]?.transactionSelections);
-
-        // ====> MULTIPLE TRANSFER SCENARIO
-
-        // if (senerio?.includes("Multiple Transfer")) {
-        //     formTypes.push('DMVREG262new', 'Reg227');
-
-        //     // ==> Correctly access transactionSelections array from the first form in multipleTransfer
-        //     let transactionSelections = [];
-        //     if (
-        //         typeof activeTransferIndex === "number" &&
-        //         multipleTransfer?.multipleTransfer &&
-        //         Array.isArray(multipleTransfer.multipleTransfer) &&
-        //         multipleTransfer.multipleTransfer[activeTransferIndex]
-        //     ) {
-        //         transactionSelections = multipleTransfer.multipleTransfer[activeTransferIndex]?.transactionSelections || [];
-        //     }
-
-        //     // ==> Ensure it's always an array
-        //     if (!Array.isArray(transactionSelections)) {
-        //         transactionSelections = [transactionSelections];
-        //     }
-
-        //     // ==> Without Title: remove REG 227
-        //     if (transactionSelections?.includes("Transaction with Vehicle Title")) {
-        //         formTypes = formTypes.filter(formType => formType !== "Reg227");
-        //     }
-
-        //     // ==> Out Of State Title: Add REG 343
-        //     if (transactionSelections?.includes("Out of State Title")) {
-        //         formTypes.push("Reg343");
-        //     }
-
-        //     // ==> Current Lienholder: Add REG 227
-        //     if (transactionSelections.includes("There is a Current Lienholder")) {
-        //         formTypes.push("Reg227");
-        //     }
-
-        //     // ==> Gift / Family / Smog: Add REG 256
-        //     if (
-        //         transactionSelections.includes("Family Transfer") ||
-        //         transactionSelections.includes("Vehicle is a Gift") ||
-        //         transactionSelections.includes("Smog Exemption")
-        //     ) {
-        //         formTypes.push("Reg256");
-        //     }
-
-        //     console.log("log transactionSelections:", transactionSelections);
-        // }
-
-        // console.log("log formTypes after processing:", formTypes);
-        // ====> SIMPLE TRANSFER SCENARIO
         if (senerio?.includes("Simple Transfer")) {
             formTypes.push('DMVREG262new', 'Reg227');
             //==> Without Title: REG 227
@@ -1131,14 +1063,85 @@ export async function handleOnPDF(activeTransferIndex?: number): Promise<void> {
         if (senerio?.includes("Disabled Person Placards/Plates")) {
             formTypes.push("REG195");
         }
-        //==> Remove duplicates just in case
-        formTypes = [...new Set(formTypes)];
-
         const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio);
-        const blob = new Blob([mergedBytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        window.open(url);
+        return mergedBytes;
+
     } catch (e) {
         console.error("error in genrating pdf : ", e)
     }
 }
+export async function headHandlerForPDf(sourceOfClick: string) {
+    const finalMergedPdf = await PDFDocument.create();
+    if (sourceOfClick === "Multiple Transfer") {
+
+        const savedForm = localStorage.getItem("multipleTransferStates");
+        const savedSenerio = localStorage.getItem("senerio");
+
+        const parsed = JSON.parse(savedForm || "[]");
+        const multipleFormDataList = parsed?.multipleTransfer || [];
+        const senerio: string = JSON.parse(savedSenerio || "[]");
+
+        if (!multipleFormDataList.length) {
+            console.warn("No transfer data found.");
+            return;
+        }
+
+        for (const data of multipleFormDataList) {
+            const filledBytes = await handleOnPDF(data, ["Simple Transfer"]);
+            if (!filledBytes) continue;
+
+            try {
+                const filledDoc = await PDFDocument.load(filledBytes);
+                const pages = await finalMergedPdf.copyPages(filledDoc, filledDoc.getPageIndices());
+                pages.forEach((page) => finalMergedPdf.addPage(page));
+            } catch (e) {
+                console.error(`Error processing filled PDF for ${data.transferNumber}`, e);
+            }
+        }
+
+    } else {
+        try {
+            const savedForm = localStorage.getItem("formStates");
+            const savedSenerio = localStorage.getItem("senerio");
+            const parsed = JSON.parse(savedForm || "{}");
+            const filledBytes = await handleOnPDF(parsed, savedSenerio);
+
+            if (filledBytes) {
+                const filledDoc = await PDFDocument.load(filledBytes);
+                const pages = await finalMergedPdf.copyPages(filledDoc, filledDoc.getPageIndices());
+                pages.forEach((page) => finalMergedPdf.addPage(page));
+            }
+        } catch (e) {
+            console.error(`Error processing filled PDF:`, e);
+        }
+    }
+    const finalBytes = await finalMergedPdf.save();
+    const blob = new Blob([finalBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    window.open(url);
+}
+// export async function handleMultipleTransfersPDF(): Promise<void> {
+//     try {
+//         const savedForm = localStorage.getItem("multipleTransfersStates");
+//         const savedSenerio = localStorage.getItem("senerio");
+
+//         const form = JSON.parse(savedForm || "[]");
+//         const senerio: string = JSON.parse(savedSenerio || "[]");
+
+//         const multipleFormDataList = form || [];
+
+//         if (!multipleFormDataList.length) {
+//             console.warn("No multiple transfers found.");
+//             return;
+//         }
+
+//         const formTypes = ['DMVREG262new']; // Only REG 262 for each step
+
+//         const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio, multipleFormDataList);
+//         const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+//         const url = URL.createObjectURL(blob);
+//         window.open(url);
+//     } catch (e) {
+//         console.error("Error generating multiple transfer PDFs: ", e);
+//     }
+// }

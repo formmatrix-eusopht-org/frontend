@@ -24,7 +24,7 @@ import { LicensePlateMissingBlock } from '../Containers/LicensePlate';
 import PlannedNonOperation from '../Containers/PlannedNon-OperationCertificate';
 import { VehicleStorageLocationDetails } from '../Containers/VehicleStorageLocation';
 import { handleOnSave } from "../Actions/save"
-import { handleOnPDF } from "../Actions/pdfGenerates"
+// import { handleOnPDF } from "../Actions/pdfGenerates"
 import Options from '../Containers/Options';
 import { UserAuth } from '../Contexts/AuthContext';
 import VehicleBodyChange from '../Containers/StatementForVehicleBodyChange';
@@ -34,9 +34,10 @@ import SalvageCertificate from '../Containers/SalvageCertificate';
 import VehicleDeclarationEntry from '../Containers/VehicleDeclarationEntry';
 import DpPlacardSection from '../Containers/DisablePersion';
 import DisablePersonVehicleInfo from '../Containers/DisablePersonVehicleInfo';
+import MultipleTransfer from '../Containers/MultipleTransfer';
+import { headHandlerForPDf } from '../Actions/pdfGenerates';
 // import { PlatesSelection } from '../Containers/PersonalizePlates';
 // import SelectConfiguration from '../Containers/Configration';
-// import MultipleTransfer from '../Containers/MultipleTransfer';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
 
@@ -75,6 +76,10 @@ type SalvageCertificateState = {
 };
 const CombineForm = ({ formData }: CombineFormProps) => {
     const isInitialMount = useRef(true);
+    const schemaForMultipletransfer = {
+        "transferNumber": 1,
+        "Values": {}
+    }
     const getInitialDateValues = () => ({
         "DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):": {
             "Month": "",
@@ -146,7 +151,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         appointer: null,
         appointee: null
     });
-    // const [multipleTransfer, setMultipleTransfer] = useState([schemaForMultipletransfer]);
+    const [multipleTransfer, setMultipleTransfer] = useState([schemaForMultipletransfer]);
 
     const [otherExplain, setOtherExplain] = useState("");
     // Missing title reason
@@ -717,7 +722,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     // Find blocks by their reference names
     const transactionBlock = findBlock("Transaction Details");
-    // const multipletransactionBlock = findBlock("Multiple Transfer");
+    const multipletransactionBlock = findBlock("Multiple Transfer");
     const typeOfVehicleBlock = findBlock("Type of Vehicle");
     const vehicleInfoBlock = findBlock("Vehicle Information");
     const registeredOwnerBlock = findBlock("Registered Owner(s)");
@@ -814,7 +819,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                 vehicleMake: "",
                 vehicleYear: "",
             })
-            // setMultipleTransfer(parsed.multipleTransfer || [schemaForMultipletransfer]);
+            setMultipleTransfer(parsed.multipleTransfer || [schemaForMultipletransfer]);
         }
     }, []);
 
@@ -917,17 +922,17 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const comercialVehicleFlag = senerio?.includes("Commercial Vehicle");
     // const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
 
-    // const handleTransferCountChange = (newCount: number) => {
-    //     const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
-    //         transferNumber: index + 1,
-    //         Values: multipleTransfer[index]?.Values || {},
-    //     }));
-    //     setMultipleTransfer(updatedTransfers);
-    // };
+    const handleTransferCountChange = (newCount: number) => {
+        const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
+            transferNumber: index + 1,
+            Values: multipleTransfer[index]?.Values || {},
+        }));
+        setMultipleTransfer(updatedTransfers);
+    };
 
     return (
         <>
-            {/* {senerio?.includes("Multiple Transfer") ?
+            {senerio?.includes("Multiple Transfer") ?
                 <MultipleTransfer
                     title="Multiple Transfer"
                     block={multipletransactionBlock}
@@ -936,261 +941,261 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     setState={setMultipleTransfer}
                     onTransferCountChange={handleTransferCountChange}
                 />
-                : */}
-            <div className="space-y-6">
-                {transactionBlock && (
-                    <TransactionDetails
-                        title="Transaction Details"
-                        block={transactionBlock}
-                        senerio={senerio}
-                        selectedItems={transactionSelections}
-                        onChange={handleTransactionChange}
-                    />
-                )}
+                :
+                <div className="space-y-6">
+                    {transactionBlock && (
+                        <TransactionDetails
+                            title="Transaction Details"
+                            block={transactionBlock}
+                            senerio={senerio}
+                            selectedItems={transactionSelections}
+                            onChange={handleTransactionChange}
+                        />
+                    )}
 
-                {typeOfVehicleBlock && isOutofStateTitle && (
-                    <TypeOfVehicle
-                        title="Type of Vehicle"
-                        block={typeOfVehicleBlock}
-                        selectedItems={typeOfVehicleSelection}
-                        onChange={handleTypeOfVehicleChange}
-                    />
-                )}
-                {forCommercialVehicleOnlyBlock && (
-                    <CommercialVehicleInfo
-                        title={forCommercialVehicleOnlyBlock.blockName}
-                        block={{}}
-                        isCommercialVehicle={isCommercialVehicle} // optional
-                        values={commercialInfo}
-                        onChange={handleCommercialChange}
-                    />
-                )}
-                {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
-                    <MissingTitleReason
-                        title="Missing Title Reason"
-                        selectedReason={missingReason}
-                        onReasonChange={setMissingReason}
-                    />
-                )}
-                {SalvageCertificateBlock && (
-                    <SalvageCertificate
-                        title={SalvageCertificateBlock.blockName}
-                        block={SalvageCertificateBlock} // ✅ pass metadata
-                        values={salvageCertificateState} // ✅ pass current field values
-                        onFieldChange={handleSalvageCertificateChange}
-                    />
-                )}
-                {vehicleInfoBlock && (
-                    <VehicleInformationDetails
-                        title="Vehicle Information"
-                        block={{
-                            ...vehicleInfoBlock,
-                            fields: vehicleInfoBlock.fields
-                                ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
-                                ?.filter(field => (isOutofStateTitle || comercialVehicleFlag) || field.label !== "If kilometers check this box")
-                                ?.filter(field => isTRAILERCOACH ||
-                                    (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
-                                .map(field => ({
-                                    ...field,
-                                    type: field.type as "checkbox" | "input field" | "dropdown",
-                                    value: vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
-                                }))
-                        }}
-                        onFieldChange={handleVehicleFieldChange}
-                    />
-                )}
-                {registeredOwnerBlock && (
-                    <RegisteredOwnerDetails
-                        title="Registered Owner(s)"
-                        block={registeredOwnerBlock}
-                        ownerCount={ownerCount}
-                        onOwnerCountChange={handleOwnerCountChange}
-                        ownersData={ownersData}
-                        onFieldChange={handleRegisteredOwnerFieldChange}
-                    />
-                )}
-                {ownerAddressBlock && (
-                    <OwnerAddress
-                        title="Address"
-                        block={ownerAddressBlock}
-                        residentialAddress={ownerAddress.residential}
-                        mailingAddress={ownerAddress.mailing}
-                        isMailingDifferent={ownerAddress.isMailingDifferent}
-                        onAddressChange={handleOwnerAddressChange}
-                        onToggleMailingAddress={toggleMailingAddress}
-                    />
-                )}
-                {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
-                    <LegalOwnerOfRecord
-                        block={LegalOwnerOfRecordBlock}
-                        legalOwnerAddress={LegalOwnerOfRecordData?.residential}
-                        legalOwnerMailingAddress={LegalOwnerOfRecordData?.mailing}
-                        selectedRadio={
-                            LegalOwnerOfRecordData?.showMailingAddress
-                                ? ["if-mailing-address-is-different"]
-                                : []
-                        }
-                        onToggleOption={legalOwnerToggleMailingAddress}
-                        onAddressChange={handleLegalOwnerFieldChange}
-                        isOutofStateTitle={isOutofStateTitle}
-                    />
-                }
-                {VehicleDeclarationEntryBlock && (
-                    <VehicleDeclarationEntry
-                        title={VehicleDeclarationEntryBlock.blockName}
-                        block={VehicleDeclarationEntryBlock}
-                        values={vehicleDeclarationEntryData}
-                        onFieldChange={handleVehicleDeclarationEntryFieldChange}
-                        onTrimEntries={handleTrimEntries}
-                    />
-                )}
+                    {typeOfVehicleBlock && isOutofStateTitle && (
+                        <TypeOfVehicle
+                            title="Type of Vehicle"
+                            block={typeOfVehicleBlock}
+                            selectedItems={typeOfVehicleSelection}
+                            onChange={handleTypeOfVehicleChange}
+                        />
+                    )}
+                    {forCommercialVehicleOnlyBlock && (
+                        <CommercialVehicleInfo
+                            title={forCommercialVehicleOnlyBlock.blockName}
+                            block={{}}
+                            isCommercialVehicle={isCommercialVehicle} // optional
+                            values={commercialInfo}
+                            onChange={handleCommercialChange}
+                        />
+                    )}
+                    {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
+                        <MissingTitleReason
+                            title="Missing Title Reason"
+                            selectedReason={missingReason}
+                            onReasonChange={setMissingReason}
+                        />
+                    )}
+                    {SalvageCertificateBlock && (
+                        <SalvageCertificate
+                            title={SalvageCertificateBlock.blockName}
+                            block={SalvageCertificateBlock} // ✅ pass metadata
+                            values={salvageCertificateState} // ✅ pass current field values
+                            onFieldChange={handleSalvageCertificateChange}
+                        />
+                    )}
+                    {vehicleInfoBlock && (
+                        <VehicleInformationDetails
+                            title="Vehicle Information"
+                            block={{
+                                ...vehicleInfoBlock,
+                                fields: vehicleInfoBlock.fields
+                                    ?.filter(field => isMotorcycle || field.label !== "Motorcycle Engine Number")
+                                    ?.filter(field => (isOutofStateTitle || comercialVehicleFlag) || field.label !== "If kilometers check this box")
+                                    ?.filter(field => isTRAILERCOACH ||
+                                        (field.label !== "Length (IN)" && field.label !== "Width (IN)"))
+                                    .map(field => ({
+                                        ...field,
+                                        type: field.type as "checkbox" | "input field" | "dropdown",
+                                        value: vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
+                                    }))
+                            }}
+                            onFieldChange={handleVehicleFieldChange}
+                        />
+                    )}
+                    {registeredOwnerBlock && (
+                        <RegisteredOwnerDetails
+                            title="Registered Owner(s)"
+                            block={registeredOwnerBlock}
+                            ownerCount={ownerCount}
+                            onOwnerCountChange={handleOwnerCountChange}
+                            ownersData={ownersData}
+                            onFieldChange={handleRegisteredOwnerFieldChange}
+                        />
+                    )}
+                    {ownerAddressBlock && (
+                        <OwnerAddress
+                            title="Address"
+                            block={ownerAddressBlock}
+                            residentialAddress={ownerAddress.residential}
+                            mailingAddress={ownerAddress.mailing}
+                            isMailingDifferent={ownerAddress.isMailingDifferent}
+                            onAddressChange={handleOwnerAddressChange}
+                            onToggleMailingAddress={toggleMailingAddress}
+                        />
+                    )}
+                    {LegalOwnerOfRecordBlock && isThereIsACurrentLeinHolder &&
+                        <LegalOwnerOfRecord
+                            block={LegalOwnerOfRecordBlock}
+                            legalOwnerAddress={LegalOwnerOfRecordData?.residential}
+                            legalOwnerMailingAddress={LegalOwnerOfRecordData?.mailing}
+                            selectedRadio={
+                                LegalOwnerOfRecordData?.showMailingAddress
+                                    ? ["if-mailing-address-is-different"]
+                                    : []
+                            }
+                            onToggleOption={legalOwnerToggleMailingAddress}
+                            onAddressChange={handleLegalOwnerFieldChange}
+                            isOutofStateTitle={isOutofStateTitle}
+                        />
+                    }
+                    {VehicleDeclarationEntryBlock && (
+                        <VehicleDeclarationEntry
+                            title={VehicleDeclarationEntryBlock.blockName}
+                            block={VehicleDeclarationEntryBlock}
+                            values={vehicleDeclarationEntryData}
+                            onFieldChange={handleVehicleDeclarationEntryFieldChange}
+                            onTrimEntries={handleTrimEntries}
+                        />
+                    )}
 
-                {newRegisteredOwnerBlock && (
-                    <NewRegisteredOwnerDetails
-                        title="New Registered Owner(s)"
-                        block={newRegisteredOwnerBlock}
-                        newOwnerCount={newOwnerCount}
-                        onNewOwnerCountChange={setNewOwnerCount}
-                        newOwnerData={newOwnerData}
-                        onNewOwnerFieldChange={handleNewOwnerFieldChange}
-                        NewOwnershipTypes={newOwnershipTypes}
-                        onNewOwnershipChange={handleNewOwnershipChange}
-                        isVehicleIsAGift={isVehickeIsAGift}
-                        isMotorcycle={isMotorcycle}
-                        isTRAILERCOACH={isTRAILERCOACH}
-                    />
-                )}
-                {newRegisteredOwnerAddressBlock && (
-                    <NewRegisteredOwnerAddress
-                        title="New Owner Address"
-                        block={newRegisteredOwnerAddressBlock}
-                        newOwnerAddress={newOwnerAddress}
-                        newOwnerMailingAddress={newOwnerMailingAddress}
-                        newOwnerLesseeAddress={newOwnerLesseeAddress}
-                        newOwnerKeptAddress={newOwnerKeptAddress}
-                        selectedRadio={selectedRadio}
-                        onToggleOption={handleToggleOption}
-                        onAddressChange={handleNewOwnerAddressChange}
-                    />
-                )}
-                {powerOfAttorneyBlock && (
-                    <PowerOfAttorneyDetails
-                        title="Power of Attorney"
-                        block={powerOfAttorneyBlock}
-                        appointer={powerOfAttorneyData.appointer}
-                        appointee={powerOfAttorneyData.appointee}
-                        onChange={handlePowerOfAttorneyChange}
-                    />
-                )}
-                {(comercialVehicleFlag || isOutofStateTitle) && dateInformationBlock && dateInformationBlock.reference && (
-                    <DateInformation
-                        title="DATE INFORMATION"
-                        block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
-                        dateValues={dateValues}
-                        onDateChange={handleDateChange}
-                    />
-                )}
-                {vehicleStatusBlock && (comercialVehicleFlag || isOutofStateTitle) && (
-                    <VehicleStatusInformation
-                        title="Vehicle Status Information"
-                        block={vehicleStatusBlock}
-                        onFieldChange={handleVehicleStatusInfoFieldChange}
-                        values={vehicleStatusInfoData}
-                    />
+                    {newRegisteredOwnerBlock && (
+                        <NewRegisteredOwnerDetails
+                            title="New Registered Owner(s)"
+                            block={newRegisteredOwnerBlock}
+                            newOwnerCount={newOwnerCount}
+                            onNewOwnerCountChange={setNewOwnerCount}
+                            newOwnerData={newOwnerData}
+                            onNewOwnerFieldChange={handleNewOwnerFieldChange}
+                            NewOwnershipTypes={newOwnershipTypes}
+                            onNewOwnershipChange={handleNewOwnershipChange}
+                            isVehicleIsAGift={isVehickeIsAGift}
+                            isMotorcycle={isMotorcycle}
+                            isTRAILERCOACH={isTRAILERCOACH}
+                        />
+                    )}
+                    {newRegisteredOwnerAddressBlock && (
+                        <NewRegisteredOwnerAddress
+                            title="New Owner Address"
+                            block={newRegisteredOwnerAddressBlock}
+                            newOwnerAddress={newOwnerAddress}
+                            newOwnerMailingAddress={newOwnerMailingAddress}
+                            newOwnerLesseeAddress={newOwnerLesseeAddress}
+                            newOwnerKeptAddress={newOwnerKeptAddress}
+                            selectedRadio={selectedRadio}
+                            onToggleOption={handleToggleOption}
+                            onAddressChange={handleNewOwnerAddressChange}
+                        />
+                    )}
+                    {powerOfAttorneyBlock && (
+                        <PowerOfAttorneyDetails
+                            title="Power of Attorney"
+                            block={powerOfAttorneyBlock}
+                            appointer={powerOfAttorneyData.appointer}
+                            appointee={powerOfAttorneyData.appointee}
+                            onChange={handlePowerOfAttorneyChange}
+                        />
+                    )}
+                    {(comercialVehicleFlag || isOutofStateTitle) && dateInformationBlock && dateInformationBlock.reference && (
+                        <DateInformation
+                            title="DATE INFORMATION"
+                            block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
+                            dateValues={dateValues}
+                            onDateChange={handleDateChange}
+                        />
+                    )}
+                    {vehicleStatusBlock && (comercialVehicleFlag || isOutofStateTitle) && (
+                        <VehicleStatusInformation
+                            title="Vehicle Status Information"
+                            block={vehicleStatusBlock}
+                            onFieldChange={handleVehicleStatusInfoFieldChange}
+                            values={vehicleStatusInfoData}
+                        />
 
-                )}
-                {vehicleAcquisitionBlock && (comercialVehicleFlag || isOutofStateTitle) && (
-                    <VehicleAcquisitionDetails
-                        title={vehicleAcquisitionBlock.blockName}
-                        block={vehicleAcquisitionBlock}
-                        values={vehiclePurchaseInfo}
-                        onFieldChange={handleVehiclePurchaseInfoChange}
-                    />
-                )}
-                {OutOfStateBlock && isOutofStateTitle &&
-                    <OutOfStateVehicleSection
-                        values={outOfStateVehicle}
-                        onFieldChange={handleOutOfStateVehcileFieldChange}
-                        onPlateSelect={handleOutOfStateVehcilePlateSelect}
-                    />
-                }
-                {statementForVehicleBodyChangeBlock && (
-                    <VehicleBodyChange
-                        title={statementForVehicleBodyChangeBlock.blockName}
-                        values={vehicleBodyState}
-                        onChange={handleVehicleBodyChange}
-                    />
-                )}
-                {itemRequestedWasBlock && (
-                    <TheItemRequestedWasBlock
-                        title="The Item Requested Was"
-                        block={itemRequestedWasBlock}
-                        checkedItems={itemRequestedWasState.checked}
-                        otherExplain={itemRequestedWasState.otherExplain}
-                        onCheckChange={handleItemRequestedCheckChange}
-                        onOtherExplainChange={handleItemRequestedOtherExplainChange}
-                        plateCount={itemRequestedWasState.plateCount}
-                        onPlateCountChange={handleItemRequestedPlateCountChange}
-                    />
+                    )}
+                    {vehicleAcquisitionBlock && (comercialVehicleFlag || isOutofStateTitle) && (
+                        <VehicleAcquisitionDetails
+                            title={vehicleAcquisitionBlock.blockName}
+                            block={vehicleAcquisitionBlock}
+                            values={vehiclePurchaseInfo}
+                            onFieldChange={handleVehiclePurchaseInfoChange}
+                        />
+                    )}
+                    {OutOfStateBlock && isOutofStateTitle &&
+                        <OutOfStateVehicleSection
+                            values={outOfStateVehicle}
+                            onFieldChange={handleOutOfStateVehcileFieldChange}
+                            onPlateSelect={handleOutOfStateVehcilePlateSelect}
+                        />
+                    }
+                    {statementForVehicleBodyChangeBlock && (
+                        <VehicleBodyChange
+                            title={statementForVehicleBodyChangeBlock.blockName}
+                            values={vehicleBodyState}
+                            onChange={handleVehicleBodyChange}
+                        />
+                    )}
+                    {itemRequestedWasBlock && (
+                        <TheItemRequestedWasBlock
+                            title="The Item Requested Was"
+                            block={itemRequestedWasBlock}
+                            checkedItems={itemRequestedWasState.checked}
+                            otherExplain={itemRequestedWasState.otherExplain}
+                            onCheckChange={handleItemRequestedCheckChange}
+                            onOtherExplainChange={handleItemRequestedOtherExplainChange}
+                            plateCount={itemRequestedWasState.plateCount}
+                            onPlateCountChange={handleItemRequestedPlateCountChange}
+                        />
 
-                )}
-                {LicensePlateBlock &&
-                    <LicensePlateMissingBlock
-                        title={LicensePlateBlock.blockName}
-                        block={LicensePlateBlock}
-                        selectedOption={licensePlateState}
-                        handleSelectedOptionOnChange={handleLicensePlateChange} />
-                }
+                    )}
+                    {LicensePlateBlock &&
+                        <LicensePlateMissingBlock
+                            title={LicensePlateBlock.blockName}
+                            block={LicensePlateBlock}
+                            selectedOption={licensePlateState}
+                            handleSelectedOptionOnChange={handleLicensePlateChange} />
+                    }
 
-                {LienReleaseBlock && (
-                    <LeinRealease
-                        title="Lien Release"
-                        block={LienReleaseBlock}
-                        lienReleaseState={lienReleaseState}
-                        onLienReleaseChange={handleLienAddressChange}
-                        onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
-                    />
-                )}
-                {plannedNonOperationCertificateBlock &&
-                    <PlannedNonOperation
-                        title="Planned Non-Operation Certificate"
-                        vehicles={plannedNonOperationState}
-                        onChange={handlePlannedNonOperationChange}
-                        onAdd={handlePlannedNonOperationAdd}
-                        onRemove={handlePlannedNonOperationRemove}
-                        fields={plannedNonOperationCertificateBlock.fields}
-                    />
-                }
-                {vehicleStorageLocationBlock && (
-                    <VehicleStorageLocationDetails
-                        title="Vehicle Storage Location"
-                        block={vehicleStorageLocationBlock}
-                        formState={vehicleStorageLocation}
-                        onFieldChange={handleVehicleStorageLocation}
-                    />
-                )}
-                {newLienHolderBlock && (
-                    <NewLienHolder
-                        block={newLienHolderBlock}
-                        formState={newLienholder.address}
-                        mailingAddress={newLienholder.mailingAddress}
-                        isMailingDifferent={newLienholder.isMailingDifferent}
-                        onFieldChange={handleLienholderFieldChange}
-                        onMailingFieldChange={handleLienholderMailingFieldChange}
-                        onToggleMailingAddress={toggleLienholderMailingAddress}
-                    />
+                    {LienReleaseBlock && (
+                        <LeinRealease
+                            title="Lien Release"
+                            block={LienReleaseBlock}
+                            lienReleaseState={lienReleaseState}
+                            onLienReleaseChange={handleLienAddressChange}
+                            onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
+                        />
+                    )}
+                    {plannedNonOperationCertificateBlock &&
+                        <PlannedNonOperation
+                            title="Planned Non-Operation Certificate"
+                            vehicles={plannedNonOperationState}
+                            onChange={handlePlannedNonOperationChange}
+                            onAdd={handlePlannedNonOperationAdd}
+                            onRemove={handlePlannedNonOperationRemove}
+                            fields={plannedNonOperationCertificateBlock.fields}
+                        />
+                    }
+                    {vehicleStorageLocationBlock && (
+                        <VehicleStorageLocationDetails
+                            title="Vehicle Storage Location"
+                            block={vehicleStorageLocationBlock}
+                            formState={vehicleStorageLocation}
+                            onFieldChange={handleVehicleStorageLocation}
+                        />
+                    )}
+                    {newLienHolderBlock && (
+                        <NewLienHolder
+                            block={newLienHolderBlock}
+                            formState={newLienholder.address}
+                            mailingAddress={newLienholder.mailingAddress}
+                            isMailingDifferent={newLienholder.isMailingDifferent}
+                            onFieldChange={handleLienholderFieldChange}
+                            onMailingFieldChange={handleLienholderMailingFieldChange}
+                            onToggleMailingAddress={toggleLienholderMailingAddress}
+                        />
 
 
-                )}
-                {StatementForSmogExemptionBlock && isSmogExemption && (
-                    <StatementForSmogExemption
-                        title="Statement For Smog Exemption"
-                        block={StatementForSmogExemptionBlock}
-                        onFieldChange={handleStatementForSomgExemption}
-                        values={statementForSomgExemptionData}
-                    />
-                )}
-                {/* {platesSelectionBlock && (
+                    )}
+                    {StatementForSmogExemptionBlock && isSmogExemption && (
+                        <StatementForSmogExemption
+                            title="Statement For Smog Exemption"
+                            block={StatementForSmogExemptionBlock}
+                            onFieldChange={handleStatementForSomgExemption}
+                            values={statementForSomgExemptionData}
+                        />
+                    )}
+                    {/* {platesSelectionBlock && (
                     <PlatesSelection
                         block={platesSelectionBlock}
                         plateInfo={platesSelectionState}
@@ -1205,59 +1210,59 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         onChange={setSelectConfigState}
                     />
                 )} */}
-                {CertificateOfLicensePlateDispositionBlock && (
-                    <CertificateOfLicensePlateDisposition
-                        title={CertificateOfLicensePlateDispositionBlock.blockName}
-                        block={{
-                            ...CertificateOfLicensePlateDispositionBlock,
-                            reference: CertificateOfLicensePlateDispositionBlock.reference || "CertificateReference",
-                        }}
-                        values={certificateOfLicensePlateDispositionState}
-                        onChange={handleCertificateOfLicensePlateDispositionChange}
+                    {CertificateOfLicensePlateDispositionBlock && (
+                        <CertificateOfLicensePlateDisposition
+                            title={CertificateOfLicensePlateDispositionBlock.blockName}
+                            block={{
+                                ...CertificateOfLicensePlateDispositionBlock,
+                                reference: CertificateOfLicensePlateDispositionBlock.reference || "CertificateReference",
+                            }}
+                            values={certificateOfLicensePlateDispositionState}
+                            onChange={handleCertificateOfLicensePlateDispositionChange}
+                        />
+                    )}
+                    {disablePersonTypeBlock && (
+                        <DpPlacardSection
+                            title={disablePersonTypeBlock.blockName}
+                            values={dpState}
+                            onChange={setDpState}
+                        />
+                    )}
+                    {disablePersonVehicleInfoBlock && (
+                        <DisablePersonVehicleInfo
+                            title={disablePersonVehicleInfoBlock.blockName}
+                            values={dpVehicleInfoState}
+                            onChange={setDpVehicleInfoState}
+                            fields={disablePersonVehicleInfoBlock.fields}
+                        />
+                    )}
+                    <Options
+                        selected={optionsForValidation}
+                        onChange={handleOptionsForValidations}
                     />
-                )}
-                {disablePersonTypeBlock && (
-                    <DpPlacardSection
-                        title={disablePersonTypeBlock.blockName}
-                        values={dpState}
-                        onChange={setDpState}
-                    />
-                )}
-                {disablePersonVehicleInfoBlock && (
-                    <DisablePersonVehicleInfo
-                        title={disablePersonVehicleInfoBlock.blockName}
-                        values={dpVehicleInfoState}
-                        onChange={setDpVehicleInfoState}
-                        fields={disablePersonVehicleInfoBlock.fields}
-                    />
-                )}
-                <Options
-                    selected={optionsForValidation}
-                    onChange={handleOptionsForValidations}
-                />
-                <FormActions
-                    loading={isLoading}
-                    onSave={async () => {
-                        setIsLoading(true);
-                        await handleOnSave(user);
-                        setIsLoading(false);
-                        window.location.reload();
+                    <FormActions
+                        loading={isLoading}
+                        onSave={async () => {
+                            setIsLoading(true);
+                            await handleOnSave(user);
+                            setIsLoading(false);
+                            window.location.reload();
 
-                    }}
-                    onPrint={async () => {
-                        setIsLoading(true);
-                        await handleOnPDF();
-                        setIsLoading(false);
-                    }}
-                    onInvoice={() => console.log('Generate Invoice clicked')}
-                    onClear={() => {
-                        localStorage.removeItem(LOCAL_STORAGE_KEY);
-                        localStorage.removeItem("senerio");
-                        window.location.reload();
-                    }}
-                />
-            </div >
-            {/* } */}
+                        }}
+                        onPrint={async () => {
+                            setIsLoading(true);
+                            await headHandlerForPDf("Combine Forms");
+                            setIsLoading(false);
+                        }}
+                        onInvoice={() => console.log('Generate Invoice clicked')}
+                        onClear={() => {
+                            localStorage.removeItem(LOCAL_STORAGE_KEY);
+                            // localStorage.removeItem("senerio");
+                            window.location.reload();
+                        }}
+                    />
+                </div >
+            }
 
         </>
     );

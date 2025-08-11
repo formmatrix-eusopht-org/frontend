@@ -7,7 +7,7 @@ interface Option {
 }
 
 interface CustomDropdownProps {
-  value: string;
+  value: string | number;
   onChange: (val: string, label: string) => void;
   options: Option[];
   placeholder?: string;
