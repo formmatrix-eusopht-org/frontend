@@ -24,7 +24,6 @@ import { LicensePlateMissingBlock } from '../Containers/LicensePlate';
 import PlannedNonOperation from '../Containers/PlannedNon-OperationCertificate';
 import { VehicleStorageLocationDetails } from '../Containers/VehicleStorageLocation';
 import { handleOnSave } from "../Actions/save"
-// import { handleOnPDF } from "../Actions/pdfGenerates"
 import Options from '../Containers/Options';
 import { UserAuth } from '../Contexts/AuthContext';
 import VehicleBodyChange from '../Containers/StatementForVehicleBodyChange';
@@ -36,6 +35,11 @@ import DpPlacardSection from '../Containers/DisablePersion';
 import DisablePersonVehicleInfo from '../Containers/DisablePersonVehicleInfo';
 import MultipleTransfer from '../Containers/MultipleTransfer';
 import { headHandlerForPDf } from '../Actions/pdfGenerates';
+import { NameChange } from '../Containers/NameChange';
+import PersonalOrBusinessInfo from '../Containers/PersonalOrBusinessInfo';
+import PreviousResidenceorBusinessAddress from '../Containers/PreviousResidenceorBusinessAddress';
+import NeworCorrectResidenceorBusinessAddressInfo from '../Containers/NeworCorrectResidenceorBusinessAddress';
+import VehiclesSection from '../Containers/VehiclesVesselsOrPlacardsOwnedByYou';
 // import { PlatesSelection } from '../Containers/PersonalizePlates';
 // import SelectConfiguration from '../Containers/Configration';
 
@@ -175,6 +179,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     //Vehicle Statis Info
     const [vehicleStatusInfoData, setVehicleStatusInfoData] = useState<Record<string, string | boolean>>({});
+    const [nameChangeData, setNameChangeData] = useState<Record<string, string | boolean>>({
+        correction: '',
+        changeFrom: '',
+        changeTo: '',
+        discrepency1: '',
+        discrepency2: ''
+    });
     //Vehicle Purchase info
     const [vehiclePurchaseInfo, setVehiclePurchaseInfo] = React.useState<Record<string, string>>({ "Vehicle Modifications": 'no', });
     //out of  state
@@ -197,6 +208,9 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     });
 
     const [statementForSomgExemptionData, setStatementForSomgExemptionData] = useState<Record<string, string | boolean>>({});
+    const [personalOrBusinessInformationData, setPersonalOrBusinessInformationData] = useState<Record<string, string | boolean>>({});
+    const [previousResidenceOrBusinessAddressData, setPreviousResidenceOrBusinessAddressData] = useState<Record<string, string | boolean>>({});
+    const [newOrCorrectResidenceOrBusinessAddressData, setNewOrCorrectResidenceOrBusinessAddressData] = useState({});
     const [lienReleaseState, setLienReleaseState] = useState({
         companyAddress: {},
         mailing: {},
@@ -242,7 +256,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         year: "",
     });
     const [salvageCertificateState, setSalvageCertificateState] = useState<SalvageCertificateState>({});
-
+    const [vehiclesOwnedByYouData, setVehiclesOwnedByYouData] = useState([{ plateNumber: "", vinNumber: "", leased: false, registeredOutsideCA: false }]);
+    const [leasaedCompanyName, setLeasaedCompanyName] = useState('')
     // Handlers for various form interactions
     const handleTransactionChange = (label: string, checked: boolean) => {
         setTransactionSelections((prev) => {
@@ -748,6 +763,11 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const CertificateOfLicensePlateDispositionBlock = findBlock("Certification of License Plate Disposition");
     const SalvageCertificateBlock = findBlock("Salvage Certificate");
     const VehicleDeclarationEntryBlock = findBlock("Vehicle Declaration Entry");
+    const PersonalOrBusinessInformationBlock = findBlock("PERSONAL OR BUSINESS INFORMATION");
+    const PreviousResidenceOrBusinessAddressBlock = findBlock("PREVIOUS RESIDENCE OR BUSINESS ADDRESS");
+    const NewOrCorrectResidenceOrBusinessAddressBlock = findBlock("NEW OR CORRECT RESIDENSE OR BUSINESS ADDRESS");
+    const NameChangeBlock = findBlock("Name Statement (Ownership Certificate Required)");
+    const VehiclesOwnedByYouBlock = findBlock("Vehicles, Vessels, or Placards Owned By You");
     const disablePersonTypeBlock = findBlock("Type of Disabled Person Parking Placard(S) or License Plates");
     const disablePersonVehicleInfoBlock = findBlock("DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION");
     // const platesSelectionBlock = findBlock("Plates Selection");
@@ -820,6 +840,18 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                 vehicleYear: "",
             })
             setMultipleTransfer(parsed.multipleTransfer || [schemaForMultipletransfer]);
+            setNameChangeData(parsed.nameChangeData || {
+                correction: '',
+                changeFrom: '',
+                changeTo: '',
+                discrepency1: '',
+                discrepency2: ''
+            })
+            setPersonalOrBusinessInformationData(parsed.personalOrBusinessInformationData || {})
+            setPreviousResidenceOrBusinessAddressData(parsed.previousResidenceOrBusinessAddressData || {})
+            setNewOrCorrectResidenceOrBusinessAddressData(parsed.newOrCorrectResidenceOrBusinessAddressData || {})
+            setVehiclesOwnedByYouData(parsed.vehiclesOwnedByYouData || {})
+            setLeasaedCompanyName(parsed.leasaedCompanyName || '')
         }
     }, []);
 
@@ -865,7 +897,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             salvageCertificateState,
             vehicleDeclarationEntryData,
             dpState,
-            dpVehicleInfoState
+            dpVehicleInfoState,
+            nameChangeData,
+            personalOrBusinessInformationData,
+            previousResidenceOrBusinessAddressData,
+            newOrCorrectResidenceOrBusinessAddressData,
+            vehiclesOwnedByYouData,
+            leasaedCompanyName
         };
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(combinedState));
@@ -906,7 +944,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         salvageCertificateState,
         vehicleDeclarationEntryData,
         dpState,
-        dpVehicleInfoState
+        dpVehicleInfoState,
+        nameChangeData,
+        personalOrBusinessInformationData,
+        previousResidenceOrBusinessAddressData,
+        newOrCorrectResidenceOrBusinessAddressData,
+        vehiclesOwnedByYouData,
+        leasaedCompanyName
     ]);
     //validations for form
     const isMotorcycle = transactionSelections?.includes("Is the Vehicle a Motorcycle");
@@ -916,10 +960,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const isThereIsACurrentLeinHolder = transactionSelections?.includes("There is a Current Lienholder");
     const isVehickeIsAGift = transactionSelections?.includes("Vehicle is a Gift");
     const isSmogExemption = transactionSelections?.includes("Smog Exemption");
+    const leasedVehicleFlag = transactionSelections?.includes("Leased Vehicle");
     const requestPNOCardFlag = transactionSelections?.includes("Request PNO card");
     const isCommercialVehicle = transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)");
 
     const comercialVehicleFlag = senerio?.includes("Commercial Vehicle");
+    const nameChangeSelected = senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? "Correction" : senerio?.includes("Legal Name Change") ? "Change" : senerio?.includes("Name Discrepancy") ? "Discrepancy" : '' : "";
     // const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
 
     const handleTransferCountChange = (newCount: number) => {
@@ -1004,6 +1050,14 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onFieldChange={handleVehicleFieldChange}
                         />
                     )}
+                    {NameChangeBlock && (
+                        <NameChange
+                            title={NameChangeBlock.blockName}
+                            values={nameChangeData}
+                            onchange={setNameChangeData}
+                            name={nameChangeSelected}
+                        />
+                    )}
                     {registeredOwnerBlock && (
                         <RegisteredOwnerDetails
                             title="Registered Owner(s)"
@@ -1040,6 +1094,42 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             isOutofStateTitle={isOutofStateTitle}
                         />
                     }
+                    {PersonalOrBusinessInformationBlock && (
+                        <PersonalOrBusinessInfo
+                            title={PersonalOrBusinessInformationBlock.blockName}
+                            block={PersonalOrBusinessInformationBlock}
+                            values={personalOrBusinessInformationData}
+                            onFieldChange={setPersonalOrBusinessInformationData}
+                        />
+                    )}
+                    {PreviousResidenceOrBusinessAddressBlock && (
+                        <PreviousResidenceorBusinessAddress
+                            title={PreviousResidenceOrBusinessAddressBlock.blockName}
+                            block={PreviousResidenceOrBusinessAddressBlock}
+                            values={previousResidenceOrBusinessAddressData}
+                            onFieldChange={setPreviousResidenceOrBusinessAddressData}
+                        />
+                    )}
+                    {NewOrCorrectResidenceOrBusinessAddressBlock && (
+                        <NeworCorrectResidenceorBusinessAddressInfo
+                            title={NewOrCorrectResidenceOrBusinessAddressBlock.blockName}
+                            block={NewOrCorrectResidenceOrBusinessAddressBlock}
+                            values={newOrCorrectResidenceOrBusinessAddressData}
+                            onFieldChange={setNewOrCorrectResidenceOrBusinessAddressData}
+                        />
+                    )}
+                    {VehiclesOwnedByYouBlock && (
+                        <VehiclesSection
+                            title={VehiclesOwnedByYouBlock.blockName}
+                            block={VehiclesOwnedByYouBlock}
+                            values={vehiclesOwnedByYouData}
+                            leasedVehicleFlag={leasedVehicleFlag}
+                            leasaedCompanyName={leasaedCompanyName}
+                            setLeasaedCompanyName={setLeasaedCompanyName}
+                            onFieldChange={setVehiclesOwnedByYouData}
+                        />
+                    )}
+
                     {VehicleDeclarationEntryBlock && (
                         <VehicleDeclarationEntry
                             title={VehicleDeclarationEntryBlock.blockName}

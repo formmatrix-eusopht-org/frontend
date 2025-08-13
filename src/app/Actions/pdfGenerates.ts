@@ -76,6 +76,12 @@ type SalvageCertificateState = {
 };
 
 type FormData = {
+    personalOrBusinessInformationData?: any;
+    previousResidenceOrBusinessAddressData?: any;
+    newOrCorrectResidenceOrBusinessAddressData?: any;
+    vehiclesOwnedByYouData?: any;
+    leasaedCompanyName?: string;
+    nameChangeData?: any;
     vehicleBodyState?: {
         ["Axles Checked"]?: boolean;
         ["Body Type Checked"]?: boolean;
@@ -187,6 +193,16 @@ function extractDateParts(dateStr?: string): { month: string, day: string, year:
 
     return { month, day, year };
 }
+const getCurrentDate = () => {
+    const today = new Date();
+
+    let mm: string = String(today.getMonth() + 1).padStart(2, "0");
+    let dd: string = String(today.getDate()).padStart(2, "0");
+    const yyyy = today.getFullYear();
+
+    return `${mm}/${dd}/${yyyy}`;
+};
+
 const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: string]: any } => {
     const owner1 = formatSingleOwner(formData.ownersData?.[0]);
     const owner2 = formatSingleOwner(formData.ownersData?.[1]);
@@ -235,6 +251,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "2DL7": formData.ownersData?.[1]?.['Driver License Number']?.split('')[6] || '',
         "2DL8": formData.ownersData?.[1]?.['Driver License Number']?.split('')[7] || '',
         "Physical address": formData.newOwnerAddress?.Street || '',
+        "Physical address 1": formData.ownerAddress?.residential?.Street || '',
+        "County 1": formData.ownerAddress?.residential?.County || '',
         "County": formData.newOwnerAddress?.County || '',
         "One license": senerio?.includes("Duplicate Plates & Stickers") ? formData.licensePlateState === "One license plate missing" ? true : false : false,
         "Two plates": senerio?.includes("Duplicate Plates & Stickers") ? formData.licensePlateState === "Two license plates are missing" ? true : false : false,
@@ -246,12 +264,13 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
             (formData.newOwnerCount ?? 0) > 1 ? newOwner2 : '',
             (formData.newOwnerCount ?? 0) > 2 ? newOwner3 : ''
         ),
+        "Reg Card": senerio?.includes("Duplicate Registration") ? true : false,
         "PRINTED NAME": formData.newOwnerData?.[0]?.['Last Name'] || '',
         "FIRST NAME": formData.newOwnerData?.[0]?.['First Name'] || '',
         "MIDDLE NAME": formData.newOwnerData?.[0]?.['Middle Name'] || '',
         "App sign area code": formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '',
         "App sign phone no": formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '',
-        "Signature date": rawDate || '',
+        "Signature date": getCurrentDate() || '',
         'sellingmonth': month || '',
         'sellingdate': day || '',
         'sellingyear1': year[0] || '',
@@ -367,8 +386,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Special plates": formData.itemRequestedWasState?.checked?.includes("SPECIAL PLATES"),
         "REG card with current address": formData.itemRequestedWasState?.checked?.includes("REQUESTING REGISTRATION CARD"),
         "CVC": formData.itemRequestedWasState?.checked?.includes("PER CVC §4467"),
-        "other": formData.itemRequestedWasState?.checked?.includes("OTHER"),
-        "Explanation": formData.itemRequestedWasState?.checked?.includes("OTHER") ? formData.itemRequestedWasState?.otherExplain || '' : '',
+        "other": formData.itemRequestedWasState?.checked?.includes("OTHER") ? true : senerio?.includes("Duplicate Registration") ? true : false,
+        "Explanation": formData.itemRequestedWasState?.checked?.includes("OTHER") ? formData.itemRequestedWasState?.otherExplain || '' : senerio?.includes("Duplicate Registration") ? "Requesting a Duplicate Registration Card" : "",
         "Name of bank, finance company, or individual having a lien on this vehicle": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || 'NONE' : "NONE",
         "2 Address": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["Street"] || '' : "",
         "2 Apt/Space Number": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["APT./SPACE/STE.#"] || '' : "",
@@ -909,6 +928,524 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Veh Make": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.make || '' : '',
         "Veh Year": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.year || '' : '',
 
+        //reg 256
+
+        "checkbox_76urox": senerio?.includes("Name Change") ? senerio?.includes("Name Discrepancy") ? true : false : false,
+        "text_71uait": senerio?.includes("Name Change") ? senerio?.includes("Name Discrepancy") ? formData?.nameChangeData?.discrepency1 || '' : '' : '',
+        "text_72rrpr": senerio?.includes("Name Change") ? senerio?.includes("Name Discrepancy") ? formData?.nameChangeData?.discrepency2 || '' : '' : '',
+        "checkbox_77lxng": senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? true : false : false,
+        "text_73xplb": senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? formData?.nameChangeData?.correction || '' : "" : '',
+        "checkbox_78tyvm": senerio?.includes("Name Change") ? senerio?.includes("Legal Name Change") ? true : false : false,
+        "text_75ujtd": senerio?.includes("Name Change") ? senerio?.includes("Legal Name Change") ? formData?.nameChangeData?.changeFrom || '' : "" : '',
+        "text_74udmw": senerio?.includes("Name Change") ? senerio?.includes("Legal Name Change") ? formData?.nameChangeData?.changeTo || '' : "" : '',
+
+        //DMV 14
+        //personal or bussiness info
+        "last name": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[0] || '' : '',
+        "last 1.0.0": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[1] || '' : '',
+        "last 1.0.1": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[2] || '' : '',
+        "last 1.0.2": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[3] || '' : '',
+        "last 1.0.3": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[4] || '' : '',
+        "last 1.0.4": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[5] || '' : '',
+        "last 1.0.5": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[6] || '' : '',
+        "last 1.0.6": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[7] || '' : '',
+        "last 1.0.7": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[8] || '' : '',
+        "last 1.0.8": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[9] || '' : '',
+        "last 1.0.9": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[10] || '' : '',
+        "last 1.0.10": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[11] || '' : '',
+        "last 1.0.11": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[12] || '' : '',
+        "last 1.0.12": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[13] || '' : '',
+        "last 1.0.13": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[14] || '' : '',
+        "last 1.0.14": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[15] || '' : '',
+        "last 1.0.15": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[16] || '' : '',
+        "last 1.0.16": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[17] || '' : '',
+        "last 1.0.17": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[18] || '' : '',
+        "last 1.0.18": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["LAST NAME OR BUSINESS NAME"]?.[19] || '' : '',
+
+        "first name": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[0] || '' : '',
+        "first.0": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[1] || '' : '',
+        "first.1": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[2] || '' : '',
+        "first.2": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[3] || '' : '',
+        "first.3": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[4] || '' : '',
+        "first.4": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[5] || '' : '',
+        "first.5": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[6] || '' : '',
+        "first.6": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[7] || '' : '',
+        "first.7": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["FIRST"]?.[8] || '' : '',
+
+        "initial": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["INITIAL"]?.[0] || '' : '',
+
+        "Driver license": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[0] || '' : '',
+        "Driver license digits.0": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[1] || '' : '',
+        "Driver license digits.1": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[2] || '' : '',
+        "Driver license digits.2": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[3] || '' : '',
+        "Driver license digits.3": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[4] || '' : '',
+        "Driver license digits.4": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[5] || '' : '',
+        "Driver license digits.5": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[6] || '' : '',
+        "Driver license digits.6": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[7] || '' : '',
+
+        "birth date.0": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[0] || '' : '',
+        "birth date.1": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[1] || '' : '',
+        "birth date.2": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[3] || '' : '',
+        "birth date.3": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[4] || '' : '',
+        "birth date.4": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[6] || '' : '',
+        "birth date.5": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[7] || '' : '',
+        "birth date.6": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[8] || '' : '',
+        "birth date.7": senerio?.includes("Change of Address") ? formData?.personalOrBusinessInformationData?.["BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)"]?.[9] || '' : '',
+
+        //Pervious Residence or Business Address
+        "street.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[0] || '' : '',
+        "street 1.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[1] || '' : '',
+        "street 1.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[2] || '' : '',
+        "street 1.2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[3] || '' : '',
+        "street 1.3.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[4] || '' : '',
+
+        "street name.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[0] || '' : '',
+        "street name 1.0.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[1] || '' : '',
+        "street name 1.0.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[2] || '' : '',
+        "street name 1.0.2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[3] || '' : '',
+        "street name 1.0.3.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[4] || '' : '',
+        "street name 1.0.4.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[5] || '' : '',
+        "street name 1.0.5.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[6] || '' : '',
+        "street name 1.0.6.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[7] || '' : '',
+        "street name 1.0.7.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[8] || '' : '',
+        "street name 1.0.8.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[9] || '' : '',
+        "street name 1.0.9.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[10] || '' : '',
+        "street name 1.0.10.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[11] || '' : '',
+        "street name 1.0.11.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[12] || '' : '',
+        "street name 1.0.12.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[13] || '' : '',
+        "street name 1.0.13.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[14] || '' : '',
+        "street name 1.0.14.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[15] || '' : '',
+        "street name 1.0.15.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[16] || '' : '',
+        "street name 1.0.16.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[17] || '' : '',
+        "street name 1.0.17.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[18] || '' : '',
+        "street name 1.0.18.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[19] || '' : '',
+        "street name 1.0.19.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[20] || '' : '',
+        "street name 1.0.19.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[21] || '' : '',
+        "street name 1.0.20.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[22] || '' : '',
+        "street name 1.0.20.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[23] || '' : '',
+        "street name 1.0.20.2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[24] || '' : '',
+        "street name 1.0.20.3.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[25] || '' : '',
+        "street name 1.0.20.4.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[26] || '' : '',
+        "street name 1.0.20.5.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[27] || '' : '',
+        "street name 1.0.20.6.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[28] || '' : '',
+        "street name 1.0.20.7.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[29] || '' : '',
+        "street name 1.0.20.8.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[30] || '' : '',
+        "street name 1.0.20.9.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[31] || '' : '',
+        "street name 1.0.20.10.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[32] || '' : '',
+        "street name 1.0.20.11.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[33] || '' : '',
+        "street name 1.0.20.12.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[34] || '' : '',
+        "street name 1.0.20.13.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[35] || '' : '',
+        "street name 1.0.20.14.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[36] || '' : '',
+        "street name 1.0.20.15.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[37] || '' : '',
+        "street name 1.0.20.16.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[38] || '' : '',
+        "street name 1.0.20.17.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[39] || '' : '',
+        "street name 1.0.20.18.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[40] || '' : '',
+        "street name 1.0.20.19.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[41] || '' : '',
+        "street name 1.0.20.20.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[42] || '' : '',
+        "street name 1.0.20.21.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STREET NAME"]?.[43] || '' : '',
+
+        "apt number.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["APT. NO."]?.[0] || '' : '',
+        "apt number.1.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["APT. NO."]?.[1] || '' : '',
+        "apt number.1.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["APT. NO."]?.[2] || '' : '',
+        "apt number.1.2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["APT. NO."]?.[3] || '' : '',
+
+        "city.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[0] || '' : '',
+        "city 1.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[1] || '' : '',
+        "city 1.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[2] || '' : '',
+        "city 1.2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[3] || '' : '',
+        "city 1.3.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[4] || '' : '',
+        "city 1.4.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[5] || '' : '',
+        "city 1.5.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[6] || '' : '',
+        "city 1.6.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[7] || '' : '',
+        "city 1.7.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[8] || '' : '',
+        "city 1.8.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[9] || '' : '',
+        "city 1.9.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[10] || '' : '',
+        "city 1.10.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[11] || '' : '',
+        "city 1.11.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[12] || '' : '',
+        "city 1.12.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[13] || '' : '',
+        "city 1.13.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[14] || '' : '',
+        "city 1.14.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[15] || '' : '',
+        "city 1.15.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[16] || '' : '',
+        "city 1.16.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[17] || '' : '',
+        "city 1.17.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[18] || '' : '',
+        "city 1.18.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[19] || '' : '',
+        "city 1.19.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[20] || '' : '',
+        "city 1.20.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["CITY"]?.[21] || '' : '',
+
+        "state 1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STATE"]?.[0] || '' : '',
+        "state 2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["STATE"]?.[1] || '' : '',
+
+        "zip code.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["ZIP CODE"]?.[0] || '' : '',
+        "zip code.1.0.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["ZIP CODE"]?.[1] || '' : '',
+        "zip code.1.1.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["ZIP CODE"]?.[2] || '' : '',
+        "zip code.1.2.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["ZIP CODE"]?.[3] || '' : '',
+        "zip code.1.3.0": senerio?.includes("Change of Address") ? formData?.previousResidenceOrBusinessAddressData?.["ZIP CODE"]?.[4] || '' : '',
+
+        //new or correct residence
+
+        "street.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[0] || '' : '',
+        "street 1.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[1] || '' : '',
+        "street 1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[2] || '' : '',
+        "street 1.2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[3] || '' : '',
+        "street 1.3.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NUMBER"]?.[4] || '' : '',
+
+        "street name.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[0] || '' : '',
+        "street name 1.0.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[1] || '' : '',
+        "street name 1.0.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[2] || '' : '',
+        "street name 1.0.2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[3] || '' : '',
+        "street name 1.0.3.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[4] || '' : '',
+        "street name 1.0.4.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[5] || '' : '',
+        "street name 1.0.5.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[6] || '' : '',
+        "street name 1.0.6.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[7] || '' : '',
+        "street name 1.0.7.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[8] || '' : '',
+        "street name 1.0.8.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[9] || '' : '',
+        "street name 1.0.9.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[10] || '' : '',
+        "street name 1.0.10.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[11] || '' : '',
+        "street name 1.0.11.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[12] || '' : '',
+        "street name 1.0.12.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[13] || '' : '',
+        "street name 1.0.13.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[14] || '' : '',
+        "street name 1.0.14.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[15] || '' : '',
+        "street name 1.0.15.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[16] || '' : '',
+        "street name 1.0.16.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[17] || '' : '',
+        "street name 1.0.17.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[18] || '' : '',
+        "street name 1.0.18.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[19] || '' : '',
+        "street name 1.0.19.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[20] || '' : '',
+        "street name 1.0.19.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[21] || '' : '',
+        "street name 1.0.20.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[22] || '' : '',
+        "street name 1.0.20.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[23] || '' : '',
+        "street name 1.0.20.2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[24] || '' : '',
+        "street name 1.0.20.3.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[25] || '' : '',
+        "street name 1.0.20.4.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[26] || '' : '',
+        "street name 1.0.20.5.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[27] || '' : '',
+        "street name 1.0.20.6.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[28] || '' : '',
+        "street name 1.0.20.7.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[29] || '' : '',
+        "street name 1.0.20.8.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[30] || '' : '',
+        "street name 1.0.20.9.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[31] || '' : '',
+        "street name 1.0.20.10.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[32] || '' : '',
+        "street name 1.0.20.11.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[33] || '' : '',
+        "street name 1.0.20.12.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[34] || '' : '',
+        "street name 1.0.20.13.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[35] || '' : '',
+        "street name 1.0.20.14.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[36] || '' : '',
+        "street name 1.0.20.15.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[37] || '' : '',
+        "street name 1.0.20.16.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[38] || '' : '',
+        "street name 1.0.20.17.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[39] || '' : '',
+        "street name 1.0.20.18.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[40] || '' : '',
+        "street name 1.0.20.19.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[41] || '' : '',
+        "street name 1.0.20.20.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[42] || '' : '',
+        "street name 1.0.20.21.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STREET NAME"]?.[43] || '' : '',
+
+        "apt number.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["APT. NO."]?.[0] || '' : '',
+        "apt number.1.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["APT. NO."]?.[1] || '' : '',
+        "apt number.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["APT. NO."]?.[2] || '' : '',
+        "apt number.1.2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["APT. NO."]?.[3] || '' : '',
+
+        "city.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[0] || '' : '',
+        "city 1.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[1] || '' : '',
+        "city 1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[2] || '' : '',
+        "city 1.2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[3] || '' : '',
+        "city 1.3.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[4] || '' : '',
+        "city 1.4.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[5] || '' : '',
+        "city 1.5.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[6] || '' : '',
+        "city 1.6.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[7] || '' : '',
+        "city 1.7.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[8] || '' : '',
+        "city 1.8.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[9] || '' : '',
+        "city 1.9.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[10] || '' : '',
+        "city 1.10.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[11] || '' : '',
+        "city 1.11.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[12] || '' : '',
+        "city 1.12.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[13] || '' : '',
+        "city 1.13.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[14] || '' : '',
+        "city 1.14.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[15] || '' : '',
+        "city 1.15.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[16] || '' : '',
+        "city 1.16.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[17] || '' : '',
+        "city 1.17.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[18] || '' : '',
+        "city 1.18.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[19] || '' : '',
+        "city 1.19.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[20] || '' : '',
+        "city 1.20.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["CITY"]?.[21] || '' : '',
+
+        "state 1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STATE"]?.[0] || '' : '',
+        "state 2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["STATE"]?.[1] || '' : '',
+
+        "zip code.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["ZIP CODE"]?.[0] || '' : '',
+        "zip code.1.0.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["ZIP CODE"]?.[1] || '' : '',
+        "zip code.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["ZIP CODE"]?.[2] || '' : '',
+        "zip code.1.2.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["ZIP CODE"]?.[3] || '' : '',
+        "zip code.1.3.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["ZIP CODE"]?.[4] || '' : '',
+
+        //new or correct mailing
+
+        "street.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STREET NUMBER"]?.[0] || '' : '' : '',
+        "street 1.0.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STREET NUMBER"]?.[1] || '' : '' : '',
+        "street 1.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STREET NUMBER"]?.[2] || '' : '' : '',
+        "street 1.2.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STREET NUMBER"]?.[3] || '' : '' : '',
+        "street 1.3.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STREET NUMBER"]?.[4] || '' : '' : '',
+
+        "street name.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[0] || '' : '' : '',
+        "street name 1.0.0.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[1] || '' : '' : '',
+        "street name 1.0.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[2] || '' : '' : '',
+        "street name 1.0.2.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[3] || '' : '' : '',
+        "street name 1.0.3.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[4] || '' : '' : '',
+        "street name 1.0.4.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[5] || '' : '' : '',
+        "street name 1.0.5.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[6] || '' : '' : '',
+        "street name 1.0.6.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[7] || '' : '' : '',
+        "street name 1.0.7.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[8] || '' : '' : '',
+        "street name 1.0.8.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[9] || '' : '' : '',
+        "street name 1.0.9.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[10] || '' : '' : '',
+        "street name 1.0.10.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[11] || '' : '' : '',
+        "street name 1.0.11.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[12] || '' : '' : '',
+        "street name 1.0.12.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[13] || '' : '' : '',
+        "street name 1.0.13.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[14] || '' : '' : '',
+        "street name 1.0.14.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[15] || '' : '' : '',
+        "street name 1.0.15.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[16] || '' : '' : '',
+        "street name 1.0.16.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[17] || '' : '' : '',
+        "street name 1.0.17.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[18] || '' : '' : '',
+        "street name 1.0.18.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[19] || '' : '' : '',
+        "street name 1.0.19.0.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[20] || '' : '' : '',
+        "street name 1.0.19.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[21] || '' : '' : '',
+        "street name 1.0.20.0.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[22] || '' : '' : '',
+        "street name 1.0.20.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[23] || '' : '' : '',
+        "street name 1.0.20.2.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[24] || '' : '' : '',
+        "street name 1.0.20.3.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[25] || '' : '' : '',
+        "street name 1.0.20.4.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[26] || '' : '' : '',
+        "street name 1.0.20.5.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[27] || '' : '' : '',
+        "street name 1.0.20.6.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[28] || '' : '' : '',
+        "street name 1.0.20.7.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[29] || '' : '' : '',
+        "street name 1.0.20.8.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[30] || '' : '' : '',
+        "street name 1.0.20.9.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[31] || '' : '' : '',
+        "street name 1.0.20.10.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[32] || '' : '' : '',
+        "street name 1.0.20.11.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[33] || '' : '' : '',
+        "street name 1.0.20.12.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[34] || '' : '' : '',
+        "street name 1.0.20.13.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[35] || '' : '' : '',
+        "street name 1.0.20.14.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[36] || '' : '' : '',
+        "street name 1.0.20.15.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[37] || '' : '' : '',
+        "street name 1.0.20.16.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[38] || '' : '' : '',
+        "street name 1.0.20.17.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[39] || '' : '' : '',
+        "street name 1.0.20.18.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[40] || '' : '' : '',
+        "street name 1.0.20.19.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[41] || '' : '' : '',
+        "street name 1.0.20.20.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[42] || '' : '' : '',
+        "street name 1.0.20.21.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)"]?.[43] || '' : '' : '',
+
+        "apt number.0.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["APT. NO."]?.[0] || '' : '' : '',
+        "apt number.1.0.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["APT. NO."]?.[1] || '' : '' : '',
+        "apt number.1.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["APT. NO."]?.[2] || '' : '' : '',
+        "apt number.1.2.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["APT. NO."]?.[3] || '' : '' : '',
+
+        "city.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[0] || '' : '' : '',
+        "city 1.0.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[1] || '' : '' : '',
+        "city 1.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[2] || '' : '' : '',
+        "city 1.2.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[3] || '' : '' : '',
+        "city 1.3.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[4] || '' : '' : '',
+        "city 1.4.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[5] || '' : '' : '',
+        "city 1.5.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[6] || '' : '' : '',
+        "city 1.6.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[7] || '' : '' : '',
+        "city 1.7.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[8] || '' : '' : '',
+        "city 1.8.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[9] || '' : '' : '',
+        "city 1.9.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[10] || '' : '' : '',
+        "city 1.10.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[11] || '' : '' : '',
+        "city 1.11.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[12] || '' : '' : '',
+        "city 1.12.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[13] || '' : '' : '',
+        "city 1.13.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[14] || '' : '' : '',
+        "city 1.14.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[15] || '' : '' : '',
+        "city 1.15.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[16] || '' : '' : '',
+        "city 1.16.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[17] || '' : '' : '',
+        "city 1.17.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[18] || '' : '' : '',
+        "city 1.18.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[19] || '' : '' : '',
+        "city 1.19.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[20] || '' : '' : '',
+        "city 1.20.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[21] || '' : '' : '',
+
+        "state 1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STATE"]?.[0] || '' : '' : '',
+        "state 2.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["STATE"]?.[1] || '' : '' : '',
+
+        "zip code.0.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["ZIP CODE"]?.[0] || '' : '' : '',
+        "zip code.1.0.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["ZIP CODE"]?.[1] || '' : '' : '',
+        "zip code.1.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["ZIP CODE"]?.[2] || '' : '' : '',
+        "zip code.1.2.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["ZIP CODE"]?.[3] || '' : '' : '',
+        "zip code.1.3.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["ZIP CODE"]?.[4] || '' : '' : '',
+
+        "Address Update": senerio?.includes("Change of Address") ? formData?.transactionSelections?.includes("Do not Use My New Address For Voter Registration Purposes") ? true : false : false,
+
+        //1
+
+        "California plate 1.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[0] || '' : '',
+        "California plate 1.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[1] || '' : '',
+        "California plate 1.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[2] || '' : '',
+        "California plate 1.3": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[3] || '' : '',
+        "California plate 1.4": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[4] || '' : '',
+        "California plate 1.5": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[5] || '' : '',
+        "California plate 1.6": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[6] || '' : '',
+        "California plate 1.7": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["plateNumber"]?.[7] || '' : '',
+
+        "HULL ID.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[0] || '' : '',
+        "HULL ID.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[1] || '' : '',
+        "HULL ID.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[2] || '' : '',
+        "HULL ID.3": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[3] || '' : '',
+        "HULL ID.4": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[4] || '' : '',
+        "HULL ID.5": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[5] || '' : '',
+        "HULL ID.6": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[6] || '' : '',
+        "HULL ID.7": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[7] || '' : '',
+        "HULL ID.8": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[8] || '' : '',
+        "HULL ID.9": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[9] || '' : '',
+        "HULL ID.10": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[10] || '' : '',
+        "HULL ID.11": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[11] || '' : '',
+        "HULL ID.12": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[12] || '' : '',
+        "HULL ID.13": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[13] || '' : '',
+        "HULL ID.14": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[14] || '' : '',
+        "HULL ID.15": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[15] || '' : '',
+        "HULL ID.16": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["vinNumber"]?.[16] || '' : '',
+
+        "Check Box3.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["leased"] ? true : false : false,
+        "Check Box4.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[0]?.["registeredOutsideCA"] ? true : false : false,
+
+        //2
+
+        "California plate 2.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[0] || '' : '',
+        "California plate 2.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[1] || '' : '',
+        "California plate 2.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[2] || '' : '',
+        "California plate 2.3": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[3] || '' : '',
+        "California plate 2.4": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[4] || '' : '',
+        "California plate 2.5": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[5] || '' : '',
+        "California plate 2.6": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[6] || '' : '',
+        "California plate 2.7": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["plateNumber"]?.[7] || '' : '',
+
+        "HULL ID 2.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[0] || '' : '',
+        "HULL ID 2.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[1] || '' : '',
+        "HULL ID 2.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[2] || '' : '',
+        "HULL ID 2.3": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[3] || '' : '',
+        "HULL ID 2.4": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[4] || '' : '',
+        "HULL ID 2.5": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[5] || '' : '',
+        "HULL ID 2.6": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[6] || '' : '',
+        "HULL ID 2.7": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[7] || '' : '',
+        "HULL ID 2.8": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[8] || '' : '',
+        "HULL ID 2.9": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[9] || '' : '',
+        "HULL ID 2.10": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[10] || '' : '',
+        "HULL ID 2.11": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[11] || '' : '',
+        "HULL ID 2.12": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[12] || '' : '',
+        "HULL ID 2.13": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[13] || '' : '',
+        "HULL ID 2.14": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[14] || '' : '',
+        "HULL ID 2.15": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[15] || '' : '',
+        "HULL ID 2.16": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["vinNumber"]?.[16] || '' : '',
+
+        "Check Box3.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["leased"] ? true : false : false,
+        "Check Box4.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[1]?.["registeredOutsideCA"] ? true : false : false,
+
+        //3
+
+        "California plate 3.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[0] || '' : '',
+        "California plate 3.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[1] || '' : '',
+        "California plate 3.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[2] || '' : '',
+        "California plate 3.3": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[3] || '' : '',
+        "California plate 3.4": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[4] || '' : '',
+        "California plate 3.5": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[5] || '' : '',
+        "California plate 3.6": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[6] || '' : '',
+        "California plate 3.7": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["plateNumber"]?.[7] || '' : '',
+
+        "HULL ID 3.0": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[0] || '' : '',
+        "HULL ID 3.1": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[1] || '' : '',
+        "HULL ID 3.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[2] || '' : '',
+        "HULL ID 3.3": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[3] || '' : '',
+        "HULL ID 3.4": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[4] || '' : '',
+        "HULL ID 3.5": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[5] || '' : '',
+        "HULL ID 3.6": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[6] || '' : '',
+        "HULL ID 3.7": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[7] || '' : '',
+        "HULL ID 3.8": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[8] || '' : '',
+        "HULL ID 3.9": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[9] || '' : '',
+        "HULL ID 3.10": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[10] || '' : '',
+        "HULL ID 3.11": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[11] || '' : '',
+        "HULL ID 3.12": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[12] || '' : '',
+        "HULL ID 3.13": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[13] || '' : '',
+        "HULL ID 3.14": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[14] || '' : '',
+        "HULL ID 3.15": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[15] || '' : '',
+        "HULL ID 3.16": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["vinNumber"]?.[16] || '' : '',
+
+        "Check Box3.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["leased"] ? true : false : false,
+        "Check Box4.2": senerio?.includes("Change of Address") ? formData?.vehiclesOwnedByYouData?.[2]?.["registeredOutsideCA"] ? true : false : false,
+
+        "leasing co.0": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[0] || '' : '' : '',
+        "leasing co.1": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[1] || '' : '' : '',
+        "leasing co.2": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[2] || '' : '' : '',
+        "leasing co.3": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[3] || '' : '' : '',
+        "leasing co.4": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[4] || '' : '' : '',
+        "leasing co.5": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[5] || '' : '' : '',
+        "leasing co.6": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[6] || '' : '' : '',
+        "leasing co.7": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[7] || '' : '' : '',
+        "leasing co.8": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[8] || '' : '' : '',
+        "leasing co.9": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[9] || '' : '' : '',
+        "leasing co.10": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[10] || '' : '' : '',
+        "leasing co.11": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[11] || '' : '' : '',
+        "leasing co.12": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[12] || '' : '' : '',
+        "leasing co.13": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[13] || '' : '' : '',
+        "leasing co.14": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[14] || '' : '' : '',
+        "leasing co.15": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[15] || '' : '' : '',
+        "leasing co.16": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[16] || '' : '' : '',
+        "leasing co.17": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[17] || '' : '' : '',
+        "leasing co.18": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[18] || '' : '' : '',
+        "leasing co.19": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[19] || '' : '' : '',
+        "leasing co.20": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[20] || '' : '' : '',
+        "leasing co.21": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Leased Vehicle") ? formData?.leasaedCompanyName?.[21] || '' : '' : '',
+
+        //location
+
+        "street.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NUMBER"]?.[0] || '' : '' : '',
+        "street 1.0.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NUMBER"]?.[1] || '' : '' : '',
+        "street 1.1.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NUMBER"]?.[2] || '' : '' : '',
+        "street 1.2.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NUMBER"]?.[3] || '' : '' : '',
+        "street 1.3.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NUMBER"]?.[4] || '' : '' : '',
+
+        "street name.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[0] || '' : '' : '',
+        "street name 1.0.0.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[1] || '' : '' : '',
+        "street name 1.0.1.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[2] || '' : '' : '',
+        "street name 1.0.2.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[3] || '' : '' : '',
+        "street name 1.0.3.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[4] || '' : '' : '',
+        "street name 1.0.4.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[5] || '' : '' : '',
+        "street name 1.0.5.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[6] || '' : '' : '',
+        "street name 1.0.6.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[7] || '' : '' : '',
+        "street name 1.0.7.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[8] || '' : '' : '',
+        "street name 1.0.8.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[9] || '' : '' : '',
+        "street name 1.0.9.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[10] || '' : '' : '',
+        "street name 1.0.10.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[11] || '' : '' : '',
+        "street name 1.0.11.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[12] || '' : '' : '',
+        "street name 1.0.12.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[13] || '' : '' : '',
+        "street name 1.0.13.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[14] || '' : '' : '',
+        "street name 1.0.14.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[15] || '' : '' : '',
+        "street name 1.0.15.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[16] || '' : '' : '',
+        "street name 1.0.16.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[17] || '' : '' : '',
+        "street name 1.0.17.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[18] || '' : '' : '',
+        "street name 1.0.18.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[19] || '' : '' : '',
+        "street name 1.0.19.0.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[20] || '' : '' : '',
+        "street name 1.0.19.1.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["STREET NAME"]?.[21] || '' : '' : '',
+
+        "city.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[0] || '' : '' : '',
+        "city 1.0.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[1] || '' : '' : '',
+        "city 1.1.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[2] || '' : '' : '',
+        "city 1.2.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[3] || '' : '' : '',
+        "city 1.3.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[4] || '' : '' : '',
+        "city 1.4.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[5] || '' : '' : '',
+        "city 1.5.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[6] || '' : '' : '',
+        "city 1.6.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[7] || '' : '' : '',
+        "city 1.7.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[8] || '' : '' : '',
+        "city 1.8.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[9] || '' : '' : '',
+        "city 1.9.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[10] || '' : '' : '',
+        "city 1.10.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[11] || '' : '' : '',
+        "city 1.11.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[12] || '' : '' : '',
+        "city 1.12.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[13] || '' : '' : '',
+        "city 1.13.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[14] || '' : '' : '',
+        "city 1.14.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[15] || '' : '' : '',
+        "city 1.15.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["CITY"]?.[16] || '' : '' : '',
+
+        "county.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[0] || '' : '' : '',
+        "county.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[1] || '' : '' : '',
+        "county.2": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[2] || '' : '' : '',
+        "county.3": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[3] || '' : '' : '',
+        "county.4": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[4] || '' : '' : '',
+        "county.5": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[5] || '' : '' : '',
+        "county.6": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[6] || '' : '' : '',
+        "county.7": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[7] || '' : '' : '',
+        "county.8": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[8] || '' : '' : '',
+        "county.9": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[9] || '' : '' : '',
+        "county.10": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[10] || '' : '' : '',
+        "county.11": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[11] || '' : '' : '',
+        "county.12": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[12] || '' : '' : '',
+        "county.13": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[13] || '' : '' : '',
+
     };
 };
 
@@ -917,11 +1454,11 @@ const mergeFilledPDFs = async (
     formTypes: string[],
     formData: FormData,
     senerio: string,
-    multipleFormDataList: FormData[] = []  // optional for multiple transfer
+    // multipleFormDataList: FormData[] = []  // optional for multiple transfer
 ): Promise<Uint8Array> => {
     const mergedPdf = await PDFDocument.create();
 
-    let dmv262Index = 0; // for tracking multiple 262 forms
+    // let dmv262Index = 0; // for tracking multiple 262 forms
 
     for (const type of formTypes) {
         const pdfUrl = `/pdfs/${type}.pdf`;
@@ -939,25 +1476,25 @@ const mergeFilledPDFs = async (
             const form = pdfDoc.getForm();
             const fields = form.getFields();
 
-            //  Select which data to use
-            let currentData: FormData;
+            // //  Select which data to use
+            // let currentData: FormData;
 
-            if (type === "DMVREG262new" && multipleFormDataList.length > 0) {
-                // Use specific transfer data
-                currentData = multipleFormDataList[dmv262Index] || formData;
-                dmv262Index++;
-            } else {
-                // Use default formData
-                currentData = formData;
-            }
+            // if (type === "DMVREG262new" && multipleFormDataList.length > 0) {
+            //     // Use specific transfer data
+            //     currentData = multipleFormDataList[dmv262Index] || formData;
+            //     dmv262Index++;
+            // } else {
+            //     // Use default formData
+            //     currentData = formData;
+            // }
 
-            const fieldMapping = buildFieldMapping(currentData, senerio);
+            const fieldMapping = buildFieldMapping(formData, senerio);
 
             // Fill fields
             fields.forEach((field: PDFField) => {
                 const name = field.getName();
                 const value = fieldMapping[name];
-                console.log(name, value);
+                // console.log(name, value);
 
                 try {
                     if (field instanceof PDFTextField) {
@@ -1028,10 +1565,14 @@ async function handleOnPDF(form: any, senerio: any) {
             }
         }
         if (senerio?.includes("Duplicate Stickers") ||
+            senerio?.includes("Duplicate Registration") ||
             senerio?.includes("Duplicate Plates & Stickers")) {
             formTypes.push('Reg156');
         }
         if (senerio?.includes("Restoring PNO Vehicle to Operational")) {
+            formTypes.push("Reg256");
+        }
+        if (senerio?.includes("Name Change")) {
             formTypes.push("Reg256");
         }
         if (senerio?.includes("Add Lienholder") ||
@@ -1062,6 +1603,12 @@ async function handleOnPDF(form: any, senerio: any) {
         }
         if (senerio?.includes("Disabled Person Placards/Plates")) {
             formTypes.push("REG195");
+        }
+        if (senerio?.includes("Duplicate Title")) {
+            formTypes.push("Reg227");
+        }
+        if (senerio?.includes("Change of Address")) {
+            formTypes.push("DMV14");
         }
         const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio);
         return mergedBytes;
@@ -1116,32 +1663,7 @@ export async function headHandlerForPDf(sourceOfClick: string) {
         }
     }
     const finalBytes = await finalMergedPdf.save();
-    const blob = new Blob([finalBytes], { type: 'application/pdf' });
+    const blob = new Blob([finalBytes as BlobPart], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     window.open(url);
 }
-// export async function handleMultipleTransfersPDF(): Promise<void> {
-//     try {
-//         const savedForm = localStorage.getItem("multipleTransfersStates");
-//         const savedSenerio = localStorage.getItem("senerio");
-
-//         const form = JSON.parse(savedForm || "[]");
-//         const senerio: string = JSON.parse(savedSenerio || "[]");
-
-//         const multipleFormDataList = form || [];
-
-//         if (!multipleFormDataList.length) {
-//             console.warn("No multiple transfers found.");
-//             return;
-//         }
-
-//         const formTypes = ['DMVREG262new']; // Only REG 262 for each step
-
-//         const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio, multipleFormDataList);
-//         const blob = new Blob([mergedBytes], { type: 'application/pdf' });
-//         const url = URL.createObjectURL(blob);
-//         window.open(url);
-//     } catch (e) {
-//         console.error("Error generating multiple transfer PDFs: ", e);
-//     }
-// }

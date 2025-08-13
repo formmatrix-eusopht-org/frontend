@@ -22,17 +22,26 @@ export default function Sidebar() {
       const isChecked = prev.includes(label);
 
       if (isChecked) {
-        // Uncheck parent and remove its sub-options
+        // Uncheck parent and all its sub-options
         return prev.filter((item) => item !== label && !subOptions.includes(item));
       } else {
-        // On first check of "Duplicate Stickers", also check its sub-options
-        if (label === "Duplicate Stickers") {
-          return [...prev, label, ...subOptions.filter((s) => !prev.includes(s))];
+        let updated = [...prev, label];
+
+        // Auto-select first subOption if radio is true
+        if (selectedOption?.radio && subOptions.length > 0) {
+          updated.push(subOptions[0]);
         }
-        return [...prev, label];
+
+        // Special case for Duplicate Stickers
+        if (label === "Duplicate Stickers") {
+          updated = [...updated, ...subOptions.filter((s) => !prev.includes(s))];
+        }
+
+        return updated;
       }
     });
   };
+
 
   return (
     <div className="min-w-8/20 fixed right-0 top-[90px] bottom-[30px] rounded-xl shadow-lg z-40 bg-white flex flex-col">
@@ -80,17 +89,34 @@ export default function Sidebar() {
                               label={sub}
                               checked={senerio.includes(sub)}
                               onChange={() =>
-                                setSenerio((prev: string[]) =>
-                                  prev.includes(sub)
-                                    ? prev.filter((item) => item !== sub)
-                                    : [...prev, sub]
-                                )
+                                setSenerio((prev: string[]) => {
+                                  if (option.radio) {
+                                    const siblings = subOptions;
+
+                                    // If the clicked one is already selected, do nothing (can't unselect in radio mode)
+                                    if (prev.includes(sub)) {
+                                      return prev;
+                                    }
+
+                                    // Radio-like: remove all siblings, add the new one
+                                    let updated = prev.filter((item) => !siblings.includes(item));
+                                    updated.push(sub);
+                                    return updated;
+                                  } else {
+                                    // Normal checkbox behavior
+                                    return prev.includes(sub)
+                                      ? prev.filter((item) => item !== sub)
+                                      : [...prev, sub];
+                                  }
+                                })
                               }
+
                             />
                           ))}
 
                         </div>
                       )}
+
                     </div>
                   );
                 })}

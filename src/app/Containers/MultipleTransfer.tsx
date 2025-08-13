@@ -851,15 +851,6 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         options={dropdownOptions}
                     />
                 </div>
-                {/* <select
-          value={transferCount}
-          onChange={handleTransferChange}
-          className="border rounded px-2 py-1"
-        > 
-          {numberOfTransfers.map((num) =>  (
-            <option key={num} value={num}> {num}</option> 
-          ))}
-        </select>  */}
             </div>
 
             <div className="flex overflow-x-auto w-full gap-0">
@@ -894,6 +885,14 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         block={typeOfVehicleBlock}
                         selectedItems={currentTransfer.typeOfVehicleSelection}
                         onChange={handleTypeOfVehicleChange}
+                    />
+                )}
+
+                {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (transferCount == activeTab) && (
+                    <MissingTitleReason
+                        title="Missing Title Reason"
+                        selectedReason={currentTransfer.missingReason}
+                        onReasonChange={(reason) => updateCurrentTransfer({ missingReason: reason })}
                     />
                 )}
 
@@ -1059,14 +1058,6 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         block={LicensePlateBlock}
                         selectedOption={currentTransfer.licensePlateState}
                         handleSelectedOptionOnChange={handleLicensePlateChange}
-                    />
-                )}
-
-                {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
-                    <MissingTitleReason
-                        title="Missing Title Reason"
-                        selectedReason={currentTransfer.missingReason}
-                        onReasonChange={(reason) => updateCurrentTransfer({ missingReason: reason })}
                     />
                 )}
 
