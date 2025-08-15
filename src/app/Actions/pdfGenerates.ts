@@ -76,9 +76,15 @@ type SalvageCertificateState = {
 };
 
 type FormData = {
+    platesSelectionState?: any;
+    personalizePlatesState?: string;
+    replacementState?: any;
+    platePurchaseState?: any;
+    specialInterestState?: any;
     personalOrBusinessInformationData?: any;
     previousResidenceOrBusinessAddressData?: any;
     newOrCorrectResidenceOrBusinessAddressData?: any;
+    selectConfigState?: any;
     vehiclesOwnedByYouData?: any;
     leasaedCompanyName?: string;
     nameChangeData?: any;
@@ -508,11 +514,22 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'Text10': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
         "Text11": formData.vehicleInfoState?.['Year of Vehicle'] || '',
         'Text62': (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0]) : '',
-        'Text73': (formData.newOwnerCount ?? 0) > 1 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1]) : '',
+        'Text73': senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["State"] || '' : '' : (formData.newOwnerCount ?? 0) > 1 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1]) : '',
         'Text81': (formData.newOwnerCount ?? 0) > 2 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[2]) : '',
-        "Text64": formData.newOwnerData?.[0]?.['State'] || '',
-        "Text74": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['State'] || '' : '',
-        "Text75": (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
+        "Text64": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.["True Full Name (Last, First, Middle Initial, Suffix)"] || '' : formData.newOwnerData?.[0]?.['State'] || '',
+        "Text65": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.["Street Address or PO Box"] || '' : '',
+        "Text66": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.City || '' : '',
+        "Text67": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.State || '' : '',
+        "Text68": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.["ZIP Code"] || '' : '',
+
+        "Text69": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["True Full Name (Last, First, Middle Initial, Suffix)"] || '' : '' : '',
+        "Text70": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["Street Address or PO Box"] || '' : '' : '',
+        "Text71": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["City"] || '' : '' : '',
+        "Text72": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["State"] || '' : '' : '',
+
+        "Text74": senerio?.includes("Personalized Plates") ? getCurrentDate() : (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['State'] || '' : '',
+        "Text75": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"].slice(1, 4) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
+        "Text76": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"].slice(5) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
         'Owner DL no': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '',
         'owner second digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '',
         'owner third digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '',
@@ -593,17 +610,48 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text132.5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
         //Reg343
         "Text12": `${formData.statementForSomgExemptionData?.diesel ? 'Diesel' : formData.statementForSomgExemptionData?.electricity ? 'Electricity' : formData.statementForSomgExemptionData?.Other || ''}`,
-        "Text18": formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
-        "Text29": formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Length (IN)'] || '' : '',
-        "Text30": formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Width (IN)'] || '' : '',
+        "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
+        "Text18": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Veterans' Organization" ? formData?.platesSelectionState?.veteranCode : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
+        "Text29": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[0] : '' : '' : formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Length (IN)'] || '' : '',
+        "Text30": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[1] : '' : '' : '',
+        "Text31": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[2] : '' : '' : '',
+        "Text32": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[3] : '' : '' : '',
+        "Text33": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[4] : '' : '' : '',
+        "Text34": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[5] : '' : '' : '',
+        "Text35": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[6] : '' : '' : '',
+        "Text36": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[7] : '' : '' : '',
+        "Text37": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.meaning : '' : '' : '',
+
+        "Text38": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[0] : '' : '' : '',
+        "Text39": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[1] : '' : '' : '',
+        "Text40": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[2] : '' : '' : '',
+        "Text41": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[3] : '' : '' : '',
+        "Text42": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[4] : '' : '' : '',
+        "Text43": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[5] : '' : '' : '',
+        "Text44": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[6] : '' : '' : '',
+        "Text45": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.text[7] : '' : '' : '',
+        "Text46": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[1]?.meaning : '' : '' : '',
+
+        "Text47": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[0] : '' : '' : '',
+        "Text48": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[1] : '' : '' : '',
+        "Text49": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[2] : '' : '' : senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Number of axles"] || '' : '',
+        "Text50": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[3] : '' : '' : senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Unladen weight"] || '' : '',
+        "Text51": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[4] : '' : '' : '',
+        "Text52": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[5] : '' : '' : '',
+        "Text53": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[6] : '' : '' : '',
+        "Text54": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.text[7] : '' : '' : '',
+        "Text55": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.meaning : '' : '' : '',
 
         //check boxes
         "App for2": true,
-        "Check Box1": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Lost' ? true : false,
-        "Check Box2": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Stolen' ? true : false,
-        "Check Box4": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Not Recive From Prior Owner' ? true : false,
-        "Check Box5": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Not Recive From DMV(Allow 30 dys from issue date)' ? true : false,
-        "Check Box6": formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Illegile/Mutilated(Attach old title)' ? true : false,
+        "Check Box1": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Order' ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Lost' ? true : false,
+        "Check Box2": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Replace' ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Stolen' ? true : false,
+        "Check Box3": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Reassign/Retain' ? true : false : false,
+        "Check Box4": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Exchange' ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Not Recive From Prior Owner' ? true : false,
+        "Check Box5": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Environmental License Plate (ELP)" ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Not Recive From DMV(Allow 30 dys from issue date)' ? true : false,
+        "Check Box6": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "California Coastal Commission (Whale Tail)" ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Illegile/Mutilated(Attach old title)' ? true : false,
+        "Check Box7": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Lake Tahoe Conservancy" ? true : false : false,
+        "Check Box8": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Honoring Veterans Plate" ? true : false : false,
         "Gift Box": formData.transactionSelections?.includes("Vehicle is a Gift") ? true : false,
         // "Gift Box1": formData.transactionSelections?.includes("Vehicle is a Gift") ? false : true,
         "And Box.0": (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'and' ? true : false : false,
@@ -626,11 +674,15 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Check Box133": formData.vehicleInfoState?.["If kilometers check this box"] ? true : false,
         "Check Box134": formData.vehicleInfoState?.["NOT Actual Mileage"] ? true : false,
         "Check Box135": formData.vehicleInfoState?.["Mileage Exceeds Mechanical Limit"] ? true : false,
-        "Check Box20": formData.typeOfVehicleSelection === "AUTO" ? true : false,
-        "Check Box24": formData.typeOfVehicleSelection === "Commercial" ? true : false,
-        "Check Box25": formData.typeOfVehicleSelection === "MOTORCYCLE" ? true : false,
-        "Check Box26": formData.typeOfVehicleSelection === "OFF HIGHWAY" ? true : false,
-        "Check Box27": formData.typeOfVehicleSelection === "TRAILER COACH" ? true : false,
+        "Check Box20": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedTo === "Commercial" ? true : false : false : formData.typeOfVehicleSelection === "AUTO" ? true : false,
+        "Check Box21": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedTo === "Trailer" ? true : false : false : false,
+        "Check Box22": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedTo === "Motorcycle" ? true : false : false : false,
+        "Check Box23": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedFor === "Sequential" ? true : false : false : false,
+        "Check Box24": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedFor !== "" ? formData?.selectConfigState.deliveryType === "Auto Club" ? true : false : false : false : formData.typeOfVehicleSelection === "Commercial" ? true : false,
+        "Check Box25": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "California 1960s Legacy" ? true : false : formData.typeOfVehicleSelection === "MOTORCYCLE" ? true : false,
+        "Check Box26": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'California Museums (Snoopy)' ? true : false : formData.typeOfVehicleSelection === "OFF HIGHWAY" ? true : false,
+        "Check Box27": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? true : false : false : formData.typeOfVehicleSelection === "TRAILER COACH" ? true : false,
+        "Check Box28": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.centered ? true : false : false : false : false,
         "Check Box140": formData.vehicleStatusInfoData?.["IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:"] ? true : false,
         "Check Box150": formData.vehicleStatusInfoData?.["Vehicle Condition"] === "NEW" ? true : false,
         "Check Box151": formData.vehicleStatusInfoData?.["IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:"] ? true : false,
@@ -777,7 +829,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "State_VSL": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.State || '' : '',
         "zip": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.["ZIP Code"] || '' : '',
 
-        "Check Box34": formData.transactionSelections?.includes("Out of State Title") ? true : false,
+        "Check Box34": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Breast Cancer Awareness' ? true : false : formData.transactionSelections?.includes("Out of State Title") ? true : false,
         "Check Box36": formData.transactionSelections?.includes("Out of State Title") ? true : false,
 
 
@@ -785,8 +837,6 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "license year": senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : false,
         "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false,
 
-        "Text49": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Number of axles"] || '' : '',
-        "Text50": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Unladen weight"] || '' : '',
         "Check Box51": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Weight Actual"] || '' : '',
         "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Weight Estimated"] || '' : '',
 
@@ -844,8 +894,16 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Check Box 6": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Rental Limousine" ? true : false || false : false : false,
         "Check Box 7": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Ambulance" ? true : false || false : false : false,
         "Check Box 8": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Station Wagon" ? true : false || false : false : false,
-        "Check Box9": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["The owner of this vehicle and it is registered in my name"] === true ? true : false || false : false : false,
-        "Check Box10": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["Employee of a business which required me to own and operate a station wagon which is registered in my name"] === true ? true : false || false : false : false,
+        "Check Box9": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Yosemite Foundation" ? true : false : senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["The owner of this vehicle and it is registered in my name"] === true ? true : false || false : false : false,
+        "Check Box10": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'California Arts Council' ? true : false : senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["Employee of a business which required me to own and operate a station wagon which is registered in my name"] === true ? true : false || false : false : false,
+        "Check Box11": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'California Agricultural (CalAg)' ? true : false : false,
+        "Check Box12": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Duplicate Decal' ? true : false : false,
+        "Check Box13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'California Memorial' ? true : false : false,
+        "Check Box14": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Collegiate (only UCLA is available)' ? true : false : false,
+        "Check Box15": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Kids - Child Health and Safety Funds' ? true : false : false,
+        "Check Box16": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Pet Lovers' ? true : false : false,
+        "Check Box17": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Veterans' Organization" ? true : false : false,
+        "Check Box18": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedFor !== "" ? formData?.selectConfigState.deliveryType === "DMV Office" ? true : false : false : false : false,
         "Text14": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["commercialStartDate"] || '' : '' : '',
 
         //reg 488c
@@ -1446,6 +1504,27 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "county.12": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[12] || '' : '' : '',
         "county.13": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["Location of Trailer Coach or Vessel"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.locationAddress?.["COUNTY - DO NOT ABBREVIATE"]?.[13] || '' : '' : '',
 
+        "Check Box19": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedTo === "Automobile" ? true : false : false : false,
+        "Text25": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Sequential" ? formData?.selectConfigState?.licensePlateNumber || '' : "" : "" : "",
+        "Text26": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Sequential" ? formData?.selectConfigState?.vehicleIdentificationNumber || '' : "" : "" : "",
+        "Text27": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor !== "" ? formData?.selectConfigState?.location || '' : "" : "" : "",
+        "Text28": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Replace" ? formData?.replacementState?.plateNumber || '' : "" : "",
+        "Check Box29": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Replace" ? formData?.replacementState?.need === "onePlate" ? true : false : false : false,
+        "Check Box30": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Replace" ? formData?.replacementState?.need === "twoPlates" ? true : false : false : false,
+        "Check Box31": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Replace" ? formData?.replacementState?.plateCondition === "lost" ? true : false : false : false,
+        "Check Box32": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Replace" ? formData?.replacementState?.plateCondition === "mutilated" ? true : false : false : false,
+        "Check Box33": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Replace" ? formData?.replacementState?.plateCondition === "stolen" ? true : false : false : false,
+        "Text56": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.specialInterestLicensePlateNumber || '' : "" : "",
+        "Text57": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.removedFrom || '' : "" : "",
+        "Text58": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.licensePlatePlacedOn || '' : "" : "",
+        "Text59": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.vinPlacedOn || '' : "" : "",
+        "Check Box60": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.releaseInterest === "RETAIN INTEREST FOR FUTURE USE" ? true : false : false : false,
+        "Check Box61": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.releaseInterest === "RETAIN INTEREST FOR FUTURE USE" ? formData?.specialInterestState?.feeEnclosed ? true : false : false : false : false,
+        "Check Box62": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.releaseInterest === "RELEASE INTEREST/SURRENDER TO DMV" ? true : false : false : false,
+        "Check Box63": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === "Reassign/Retain" ? formData?.specialInterestState?.releaseInterest === "RELEASE INTEREST TO NEW OWNER" ? true : false : false : false,
+
+        "Check Box79": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent === false ? true : false : false,
+
     };
 };
 
@@ -1609,6 +1688,9 @@ async function handleOnPDF(form: any, senerio: any) {
         }
         if (senerio?.includes("Change of Address")) {
             formTypes.push("DMV14");
+        }
+        if (senerio?.includes("Personalized Plates")) {
+            formTypes.push("REG17");
         }
         const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio);
         return mergedBytes;

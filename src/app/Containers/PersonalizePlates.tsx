@@ -1,6 +1,7 @@
 import React from "react";
 import Section from "../Components/FieldSection";
 import RadioButton from "../Components/RadioButton";
+import Checkbox from "../Components/CheckBox";
 
 type PlateOption = {
     label: string;
@@ -16,6 +17,7 @@ type PlateCategory = {
 type Block = {
     blockName: string;
     fields: PlateCategory[];
+    options?: string[];
 };
 
 type Props = {
@@ -27,6 +29,8 @@ type Props = {
     };
     onPlateChange: (label: string) => void;
     onInputChange: (field: "veteranCode" | "duplicatePlate", value: string) => void;
+    personalizePlatesState: string;
+    setPersonalizePlatesState: any;
 };
 
 export const PlatesSelection = ({
@@ -34,11 +38,30 @@ export const PlatesSelection = ({
     plateInfo,
     onPlateChange,
     onInputChange,
+    personalizePlatesState,
+    setPersonalizePlatesState
 }: Props) => {
     const { selectedPlate, veteranCode, duplicatePlate } = plateInfo;
+    const checkboxOptions = block?.options || [];
 
     return (
         <div className="pb-4">
+            <Section title="Plates Options">
+                <div className="flex justify-between">
+                    {checkboxOptions?.map((f: string) => (
+                        <Checkbox
+                            key={f}
+                            label={f}
+                            checked={personalizePlatesState === f}
+                            onChange={() =>
+                                setPersonalizePlatesState((prev: string) => (prev === f ? "" : f))
+                            }
+                        />
+
+                    ))}
+                </div>
+            </Section>
+
             <Section title="Plate Selection" subSection>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                     {/* Left Column */}

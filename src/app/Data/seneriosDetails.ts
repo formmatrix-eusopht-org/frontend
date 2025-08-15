@@ -635,6 +635,22 @@ export const seneriosDetails = [
                     placeholder: 'Select reason'
                 }
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Buyer's Driver's License or ID",
+                    // unless: []
+                },
+                {
+                    label: "Collect Smog Certificate",
+                    // unless: ["smog exempt", "motorcycle"]
+                }, {
+                    label: "Have a DMV Authorized Agent HandFill REG 31",
+                    // unless: ["smog exempt", "motorcycle"]
+                }
+            ]
         }
         ]
     }, {
@@ -822,6 +838,17 @@ export const seneriosDetails = [
                     placeholder: 'Select reason'
                 }
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                },
+                {
+                    label: "Collect Title Replacement Fee",
+                }
+            ]
         }
         ]
     }, {
@@ -923,7 +950,18 @@ export const seneriosDetails = [
                     placeholder: 'ZIP Code'
                 }
             ]
-        },
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                },
+                {
+                    label: "Collect Replacement Registration Fee",
+                }
+            ]
+        }
         ]
     }, {
         form: "Name Change",
@@ -963,6 +1001,20 @@ export const seneriosDetails = [
                     { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
                     { label: 'State', type: 'dropdown', placeholder: 'Select State' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
+                ]
+            }, {
+                reference: "Documents Received",
+                blockName: "Documents Received",
+                fields: [
+                    {
+                        label: "Collect Legal Proof of Name Change",
+                    },
+                    {
+                        label: "Collect Original Vehicle Title",
+                    },
+                    {
+                        label: "Collect a copy of Registered Owner’s updated CA Driver’s License or ID",
+                    },
                 ]
             }
         ]
@@ -1613,6 +1665,22 @@ export const seneriosDetails = [
                     placeholder: 'Select reason'
                 }
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Buyer's Driver's License or ID",
+                    // unless: []
+                },
+                {
+                    label: "Collect Smog Certificate",
+                    // unless: ["smog exempt", "motorcycle"]
+                }, {
+                    label: "Have a DMV Authorized Agent HandFill REG 31",
+                    // unless: ["smog exempt", "motorcycle"]
+                }
+            ]
         }
         ]
     },
@@ -1759,6 +1827,20 @@ export const seneriosDetails = [
                     value: "PER CVC §4467",
                 }
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                },
+                {
+                    label: "Collect Sticker Replacement Fee",
+                },
+                {
+                    label: "Issue only one sticker",
+                }
+            ]
         }
         ]
     }, {
@@ -1891,6 +1973,20 @@ export const seneriosDetails = [
                 }, {
                     label: "Two license plates are missing or one plate is missing for a single-plate commercial truck tractor, motorcycle, or trailer",
                     value: "Two license plates are missing",
+                }
+            ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                },
+                {
+                    label: "Collect Plate and Sticker Replacement Fee",
+                },
+                {
+                    label: "Issue only one plate and sticker",
                 }
             ]
         }
@@ -2067,6 +2163,23 @@ export const seneriosDetails = [
                     placeholder: 'ZIP Code'
                 }
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                },
+                {
+                    label: "Collect Proof of Vehicle Ownership",
+                },
+                {
+                    label: "Collect Lienholder Information",
+                },
+                {
+                    label: "Collect Original Vehicle Title",
+                }
+            ]
         }
         ]
     }, {
@@ -2207,6 +2320,20 @@ export const seneriosDetails = [
                 { label: 'Printed name of authorized agent', type: 'input field', placeholder: 'Full name' },
                 { label: 'Title of authorized agent signing for company', type: 'input field', placeholder: 'Title of authorized agent signing for company' },
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                },
+                {
+                    label: "Collect Proof of Vehicle Ownership",
+                },
+                {
+                    label: "Collect Original Vehicle Title",
+                }
+            ]
         }
         ]
     }, {
@@ -2308,6 +2435,18 @@ export const seneriosDetails = [
                 { label: "Make", key: "make", placeholder: "Make" },
                 { label: "Equipment Number (Optional)", key: "equipment", placeholder: "Equipment number" },
             ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                }, {
+                    label: "Collect PNO Fee ($23)",
+                }, {
+                    label: "Customer Must Must Pay Full Registration Fees, Plus Any Late Penalties",
+                },
+            ]
         }
         ]
     }, {
@@ -2355,7 +2494,21 @@ export const seneriosDetails = [
                     placeholder: 'Phone Number'
                 }
             ]
-        },]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                }, {
+                    label: "Collect Proof of Insurance",
+                }, {
+                    label: "Collect Smog Certification",
+                }, {
+                    label: "Collect Any Registration / Late Fees",
+                },
+            ]
+        }]
     }, {
         form: "Certificate of Non-Operation",
         blocks: [{
@@ -2402,132 +2555,232 @@ export const seneriosDetails = [
         }
         ]
     },
-    // {
-    //     form: "Personalized Plates",
-    //     blocks: [{
-    //         reference: "Transaction Details",
-    //         blockName: "Transaction Details",
-    //         fields: [
-    //             {
-    //                 label: 'Order',
-    //                 type: "checkbox",
-    //                 placeholder: 'Order'
-    //             }, {
-    //                 label: 'Replace',
-    //                 type: "checkbox",
-    //                 placeholder: 'Replace'
-    //             }, {
-    //                 label: 'Reassign/Retain',
-    //                 type: "checkbox",
-    //                 placeholder: 'Reassign/Retain'
-    //             }, {
-    //                 label: 'Exchange',
-    //                 type: "checkbox",
-    //                 placeholder: 'Exchange'
-    //             },
-    //         ]
-    //     }, {
-    //         reference: "Plates Selection",
-    //         blockName: "Plates Selection",
-    //         fields: [{
-    //             label: "Plates allowed 2-6 Characters",
-    //             fields: [
-    //                 {
-    //                     label: "Breast Cancer Awareness",
-    //                     type: "checkbox",
-    //                     placeholder: "Breast Cancer Awareness",
-    //                 },
-    //                 {
-    //                     label: "California Arts Council",
-    //                     type: "checkbox",
-    //                     placeholder: "California Arts Council",
-    //                 }, {
-    //                     label: "California Agricultural (CalAg)",
-    //                     type: "checkbox",
-    //                     placeholder: "California Agricultural (CalAg)",
-    //                 },
-    //                 {
-    //                     label: "California Memorial",
-    //                     type: "checkbox",
-    //                     placeholder: "California Memorial",
-    //                 }, {
-    //                     label: "California Museums (Snoopy)",
-    //                     type: "checkbox",
-    //                     placeholder: "California Museums (Snoopy)",
-    //                 },
-    //                 {
-    //                     label: "Collegiate (only UCLA is available)",
-    //                     type: "checkbox",
-    //                     placeholder: "Collegiate (only UCLA is available)",
-    //                 }, {
-    //                     label: "Kids - Child Health and Safety Funds",
-    //                     type: "checkbox",
-    //                     placeholder: "Kids - Child Health and Safety Funds",
-    //                 },
-    //                 {
-    //                     label: "Pet Lovers",
-    //                     type: "checkbox",
-    //                     placeholder: "Pet Lovers",
-    //                 }, {
-    //                     label: "Veterans' Organization",
-    //                     type: "checkbox",
-    //                     placeholder: "Veterans' Organization",
-    //                 }
-    //             ],
-    //         }, {
-    //             label: "Plates allowed 2-7 Characters",
-    //             fields: [
-    //                 {
-    //                     label: "Environmental License Plate (ELP)",
-    //                     type: "checkbox",
-    //                     placeholder: "Environmental License Plate (ELP)",
-    //                 },
-    //                 {
-    //                     label: "California Coastal Commission (Whale Tail)",
-    //                     type: "checkbox",
-    //                     placeholder: "California Coastal Commission (Whale Tail)",
-    //                 }, {
-    //                     label: "Lake Tahoe Conservancy",
-    //                     type: "checkbox",
-    //                     placeholder: "Lake Tahoe Conservancy",
-    //                 },
-    //                 {
-    //                     label: "Yosemite Foundation",
-    //                     type: "checkbox",
-    //                     placeholder: "Yosemite Foundation",
-    //                 }, {
-    //                     label: "California 1960s Legacy",
-    //                     type: "checkbox",
-    //                     placeholder: "California 1960s Legacy",
-    //                 }
-    //             ],
-    //         }, {
-    //             label: "Other Options",
-    //             fields: [
-    //                 {
-    //                     label: "Honoring Veterans Plate",
-    //                     type: "checkbox",
-    //                     placeholder: "Honoring Veterans Plate",
-    //                 },
-    //                 {
-    //                     label: "Duplicate Decal",
-    //                     type: "checkbox",
-    //                     placeholder: "Duplicate Decal",
-    //                 }
-    //             ],
-    //         },]
-    //     }, {
-    //         reference: "Select Configuration",
-    //         blockName: "Select Configuration",
-    //         fields: [
-    //             { label: "Automobile", type: "checkbox" },
-    //             { label: "Commercial", type: "checkbox" },
-    //             { label: "Trailer", type: "checkbox" },
-    //             { label: "Motorcycle", type: "checkbox" },
-    //         ],
-    //     }
-    //     ]
-    // },
+    {
+        form: "Personalized Plates",
+        blocks: [{
+            reference: "Plates Selection",
+            blockName: "Plates Selection",
+            options: ["Order", "Replace", "Reassign/Retain", "Exchange"],
+            fields: [
+                {
+                    label: "Plates allowed 2-6 Characters",
+                    fields: [
+                        {
+                            label: "Breast Cancer Awareness",
+                            type: "checkbox",
+                            placeholder: "Breast Cancer Awareness",
+                        },
+                        {
+                            label: "California Arts Council",
+                            type: "checkbox",
+                            placeholder: "California Arts Council",
+                        }, {
+                            label: "California Agricultural (CalAg)",
+                            type: "checkbox",
+                            placeholder: "California Agricultural (CalAg)",
+                        },
+                        {
+                            label: "California Memorial",
+                            type: "checkbox",
+                            placeholder: "California Memorial",
+                        }, {
+                            label: "California Museums (Snoopy)",
+                            type: "checkbox",
+                            placeholder: "California Museums (Snoopy)",
+                        },
+                        {
+                            label: "Collegiate (only UCLA is available)",
+                            type: "checkbox",
+                            placeholder: "Collegiate (only UCLA is available)",
+                        }, {
+                            label: "Kids - Child Health and Safety Funds",
+                            type: "checkbox",
+                            placeholder: "Kids - Child Health and Safety Funds",
+                        },
+                        {
+                            label: "Pet Lovers",
+                            type: "checkbox",
+                            placeholder: "Pet Lovers",
+                        }, {
+                            label: "Veterans' Organization",
+                            type: "checkbox",
+                            placeholder: "Veterans' Organization",
+                        }
+                    ],
+                }, {
+                    label: "Plates allowed 2-7 Characters",
+                    fields: [
+                        {
+                            label: "Environmental License Plate (ELP)",
+                            type: "checkbox",
+                            placeholder: "Environmental License Plate (ELP)",
+                        },
+                        {
+                            label: "California Coastal Commission (Whale Tail)",
+                            type: "checkbox",
+                            placeholder: "California Coastal Commission (Whale Tail)",
+                        }, {
+                            label: "Lake Tahoe Conservancy",
+                            type: "checkbox",
+                            placeholder: "Lake Tahoe Conservancy",
+                        },
+                        {
+                            label: "Yosemite Foundation",
+                            type: "checkbox",
+                            placeholder: "Yosemite Foundation",
+                        }, {
+                            label: "California 1960s Legacy",
+                            type: "checkbox",
+                            placeholder: "California 1960s Legacy",
+                        }
+                    ],
+                }, {
+                    label: "Other Options",
+                    fields: [
+                        {
+                            label: "Honoring Veterans Plate",
+                            type: "checkbox",
+                            placeholder: "Honoring Veterans Plate",
+                        },
+                        {
+                            label: "Duplicate Decal",
+                            type: "checkbox",
+                            placeholder: "Duplicate Decal",
+                        }
+                    ],
+                },]
+        }, {
+            reference: "Select Configuration",
+            blockName: "Select Configuration",
+            fields: [
+                { label: "Automobile", type: "checkbox" },
+                { label: "Commercial", type: "checkbox" },
+                { label: "Trailer", type: "checkbox" },
+                { label: "Motorcycle", type: "checkbox" },
+            ],
+        }, {
+            reference: "FOR REPLACEMENT ONLY",
+            blockName: "FOR REPLACEMENT ONLY",
+            fields: [],
+        }, {
+            reference: "REASSIGN, RETAIN INTEREST, OR RELEASE INTEREST",
+            blockName: "REASSIGN, RETAIN INTEREST, OR RELEASE INTEREST",
+            fields: [
+                {
+                    key: 'specialInterestLicensePlateNumber',
+                    label: 'SPECIAL INTEREST LICENSE PLATE NUMBER',
+                    type: "input field",
+                    placeholder: 'ENTER PLATE NUMBER'
+                }, {
+                    key: 'removedFrom',
+                    label: 'REMOVED FROM (VEHICLE IDENTIFICATION NUMBER)',
+                    type: "input field",
+                    placeholder: 'ENTER VIN'
+                }, {
+                    key: 'licensePlatePlacedOn',
+                    label: 'PLACED ON (CURRENT LICENSE PLATE)',
+                    type: "input field",
+                    placeholder: 'ENTER LICENSE PLATE'
+                }, {
+                    key: 'vinPlacedOn',
+                    label: 'PLACED ON (VEHICLE IDENTIFICATION NUMBER)',
+                    type: "input field",
+                    placeholder: 'ENTER VIN'
+                }, {
+                    key: 'releaseInterest',
+                    label: 'RETAIN INTEREST FOR FUTURE USE',
+                    type: "checkbox",
+                }, {
+                    key: 'releaseInterest',
+                    label: 'RELEASE INTEREST/SURRENDER TO DMV',
+                    type: "checkbox",
+                }, {
+                    key: 'feeEnclosed',
+                    label: 'Fee enclosed',
+                    type: "checkbox",
+                }, {
+                    key: 'releaseInterest',
+                    label: 'RELEASE INTEREST TO NEW OWNER',
+                    type: "checkbox",
+                },
+            ],
+        }, {
+            reference: "PLATE PURCHASER",
+            blockName: "PLATE PURCHASER",
+            subOptions: [
+                {
+                    label: "If Plate Owner is Different",
+                    fieldName: "PLATE OWNER",
+                    type: "radiocheckbox",
+                    subFields: [
+                        {
+                            label: 'True Full Name (Last, First, Middle Initial, Suffix)',
+                            type: "input field",
+                            placeholder: 'True Full Name (Last, First, Middle Initial, Suffix)'
+                        }, {
+                            label: 'Street Address or PO Box',
+                            type: "input field",
+                            placeholder: 'Street Address or PO Box'
+                        }, {
+                            label: 'City',
+                            type: "input field",
+                            placeholder: 'City'
+                        }, {
+                            label: 'State',
+                            type: "dropdown",
+                            placeholder: 'State'
+                        }, {
+                            label: 'ZIP Code',
+                            type: "input field",
+                            placeholder: 'ZIP Code'
+                        }, {
+                            label: 'Phone Number',
+                            type: "phone",
+                            placeholder: 'Phone Number'
+                        },
+                    ]
+                },
+            ],
+            fields: [
+                {
+                    label: 'True Full Name (Last, First, Middle Initial, Suffix)',
+                    type: "input field",
+                    placeholder: 'True Full Name (Last, First, Middle Initial, Suffix)'
+                }, {
+                    label: 'Street Address or PO Box',
+                    type: "input field",
+                    placeholder: 'Street Address or PO Box'
+                }, {
+                    label: 'City',
+                    type: "input field",
+                    placeholder: 'City'
+                }, {
+                    label: 'State',
+                    type: "dropdown",
+                    placeholder: 'State'
+                }, {
+                    label: 'ZIP Code',
+                    type: "input field",
+                    placeholder: 'ZIP Code'
+                }, {
+                    label: 'Phone Number',
+                    type: "phone",
+                    placeholder: 'Phone Number'
+                },
+            ]
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                }, {
+                    label: "Collect Current Registration Card or Vehicle Information",
+                }
+            ]
+        }
+        ]
+    },
     {
         form: "Commercial Vehicle",
         blocks: [{
@@ -3115,6 +3368,20 @@ export const seneriosDetails = [
             blockName: "For Commercial Vehicle Only",
             reference: "For Commercial Vehicle Only",
             fields: [], // no dynamic fields, hardcoded in component
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                }, {
+                    label: "Collect Vehicle Information",
+                }, {
+                    label: "Collect Proof of Ownership",
+                }, {
+                    label: "Collect Weight Certificate",
+                }
+            ]
         }
         ]
     }, {
@@ -3242,6 +3509,20 @@ export const seneriosDetails = [
                     { label: "HAVE BEEN DESTROYED (OCCUPATIONAL LICENSEES ONLY)", type: "checkbox" },
                     { label: "PLATE WITH OWNER - RETAINED BY OWNER FOR REASSIGNMENT", type: "checkbox" }
                 ]
+            }, {
+                reference: "Documents Received",
+                blockName: "Documents Received",
+                fields: [
+                    {
+                        label: "Collect Receipts for Repairs and Parts",
+                    }, {
+                        label: "Collect Brake and Light Inspection Certificates",
+                    }, {
+                        label: "Collect Proof of Insurance",
+                    }, {
+                        label: "Collect a copy of Registrant’s CA Driver’s License or ID",
+                    }
+                ]
             }
         ]
     }, {
@@ -3358,6 +3639,18 @@ export const seneriosDetails = [
                     { label: "VEHICLE MAKE", key: "make", placeholder: "VEHICLE MAKE" },
                     { label: "VEHICLE YEAR", key: "year", placeholder: "VEHICLE YEAR" },
                 ]
+            }, {
+                reference: "Documents Received",
+                blockName: "Documents Received",
+                fields: [
+                    {
+                        label: "Collect a copy of Applicant’s CA Driver’s License or ID",
+                    }, {
+                        label: "Collect Current Registration Card or Vehicle Information",
+                    }, {
+                        label: "Collect Proof of Insurance",
+                    }
+                ]
             }
         ]
     }, {
@@ -3440,7 +3733,15 @@ export const seneriosDetails = [
             reference: "Vehicles, Vessels, or Placards Owned By You",
             blockName: "Vehicles, Vessels, or Placards Owned By You",
             fields: [],
-        },
+        }, {
+            reference: "Documents Received",
+            blockName: "Documents Received",
+            fields: [
+                {
+                    label: "Collect a copy of Registered Owner’s Driver’s License or ID",
+                }
+            ]
+        }
         ]
     },
 

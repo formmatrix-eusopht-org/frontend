@@ -40,8 +40,11 @@ import PersonalOrBusinessInfo from '../Containers/PersonalOrBusinessInfo';
 import PreviousResidenceorBusinessAddress from '../Containers/PreviousResidenceorBusinessAddress';
 import NeworCorrectResidenceorBusinessAddressInfo from '../Containers/NeworCorrectResidenceorBusinessAddress';
 import VehiclesSection from '../Containers/VehiclesVesselsOrPlacardsOwnedByYou';
-// import { PlatesSelection } from '../Containers/PersonalizePlates';
-// import SelectConfiguration from '../Containers/Configration';
+import { PlatesSelection } from '../Containers/PersonalizePlates';
+import SelectConfiguration from '../Containers/Configration';
+import PlatePurchaserAndOwner from '../Containers/PlatePurchaserAndOwner';
+import ReplacementOnlySection from '../Containers/forReplacementOnly';
+import SpecialInterestSection from '../Containers/SpecialInterest';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
 
@@ -233,13 +236,21 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     });
     const [vehicleDeclarationEntryData, setVehicleDeclarationEntryData] = useState<Record<string, string>[]>([]);
 
-    // const [selectConfigState, setSelectConfigState] = useState({
-    //     assignedTo: '',
-    //     assignedFor: "",
-    //     licensePlateNumber: "",
-    //     vehicleIdentificationNumber: "",
-    //     plateChoices: [{ text: "", meaning: "" }, { text: "", meaning: "" }, { text: "", meaning: "" }],
-    // });
+    const [selectConfigState, setSelectConfigState] = useState({
+        assignedTo: '',
+        assignedFor: "",
+        licensePlateNumber: "",
+        vehicleIdentificationNumber: "",
+        plateChoices: [{ text: "", meaning: "" }, { text: "", meaning: "" }, { text: "", meaning: "" }],
+        location: '',
+        deliveryType: "",
+        centered: "",
+    });
+    const [replacementState, setReplacementState] = useState({
+        plateNumber: "",
+        need: '',
+        plateCondition: ''
+    });
     const [plannedNonOperationState, setPlannedNonOperationState] = useState([{ ...initialVehicle }]);
     const [vehicleStorageLocation, setVehicleStorageLocation] = useState<Record<string, string>>({});
     const [vehicleBodyState, setVehicleBodyState] = useState<Record<string, any>>({});
@@ -258,6 +269,20 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const [salvageCertificateState, setSalvageCertificateState] = useState<SalvageCertificateState>({});
     const [vehiclesOwnedByYouData, setVehiclesOwnedByYouData] = useState([{ plateNumber: "", vinNumber: "", leased: false, registeredOutsideCA: false }]);
     const [leasaedCompanyName, setLeasaedCompanyName] = useState('')
+    const [platePurchaseState, setPlatePurchaseState] = useState({
+        platePurchase: {},
+        plateOwner: {},
+        ifPlateOwnerIsDifferent: false,
+    });
+    const [specialInterestState, setSpecialInterestState] = useState({
+        specialInterestLicensePlateNumber: '',
+        removedFrom: '',
+        licensePlatePlacedOn: '',
+        vinPlacedOn: '',
+        releaseInterest: '',
+        feeEnclosed: false
+    });
+    const [personalizePlatesState, setPersonalizePlatesState] = useState('Order')
     // Handlers for various form interactions
     const handleTransactionChange = (label: string, checked: boolean) => {
         setTransactionSelections((prev) => {
@@ -685,22 +710,22 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         setVehicleDeclarationEntryData(trimmed);
     };
 
-    // const handlePlateChange = (label: string) => {
-    //     setPlatesSelectionState((prev) => ({
-    //         ...prev,
-    //         selectedPlate: label,
-    //         // Reset dependent fields when switching options
-    //         veteranCode: label === "Veterans' Organization" ? prev.veteranCode : "",
-    //         duplicatePlate: label === "Duplicate Decal" ? prev.duplicatePlate : "",
-    //     }));
-    // };
+    const handlePlateChange = (label: string) => {
+        setPlatesSelectionState((prev) => ({
+            ...prev,
+            selectedPlate: label,
+            // Reset dependent fields when switching options
+            veteranCode: label === "Veterans' Organization" ? prev.veteranCode : "",
+            duplicatePlate: label === "Duplicate Decal" ? prev.duplicatePlate : "",
+        }));
+    };
 
-    // const handleInputChange = (field: "veteranCode" | "duplicatePlate", value: string) => {
-    //     setPlatesSelectionState((prev) => ({
-    //         ...prev,
-    //         [field]: value
-    //     }));
-    // };
+    const handleInputChange = (field: "veteranCode" | "duplicatePlate", value: string) => {
+        setPlatesSelectionState((prev) => ({
+            ...prev,
+            [field]: value
+        }));
+    };
 
     useEffect(() => {
         const owner = ownersData[0];
@@ -770,8 +795,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const VehiclesOwnedByYouBlock = findBlock("Vehicles, Vessels, or Placards Owned By You");
     const disablePersonTypeBlock = findBlock("Type of Disabled Person Parking Placard(S) or License Plates");
     const disablePersonVehicleInfoBlock = findBlock("DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION");
-    // const platesSelectionBlock = findBlock("Plates Selection");
-    // const selectConfigurationBlock = findBlock("Select Configuration");
+    const platesSelectionBlock = findBlock("Plates Selection");
+    const selectConfigurationBlock = findBlock("Select Configuration");
+    const forReplacementOnlyBlock = findBlock("FOR REPLACEMENT ONLY");
+    const reassignInterestBlock = findBlock("REASSIGN, RETAIN INTEREST, OR RELEASE INTEREST");
+    const platePurchaseBlock = findBlock("PLATE PURCHASER");
+    const documentsReceivedBlock = findBlock("Documents Received");
 
     useEffect(() => {
         const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -852,6 +881,33 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             setNewOrCorrectResidenceOrBusinessAddressData(parsed.newOrCorrectResidenceOrBusinessAddressData || {})
             setVehiclesOwnedByYouData(parsed.vehiclesOwnedByYouData || {})
             setLeasaedCompanyName(parsed.leasaedCompanyName || '')
+            setSelectConfigState(parsed.selectConfigState || {
+                assignedTo: '',
+                assignedFor: "",
+                licensePlateNumber: "",
+                vehicleIdentificationNumber: "",
+                plateChoices: [{ text: "", meaning: "" }, { text: "", meaning: "" }, { text: "", meaning: "" }],
+            })
+            setPlatePurchaseState(parsed.platePurchaseState || {
+                platePurchase: {},
+                plateOwner: {},
+                isSameAsPlateOwner: false,
+            })
+            setReplacementState(parsed.replacementState || {
+                plateNumber: "",
+                need: '',
+                plateCondition: ''
+            })
+            setSpecialInterestState(parsed.specialInterestState || {
+                specialInterestLicensePlateNumber: '',
+                removedFrom: '',
+                licensePlatePlacedOn: '',
+                vinPlacedOn: '',
+                releaseInterest: '',
+                feeEnclosed: false
+            })
+            setPersonalizePlatesState(parsed.personalizePlatesState || '')
+            setOptionsForValidation(parsed.optionsForValidation || [])
         }
     }, []);
 
@@ -903,7 +959,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             previousResidenceOrBusinessAddressData,
             newOrCorrectResidenceOrBusinessAddressData,
             vehiclesOwnedByYouData,
-            leasaedCompanyName
+            leasaedCompanyName,
+            selectConfigState,
+            platePurchaseState,
+            replacementState,
+            specialInterestState,
+            personalizePlatesState,
+            optionsForValidation
         };
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(combinedState));
@@ -950,7 +1012,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         previousResidenceOrBusinessAddressData,
         newOrCorrectResidenceOrBusinessAddressData,
         vehiclesOwnedByYouData,
-        leasaedCompanyName
+        leasaedCompanyName,
+        selectConfigState,
+        platePurchaseState,
+        replacementState,
+        specialInterestState,
+        personalizePlatesState,
+        optionsForValidation
     ]);
     //validations for form
     const isMotorcycle = transactionSelections?.includes("Is the Vehicle a Motorcycle");
@@ -966,7 +1034,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     const comercialVehicleFlag = senerio?.includes("Commercial Vehicle");
     const nameChangeSelected = senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? "Correction" : senerio?.includes("Legal Name Change") ? "Change" : senerio?.includes("Name Discrepancy") ? "Discrepancy" : '' : "";
-    // const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
+    const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
 
     const handleTransferCountChange = (newCount: number) => {
         const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
@@ -1192,7 +1260,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onFieldChange={handleVehicleStatusInfoFieldChange}
                             values={vehicleStatusInfoData}
                         />
-
                     )}
                     {vehicleAcquisitionBlock && (comercialVehicleFlag || isOutofStateTitle) && (
                         <VehicleAcquisitionDetails
@@ -1285,21 +1352,44 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             values={statementForSomgExemptionData}
                         />
                     )}
-                    {/* {platesSelectionBlock && (
-                    <PlatesSelection
-                        block={platesSelectionBlock}
-                        plateInfo={platesSelectionState}
-                        onPlateChange={handlePlateChange}
-                        onInputChange={handleInputChange}
-                    />
-                )}
-                {selectConfigurationBlock && (
-                    <SelectConfiguration
-                        block={selectConfigurationBlock}
-                        value={selectConfigState}
-                        onChange={setSelectConfigState}
-                    />
-                )} */}
+                    {platesSelectionBlock && (
+                        <PlatesSelection
+                            block={platesSelectionBlock}
+                            plateInfo={platesSelectionState}
+                            onPlateChange={handlePlateChange}
+                            onInputChange={handleInputChange}
+                            personalizePlatesState={personalizePlatesState}
+                            setPersonalizePlatesState={setPersonalizePlatesState}
+                        />
+                    )}
+                    {selectConfigurationBlock && (personalizePlatesState === "Order" || personalizePlatesState === "Exchange") && (
+                        <SelectConfiguration
+                            block={selectConfigurationBlock}
+                            value={selectConfigState}
+                            onChange={setSelectConfigState}
+                        />
+                    )}
+                    {forReplacementOnlyBlock && personalizePlatesState === "Replace" && (
+                        <ReplacementOnlySection
+                            block={forReplacementOnlyBlock}
+                            values={replacementState}
+                            onChange={setReplacementState}
+                        />
+                    )}
+                    {reassignInterestBlock && personalizePlatesState === "Reassign/Retain" && (
+                        <SpecialInterestSection
+                            block={reassignInterestBlock}
+                            values={specialInterestState}
+                            onChange={setSpecialInterestState}
+                        />
+                    )}
+                    {platePurchaseBlock && (
+                        <PlatePurchaserAndOwner
+                            block={platePurchaseBlock}
+                            values={platePurchaseState}
+                            onChange={setPlatePurchaseState}
+                        />
+                    )}
                     {CertificateOfLicensePlateDispositionBlock && (
                         <CertificateOfLicensePlateDisposition
                             title={CertificateOfLicensePlateDispositionBlock.blockName}
@@ -1326,10 +1416,13 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             fields={disablePersonVehicleInfoBlock.fields}
                         />
                     )}
-                    <Options
-                        selected={optionsForValidation}
-                        onChange={handleOptionsForValidations}
-                    />
+                    {documentsReceivedBlock && (
+                        <Options
+                            selected={optionsForValidation}
+                            block={documentsReceivedBlock}
+                            onChange={handleOptionsForValidations}
+                        />
+                    )}
                     <FormActions
                         loading={isLoading}
                         onSave={async () => {

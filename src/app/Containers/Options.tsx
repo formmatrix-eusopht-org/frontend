@@ -7,11 +7,12 @@ import Section from '../Components/FieldSection';
 
 interface OptionsProps {
     selected: string[];
+    block?: any;
     onChange: (updated: string[]) => void;
 }
 
-const Options: React.FC<OptionsProps> = ({ selected, onChange }) => {
-    const options = ["Option A", "Option B", "Option C", "Option D"];
+const Options: React.FC<OptionsProps> = ({ selected, onChange, block }) => {
+    const options = block.fields;
 
     const handleCheckboxChange = (option: string) => {
         const updated = selected.includes(option)
@@ -24,12 +25,12 @@ const Options: React.FC<OptionsProps> = ({ selected, onChange }) => {
     return (
         <div className="grid">
             <Section title="Options">
-                {options.map((option) => (
+                {options.map((option: any) => (
                     <Checkbox
-                        key={option}
-                        label={option}
-                        checked={selected.includes(option)}
-                        onChange={() => handleCheckboxChange(option)}
+                        key={option.label}
+                        label={option.label}
+                        checked={selected.includes(option.label)}
+                        onChange={() => handleCheckboxChange(option.label)}
                     />
                 ))}
             </Section>
