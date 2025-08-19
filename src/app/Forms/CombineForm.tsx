@@ -45,6 +45,7 @@ import SelectConfiguration from '../Containers/Configration';
 import PlatePurchaserAndOwner from '../Containers/PlatePurchaserAndOwner';
 import ReplacementOnlySection from '../Containers/forReplacementOnly';
 import SpecialInterestSection from '../Containers/SpecialInterest';
+import { Dialog } from '../Components/DialogBox';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
 
@@ -82,6 +83,7 @@ type SalvageCertificateState = {
     [key: string]: string;
 };
 const CombineForm = ({ formData }: CombineFormProps) => {
+    const [open, setOpen] = useState(false);
     const isInitialMount = useRef(true);
     const schemaForMultipletransfer = {
         "transferNumber": 1,
@@ -1434,6 +1436,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         }}
                         onPrint={async () => {
                             setIsLoading(true);
+                            if (optionsForValidation.length < 1) {
+                                setOpen(true)
+                                setIsLoading(false);
+
+                                return
+                            }
                             await headHandlerForPDf("Combine Forms");
                             setIsLoading(false);
                         }}
@@ -1443,6 +1451,22 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             // localStorage.removeItem("senerio");
                             window.location.reload();
                         }}
+                    />
+                    <Dialog
+                        open={open}
+                        onClose={() => setOpen(false)}
+                        title="Select Any Options"
+                        description="Please select at least one option before saving."
+                        intent="danger"
+                        // cancelText="Cancel"
+                        actions={[
+                            {
+                                label: "Continue",
+                                onClick: () => setOpen(false),
+                                variant: "primary",
+                                autoFocus: true,
+                            },
+                        ]}
                     />
                 </div >
             }

@@ -63,6 +63,8 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log(userCredential);
+      
       const token = await userCredential.user.getIdToken(true);
 
       const { data } = await axios.post(
@@ -134,7 +136,6 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       setIsSubscribed(true);
       return;
     }
-    console.log(user);
 
     const unsubscribe = onSnapshot(userRef, async (docSnap) => {
       try {

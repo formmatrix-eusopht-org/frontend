@@ -19,7 +19,7 @@ const LoginPage = () => {
       await emailSignIn(email, password);
     } catch (err: any) {
       setError('Login failed. Please check your credentials.');
-      console.error('Login error:', err);
+      // console.error('Login error:', err);
     }
   };
 

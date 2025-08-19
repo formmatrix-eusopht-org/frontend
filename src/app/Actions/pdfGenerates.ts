@@ -223,6 +223,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         names.filter(name => name && name.trim()).join(', ');
     const rawDate = formData.ownersData?.[0]?.['Date of Sale'] || '';
     const { month, day, year } = extractDateParts(rawDate);
+    const isTitleAvailable = formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title")
+    console.log(isTitleAvailable);
 
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
@@ -528,8 +530,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text72": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["State"] || '' : '' : '',
 
         "Text74": senerio?.includes("Personalized Plates") ? getCurrentDate() : (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['State'] || '' : '',
-        "Text75": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"].slice(1, 4) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
-        "Text76": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"].slice(5) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
+        "Text75": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"]?.slice(1, 4) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
+        "Text76": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"]?.slice(5) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
         'Owner DL no': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '',
         'owner second digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '',
         'owner third digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '',
@@ -610,8 +612,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text132.5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
         //Reg343
         "Text12": `${formData.statementForSomgExemptionData?.diesel ? 'Diesel' : formData.statementForSomgExemptionData?.electricity ? 'Electricity' : formData.statementForSomgExemptionData?.Other || ''}`,
-        "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
-        "Text18": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "Veterans' Organization" ? formData?.platesSelectionState?.veteranCode : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
+        "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
+        "Text18": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Veterans' Organization" ? formData?.platesSelectionState?.veteranCode : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
         "Text29": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[0] : '' : '' : formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Length (IN)'] || '' : '',
         "Text30": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[1] : '' : '' : '',
         "Text31": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[2] : '' : '' : '',
@@ -1525,6 +1527,28 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
         "Check Box79": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent === false ? true : false : false,
 
+
+        //with title 
+        "VIN_title": isTitleAvailable ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : "",
+        'year_model': formData.vehicleInfoState?.['Year of Vehicle'] || "",
+        'make_title': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
+        'plate_number': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
+        'motorcycle_number': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
+        "odometer_reading": formData.vehicleInfoState?.['Mileage of Vehicle'] || '',
+
+        "reg_owner_1": (formData.ownerCount ?? 0) > 0 ? owner1 : '',
+        "reg_owner_2": (formData.ownerCount ?? 0) > 1 ? owner2 : '',
+        "reg_owner_3": (formData.ownerCount ?? 0) > 2 ? owner3 : '',
+
+        // "date_1a": (formData.ownerCount ?? 0) > 0 ? getCurrentDate() : '',
+        // "date_1b": (formData.ownerCount ?? 0) > 1 ? getCurrentDate() : '',
+
+        // "odometer_read_1": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[5] || "",
+        // "odometer_read_2": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[4] || "",
+        // "odometer_read_3": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[3] || "",
+        // "odometer_read_4": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[2] || "",
+        // "odometer_read_5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[1] || "",
+        // "odometer_read_6": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
     };
 };
 
@@ -1570,7 +1594,7 @@ const mergeFilledPDFs = async (
             const fieldMapping = buildFieldMapping(formData, senerio);
 
             // Fill fields
-            fields.forEach((field: PDFField) => {
+            fields?.forEach((field: PDFField) => {
                 const name = field.getName();
                 const value = fieldMapping[name];
                 // console.log(name, value);
@@ -1592,7 +1616,7 @@ const mergeFilledPDFs = async (
             });
 
             // Make fields read-only
-            fields.forEach((field: PDFField) => {
+            fields?.forEach((field: PDFField) => {
                 try {
                     if (typeof (field as any).enableReadOnly === 'function') {
                         (field as any).enableReadOnly();
@@ -1622,6 +1646,7 @@ async function handleOnPDF(form: any, senerio: any) {
             //==> Without Title: REG 227
             if (form.transactionSelections?.includes("Transaction with Vehicle Title")) {
                 formTypes = formTypes.filter(formType => formType !== "Reg227");
+                formTypes.push("title")
             }
 
             //==> Out Of State Title: REG 343
@@ -1658,6 +1683,7 @@ async function handleOnPDF(form: any, senerio: any) {
             senerio?.includes("Remove Lienholder")) {
             if (form.transactionSelections?.includes("With Title")) {
                 formTypes = formTypes?.filter(formType => formType !== "Reg227");
+                formTypes.push("title");
             } else {
                 formTypes.push("Reg227");
             }

@@ -130,6 +130,7 @@ export const PlatesSelection = ({
                         <input
                             type="text"
                             value={plateInfo.veteranCode}
+                            placeholder="Enter Organizational Code"
                             onChange={(e) => onInputChange("veteranCode", e.target.value)}
                             className="border border-gray-300 rounded-md p-2 mt-1 h-9 min-w-[500px] text-sm"
                         />
@@ -145,6 +146,7 @@ export const PlatesSelection = ({
                         <input
                             type="text"
                             value={plateInfo.duplicatePlate}
+                            placeholder="CURRENT LICENSE PLATE NUMBER"
                             onChange={(e) => onInputChange("duplicatePlate", e.target.value)}
                             className="border border-gray-300 rounded-md p-2 mt-1 h-9 min-w-[500px] text-sm"
                         />
