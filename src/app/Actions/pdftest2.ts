@@ -1,9 +1,7 @@
-// lib/stripPdfFields.ts
 import { PDFDocument, rgb } from "pdf-lib";
 
 export async function stripContentButKeepFields(pdfBytes: ArrayBuffer) {
   const originalPdf = await PDFDocument.load(pdfBytes);
-
   const form = originalPdf.getForm();
   const fields = form.getFields();
 
@@ -16,15 +14,6 @@ export async function stripContentButKeepFields(pdfBytes: ArrayBuffer) {
   });
 
   const cleanForm = cleanPdf.getForm();
-
-  // --- helper for extracting numbers safely ---
-  const getNum = (val: any): number => {
-    if (!val) return 0;
-    if (typeof val.numberValue === "function") return val.numberValue();
-    if (typeof val.asNumber === "function") return val.asNumber();
-    if (typeof val === "number") return val;
-    return 0;
-  };
 
   for (const field of fields) {
     const name = field.getName();
@@ -48,44 +37,40 @@ export async function stripContentButKeepFields(pdfBytes: ArrayBuffer) {
           y: rect.y,
           width: rect.width,
           height: rect.height,
+          textColor: rgb(0, 0, 0),
+          borderColor: rgb(1, 1, 1),
         });
       });
     }
 
     if (name === "CheckBox") continue;
+
     // --- Checkboxes ---
     if (type === "PDFCheckBox") {
       const f = cleanForm.createCheckBox(name);
-      widgets.forEach((widget: any) => {
-        // use built-in helper instead of dict
-        const rect = widget.getRectangle();
 
+      widgets.forEach((widget: any) => {
+        const rect = widget.getRectangle();
         const refPage = widget.P();
         const pageIndex = originalPages.findIndex((p) => p.ref === refPage);
         if (pageIndex === -1) return;
 
         const page = pageMap[pageIndex];
-
         const size = Math.max(rect.width, rect.height) || 12;
         const x = rect.x || 50;
         const y = rect.y || 700;
 
-        // Debug outline
-        page.drawRectangle({
-          x, y,
+        // Just add the checkbox field, no rectangle drawn
+        f.addToPage(page, {
+          x,
+          y,
           width: size,
           height: size,
-          borderColor: rgb(1, 0, 0),
-          borderWidth: 1,
         });
-        console.log("Checkbox rect:", { x, y, width: size, height: size, name });
-
-        f.addToPage(page, { x, y, width: size, height: size });
       });
 
       f.uncheck();
     }
-
   }
 
   cleanForm.updateFieldAppearances();
@@ -95,7 +80,7 @@ export async function stripContentButKeepFields(pdfBytes: ArrayBuffer) {
 
 // Example usage
 export const pdfTest2 = async () => {
-  const res = await fetch(`/pdfs/DMVREG262.pdf`);
+  const res = await fetch(`/pdfs/title.pdf`);
   const pdfBytes = await res.arrayBuffer();
 
   const newPdfBytes = await stripContentButKeepFields(pdfBytes);

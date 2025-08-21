@@ -1444,9 +1444,9 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
                                 return
                             }
-                            await pdfTest2()
+                            // await pdfTest2()
                             // await pdftest();
-                            // await headHandlerForPDf("combineForm")
+                            await headHandlerForPDf("combineForm")
                             setIsLoading(false);
                         }}
                         onInvoice={() => console.log('Generate Invoice clicked')}

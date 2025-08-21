@@ -4,6 +4,7 @@ import {
     PDFCheckBox,
     PDFField,
 } from 'pdf-lib';
+import { stripContentButKeepFields } from './pdftest2';
 
 type OwnerData = {
     [key: string]: string | undefined;
@@ -1529,16 +1530,16 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
 
         //with title 
-        "VIN_title": isTitleAvailable ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : "",
-        'year_model': formData.vehicleInfoState?.['Year of Vehicle'] || "",
-        'make_title': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
-        'plate_number': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
-        'motorcycle_number': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
-        "odometer_reading": formData.vehicleInfoState?.['Mileage of Vehicle'] || '',
+        // "VIN_title": isTitleAvailable ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : "",
+        // 'year_model': formData.vehicleInfoState?.['Year of Vehicle'] || "",
+        // 'make_title': formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || "",
+        // 'plate_number': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
+        // 'motorcycle_number': formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
+        // "odometer_reading": formData.vehicleInfoState?.['Mileage of Vehicle'] || '',
 
-        "reg_owner_1": (formData.ownerCount ?? 0) > 0 ? owner1 : '',
-        "reg_owner_2": (formData.ownerCount ?? 0) > 1 ? owner2 : '',
-        "reg_owner_3": (formData.ownerCount ?? 0) > 2 ? owner3 : '',
+        // "reg_owner_1": (formData.ownerCount ?? 0) > 0 ? owner1 : '',
+        // "reg_owner_2": (formData.ownerCount ?? 0) > 1 ? owner2 : '',
+        // "reg_owner_3": (formData.ownerCount ?? 0) > 2 ? owner3 : '',
 
         // "date_1a": (formData.ownerCount ?? 0) > 0 ? getCurrentDate() : '',
         // "date_1b": (formData.ownerCount ?? 0) > 1 ? getCurrentDate() : '',
@@ -1549,19 +1550,335 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         // "odometer_read_4": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[2] || "",
         // "odometer_read_5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[1] || "",
         // "odometer_read_6": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
+
+        //true full name new reg owner
+        "true_full_name_1": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[0] : '' : "",
+        "true_full_name_2": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[1] : '' : "",
+        "true_full_name_3": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[2] : '' : "",
+        "true_full_name_4": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[3] : '' : "",
+        "true_full_name_5": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[4] : '' : "",
+        "true_full_name_6": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[5] : '' : "",
+        "true_full_name_7": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[6] : '' : "",
+        "true_full_name_8": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[7] : '' : "",
+        "true_full_name_9": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[8] : '' : "",
+        "true_full_name_10": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[9] : '' : "",
+        "true_full_name_11": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[10] : '' : "",
+        "true_full_name_12": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[11] : '' : "",
+        "true_full_name_13": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[12] : '' : "",
+        "true_full_name_14": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[13] : '' : "",
+        "true_full_name_15": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[14] : '' : "",
+        "true_full_name_16": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[15] : '' : "",
+        "true_full_name_17": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[16] : '' : "",
+        "true_full_name_18": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[17] : '' : "",
+        "true_full_name_19": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[18] : '' : "",
+        "true_full_name_20": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[19] : '' : "",
+        "true_full_name_21": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[20] : '' : "",
+        "true_full_name_22": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[21] : '' : "",
+        "true_full_name_23": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[22] : '' : "",
+        "true_full_name_24": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[23] : '' : "",
+        "true_full_name_25": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[24] : '' : "",
+        "true_full_name_26": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[25] : '' : "",
+        "true_full_name_27": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0])?.[26] : '' : "",
+
+        //true full name new reg owner
+        "true_full_name_28": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[0] : '' : "",
+        "true_full_name_29": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[1] : '' : "",
+        "true_full_name_30": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[2] : '' : "",
+        "true_full_name_31": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[3] : '' : "",
+        "true_full_name_32": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[4] : '' : "",
+        "true_full_name_33": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[5] : '' : "",
+        "true_full_name_34": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[6] : '' : "",
+        "true_full_name_35": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[7] : '' : "",
+        "true_full_name_36": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[8] : '' : "",
+        "true_full_name_37": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[9] : '' : "",
+        "true_full_name_38": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[10] : '' : "",
+        "true_full_name_39": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[11] : '' : "",
+        "true_full_name_40": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[12] : '' : "",
+        "true_full_name_41": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[13] : '' : "",
+        "true_full_name_42": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[14] : '' : "",
+        "true_full_name_43": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[15] : '' : "",
+        "true_full_name_44": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[16] : '' : "",
+        "true_full_name_45": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[17] : '' : "",
+        "true_full_name_46": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[18] : '' : "",
+        "true_full_name_47": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[19] : '' : "",
+        "true_full_name_48": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[20] : '' : "",
+        "true_full_name_49": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[21] : '' : "",
+        "true_full_name_50": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[22] : '' : "",
+        "true_full_name_51": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[23] : '' : "",
+        "true_full_name_52": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[24] : '' : "",
+        "true_full_name_53": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[25] : '' : "",
+        "true_full_name_54": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[1])?.[26] : '' : "",
+
+        //
+        "cb_and": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'and' ? true : false : false : false,
+        "cb_or": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnershipTypes?.[1] === 'or' ? true : false : false : false,
+
+        //address
+        "residence_add_1": isTitleAvailable ? formData.newOwnerAddress?.Street?.[0] || '' : "",
+        "residence_add_2": isTitleAvailable ? formData.newOwnerAddress?.Street?.[1] || '' : "",
+        "residence_add_3": isTitleAvailable ? formData.newOwnerAddress?.Street?.[2] || '' : "",
+        "residence_add_4": isTitleAvailable ? formData.newOwnerAddress?.Street?.[3] || '' : "",
+        "residence_add_5": isTitleAvailable ? formData.newOwnerAddress?.Street?.[4] || '' : "",
+        "residence_add_6": isTitleAvailable ? formData.newOwnerAddress?.Street?.[5] || '' : "",
+        "residence_add_7": isTitleAvailable ? formData.newOwnerAddress?.Street?.[6] || '' : "",
+        "residence_add_8": isTitleAvailable ? formData.newOwnerAddress?.Street?.[7] || '' : "",
+        "residence_add_9": isTitleAvailable ? formData.newOwnerAddress?.Street?.[8] || '' : "",
+        "residence_add_10": isTitleAvailable ? formData.newOwnerAddress?.Street?.[9] || '' : "",
+        "residence_add_11": isTitleAvailable ? formData.newOwnerAddress?.Street?.[10] || '' : "",
+        "residence_add_12": isTitleAvailable ? formData.newOwnerAddress?.Street?.[11] || '' : "",
+        "residence_add_13": isTitleAvailable ? formData.newOwnerAddress?.Street?.[12] || '' : "",
+        "residence_add_14": isTitleAvailable ? formData.newOwnerAddress?.Street?.[13] || '' : "",
+        "residence_add_15": isTitleAvailable ? formData.newOwnerAddress?.Street?.[14] || '' : "",
+        "residence_add_16": isTitleAvailable ? formData.newOwnerAddress?.Street?.[15] || '' : "",
+        "residence_add_17": isTitleAvailable ? formData.newOwnerAddress?.Street?.[16] || '' : "",
+        "residence_add_18": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[0] || '' : '',
+        "residence_add_19": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[1] || '' : "",
+        "residence_add_20": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[2] || '' : "",
+        "residence_add_21": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[3] || '' : "",
+        "residence_add_22": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[4] || '' : "",
+        "residence_add_23": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[5] || '' : "",
+        "residence_add_24": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[6] || '' : "",
+        "residence_add_25": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[7] || '' : "",
+        "residence_add_26": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[8] || '' : "",
+        "residence_add_27": isTitleAvailable ? formData.newOwnerAddress?.["APT./SPACE/STE.#"]?.[9] || '' : "",
+
+        "city_1": isTitleAvailable ? formData.newOwnerAddress?.City?.[0] || '' : "",
+        "city_2": isTitleAvailable ? formData.newOwnerAddress?.City?.[1] || '' : "",
+        "city_3": isTitleAvailable ? formData.newOwnerAddress?.City?.[2] || '' : "",
+        "city_4": isTitleAvailable ? formData.newOwnerAddress?.City?.[3] || '' : "",
+        "city_5": isTitleAvailable ? formData.newOwnerAddress?.City?.[4] || '' : "",
+        "city_6": isTitleAvailable ? formData.newOwnerAddress?.City?.[5] || '' : "",
+        "city_7": isTitleAvailable ? formData.newOwnerAddress?.City?.[6] || '' : "",
+        "city_8": isTitleAvailable ? formData.newOwnerAddress?.City?.[7] || '' : "",
+        "city_9": isTitleAvailable ? formData.newOwnerAddress?.City?.[8] || '' : "",
+        "city_10": isTitleAvailable ? formData.newOwnerAddress?.City?.[9] || '' : "",
+        "city_11": isTitleAvailable ? formData.newOwnerAddress?.City?.[10] || '' : "",
+        "city_12": isTitleAvailable ? formData.newOwnerAddress?.City?.[11] || '' : "",
+        "city_13": isTitleAvailable ? formData.newOwnerAddress?.City?.[12] || '' : "",
+        "city_14": isTitleAvailable ? formData.newOwnerAddress?.City?.[13] || '' : "",
+        "city_15": isTitleAvailable ? formData.newOwnerAddress?.City?.[14] || '' : "",
+        "city_16": isTitleAvailable ? formData.newOwnerAddress?.City?.[15] || '' : "",
+        "city_17": isTitleAvailable ? formData.newOwnerAddress?.City?.[16] || '' : "",
+        "city_18": isTitleAvailable ? formData.newOwnerAddress?.City?.[17] || '' : "",
+        "city_19": isTitleAvailable ? formData.newOwnerAddress?.City?.[18] || '' : "",
+        "city_20": isTitleAvailable ? formData.newOwnerAddress?.City?.[19] || '' : "",
+
+        "state_1": isTitleAvailable ? formData.newOwnerAddress?.State?.[0] || '' : "",
+        "state_2": isTitleAvailable ? formData.newOwnerAddress?.State?.[1] || '' : "",
+
+        "zip_1": isTitleAvailable ? formData.newOwnerAddress?.["ZIP Code"]?.[0] || '' : "",
+        "zip_2": isTitleAvailable ? formData.newOwnerAddress?.["ZIP Code"]?.[1] || '' : "",
+        "zip_3": isTitleAvailable ? formData.newOwnerAddress?.["ZIP Code"]?.[2] || '' : "",
+        "zip_4": isTitleAvailable ? formData.newOwnerAddress?.["ZIP Code"]?.[3] || '' : "",
+        "zip_5": isTitleAvailable ? formData.newOwnerAddress?.["ZIP Code"]?.[4] || '' : "",
+
+        "county_1": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[0] : formData.newOwnerAddress?.County?.[0] || '' : "",
+        "county_2": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[1] : formData.newOwnerAddress?.County?.[1] || '' : "",
+        "county_3": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[2] : formData.newOwnerAddress?.County?.[2] || '' : "",
+        "county_4": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[3] : formData.newOwnerAddress?.County?.[3] || '' : "",
+        "county_5": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[4] : formData.newOwnerAddress?.County?.[4] || '' : "",
+        "county_6": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[5] : formData.newOwnerAddress?.County?.[5] || '' : "",
+        "county_7": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[6] : formData.newOwnerAddress?.County?.[6] || '' : "",
+        "county_8": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[7] : formData.newOwnerAddress?.County?.[7] || '' : "",
+        "county_9": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[8] : formData.newOwnerAddress?.County?.[8] || '' : "",
+        "county_10": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[9] : formData.newOwnerAddress?.County?.[9] || '' : "",
+        "county_11": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[10] : formData.newOwnerAddress?.County?.[10] || '' : "",
+        "county_12": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[11] : formData.newOwnerAddress?.County?.[11] || '' : "",
+        "county_13": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[12] : formData.newOwnerAddress?.County?.[12] || '' : "",
+        "county_14": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[13] : formData.newOwnerAddress?.County?.[13] || '' : "",
+        "county_15": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[14] : formData.newOwnerAddress?.County?.[14] || '' : "",
+        "county_16": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[15] : formData.newOwnerAddress?.County?.[15] || '' : "",
+        "county_17": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[16] : formData.newOwnerAddress?.County?.[16] || '' : "",
+        "county_18": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[17] : formData.newOwnerAddress?.County?.[17] || '' : "",
+        "county_19": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[18] : formData.newOwnerAddress?.County?.[18] || '' : "",
+        "county_20": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[19] : formData.newOwnerAddress?.County?.[19] || '' : "",
+        "county_21": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[20] : formData.newOwnerAddress?.County?.[20] || '' : "",
+        "county_22": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[21] : formData.newOwnerAddress?.County?.[21] || '' : "",
+        "county_23": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[22] : formData.newOwnerAddress?.County?.[22] || '' : "",
+        "county_24": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[23] : formData.newOwnerAddress?.County?.[23] || '' : "",
+        "county_25": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[24] : formData.newOwnerAddress?.County?.[24] || '' : "",
+        "county_26": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[25] : formData.newOwnerAddress?.County?.[25] || '' : "",
+        "county_27": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[26] : formData.newOwnerAddress?.County?.[26] || '' : "",
+
+        "mailing_1": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[0] || "" : '' : "",
+        "mailing_2": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[1] || "" : '' : "",
+        "mailing_3": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[2] || "" : '' : "",
+        "mailing_4": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[3] || "" : '' : "",
+        "mailing_5": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[4] || "" : '' : "",
+        "mailing_6": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[5] || "" : '' : "",
+        "mailing_7": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[6] || "" : '' : "",
+        "mailing_8": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[7] || "" : '' : "",
+        "mailing_9": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[8] || "" : '' : "",
+        "mailing_10": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[9] || "" : '' : "",
+        "mailing_11": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[10] || "" : '' : "",
+        "mailing_12": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[11] || "" : '' : "",
+        "mailing_13": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[12] || "" : '' : "",
+        "mailing_14": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[13] || "" : '' : "",
+        "mailing_15": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[14] || "" : '' : "",
+        "mailing_16": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[15] || "" : '' : "",
+        "mailing_17": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[16] || "" : '' : "",
+        "mailing_18": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[17] || "" : '' : "",
+        "mailing_19": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[18] || "" : '' : "",
+        "mailing_20": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[19] || "" : '' : "",
+        "mailing_21": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[20] || "" : '' : "",
+        "mailing_22": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[21] || "" : '' : "",
+        "mailing_23": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[22] || "" : '' : "",
+        "mailing_24": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[23] || "" : '' : "",
+        "mailing_25": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[24] || "" : '' : "",
+        "mailing_26": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[25] || "" : '' : "",
+        "mailing_27": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[26] || "" : '' : "",
+
+        "city_21": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[0] || "" : '' : "",
+        "city_22": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[1] || "" : '' : "",
+        "city_23": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[2] || "" : '' : "",
+        "city_24": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[3] || "" : '' : "",
+        "city_25": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[4] || "" : '' : "",
+        "city_26": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[5] || "" : '' : "",
+        "city_27": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[6] || "" : '' : "",
+        "city_28": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[7] || "" : '' : "",
+        "city_29": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[8] || "" : '' : "",
+        "city_30": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[9] || "" : '' : "",
+        "city_31": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[10] || "" : '' : "",
+        "city_32": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[11] || "" : '' : "",
+        "city_33": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[12] || "" : '' : "",
+        "city_34": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[13] || "" : '' : "",
+        "city_35": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[14] || "" : '' : "",
+        "city_36": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[15] || "" : '' : "",
+        "city_37": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[16] || "" : '' : "",
+        "city_38": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[17] || "" : '' : "",
+        "city_39": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[18] || "" : '' : "",
+        "city_40": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[19] || "" : '' : "",
+
+        "state_3": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.State?.[0] || "" : '' : "",
+        "state_4": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.State?.[1] || "" : '' : "",
+
+        "zip_6": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"]?.[0] || "" : '' : "",
+        "zip_7": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"]?.[1] || "" : '' : "",
+        "zip_8": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"]?.[2] || "" : '' : "",
+        "zip_9": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"]?.[3] || "" : '' : "",
+        "zip_10": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"]?.[4] || "" : '' : "",
+
+        "date_title_9a": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? getCurrentDate() : "" : "",
+        "date_title_9b": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? getCurrentDate() : "" : "",
+
+        "dl/idcardno_1": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[0] : '' : "",
+        "dl/idcardno_2": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[1] : '' : "",
+        "dl/idcardno_3": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[2] : '' : "",
+        "dl/idcardno_4": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[3] : '' : "",
+        "dl/idcardno_5": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[4] : '' : "",
+        "dl/idcardno_6": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[5] : '' : "",
+        "dl/idcardno_7": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[6] : '' : "",
+        "dl/idcardno_8": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[7] : '' : "",
+
+        "purchase_date": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Purchase Price/Value"] : '' : "",
+
+        "dl/idcardno_9": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[0] : '' : "",
+        "dl/idcardno_10": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[1] : '' : "",
+        "dl/idcardno_11": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[2] : '' : "",
+        "dl/idcardno_12": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[3] : '' : "",
+        "dl/idcardno_13": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[4] : '' : "",
+        "dl/idcardno_14": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[5] : '' : "",
+        "dl/idcardno_15": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[6] : '' : "",
+        "dl/idcardno_16": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[7] : '' : "",
+
+        "purchase_price": isTitleAvailable ? formData.transactionSelections?.includes("Vehicle is a Gift") ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Gift Value"] : "" : '' : "",
+
+        "lienholder_2.1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[0] : '' : "",
+        "lienholder_2.2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[1] : '' : "",
+        "lienholder_2.3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[2] : '' : "",
+        "lienholder_2.4": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[3] : '' : "",
+        "lienholder_2.5": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[4] : '' : "",
+        "lienholder_2.6": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[5] : '' : "",
+        "lienholder_2.7": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[6] : '' : "",
+        "lienholder_2.8": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[7] : '' : "",
+        "lienholder_2.9": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[8] : '' : "",
+        "lienholder_4.1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[9] : '' : "",
+        "lienholder_3.0": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[10] : '' : "",
+        "lienholder_3.1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[11] : '' : "",
+        "lienholder_3.2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[12] : '' : "",
+        "lienholder_3.3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[13] : '' : "",
+        "lienholder_3.4": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[14] : '' : "",
+        "lienholder_3.5": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[15] : '' : "",
+        "lienholder_4.2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[16] : '' : "",
+        "lienholder_3.6": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[17] : '' : "",
+        "lienholder_3.7": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[18] : '' : "",
+        "lienholder_3.8": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[19] : '' : "",
+        "lienholder_3.9": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[20] : '' : "",
+        "lienholder_4.0": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[21] : '' : "",
+
+        "elt#_title_1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ELT Number (3 digits)"]?.[0] : '' : "",
+        "elt#_title_2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ELT Number (3 digits)"]?.[1] : '' : "",
+        "elt#_title_3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ELT Number (3 digits)"]?.[2] : '' : "",
+
+        "lien_add_1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[0] : '' : "",
+        "lien_add_2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[1] : '' : "",
+        "lien_add_3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[2] : '' : "",
+        "lien_add_4": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[3] : '' : "",
+        "lien_add_5": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[4] : '' : "",
+        "lien_add_6": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[5] : '' : "",
+        "lien_add_7": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[6] : '' : "",
+        "lien_add_8": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[7] : '' : "",
+        "lien_add_9": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[8] : '' : "",
+        "lien_add_10": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[9] : '' : "",
+        "lien_add_11": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[10] : '' : "",
+        "lien_add_12": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[11] : '' : "",
+        "lien_add_13": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[12] : '' : "",
+        "lien_add_14": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[13] : '' : "",
+        "lien_add_15": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[14] : '' : "",
+        "lien_add_16": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[15] : '' : "",
+        "lien_add_17": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[16] : '' : "",
+        "lien_add_18": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[17] : '' : "",
+        "lien_add_19": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[18] : '' : "",
+        "lien_add_20": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[19] : '' : "",
+        "lien_add_21": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[20] : '' : "",
+        "lien_add_22": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[21] : '' : "",
+        "lien_add_23": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[22] : '' : "",
+        "lien_add_24": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[23] : '' : "",
+        "lien_add_25": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[24] : '' : "",
+        "lien_add_26": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[25] : '' : "",
+        "lien_add_27": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[26] : '' : "",
+
+        "city_41": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[0] : '' : "",
+        "city_42": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[1] : '' : "",
+        "city_43": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[2] : '' : "",
+        "city_44": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[3] : '' : "",
+        "city_45": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[4] : '' : "",
+        "city_46": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[5] : '' : "",
+        "city_47": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[6] : '' : "",
+        "city_48": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[7] : '' : "",
+        "city_49": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[8] : '' : "",
+        "city_50": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[9] : '' : "",
+        "city_51": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[10] : '' : "",
+        "city_52": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[11] : '' : "",
+        "city_53": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[12] : '' : "",
+        "city_54": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[13] : '' : "",
+        "city_55": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[14] : '' : "",
+        "city_56": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[15] : '' : "",
+        "city_57": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[16] : '' : "",
+        "city_58": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[17] : '' : "",
+        "city_59": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[18] : '' : "",
+        "city_60": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[19] : '' : "",
+
+        "state_5": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["State"]?.[0] : '' : "",
+        "state_6": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["State"]?.[1] : '' : "",
+
+        "zip_11": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ZIP Code"]?.[0] : '' : "",
+        "zip_12": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ZIP Code"]?.[1] : '' : "",
+        "zip_13": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ZIP Code"]?.[2] : '' : "",
+        "zip_14": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ZIP Code"]?.[3] : '' : "",
+        "zip_15": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ZIP Code"]?.[4] : '' : "",
+
     };
 };
 
 
-const mergeFilledPDFs = async (
+export const mergeFilledPDFs = async (
     formTypes: string[],
     formData: FormData,
     senerio: string,
-    // multipleFormDataList: FormData[] = []  // optional for multiple transfer
+    stripContent: boolean = false // 👈 flag
 ): Promise<Uint8Array> => {
     const mergedPdf = await PDFDocument.create();
-
-    // let dmv262Index = 0; // for tracking multiple 262 forms
 
     for (const type of formTypes) {
         const pdfUrl = `/pdfs/${type}.pdf`;
@@ -1572,67 +1889,59 @@ const mergeFilledPDFs = async (
             continue;
         }
 
-        const pdfBytes = await res.arrayBuffer();
-        const pdfDoc = await PDFDocument.load(pdfBytes);
+        let pdfBytes = await res.arrayBuffer();
 
-        try {
-            const form = pdfDoc.getForm();
-            const fields = form.getFields();
-
-            // //  Select which data to use
-            // let currentData: FormData;
-
-            // if (type === "DMVREG262new" && multipleFormDataList.length > 0) {
-            //     // Use specific transfer data
-            //     currentData = multipleFormDataList[dmv262Index] || formData;
-            //     dmv262Index++;
-            // } else {
-            //     // Use default formData
-            //     currentData = formData;
-            // }
-
-            const fieldMapping = buildFieldMapping(formData, senerio);
-
-            // Fill fields
-            fields?.forEach((field: PDFField) => {
-                const name = field.getName();
-                const value = fieldMapping[name];
-                // console.log(name, value);
-
-                try {
-                    if (field instanceof PDFTextField) {
-                        field.setText(value);
-                        field.setFontSize(11);
-                    } else if (field instanceof PDFCheckBox) {
-                        if (value === true || value === 'true') {
-                            field.check();
-                        } else {
-                            field.uncheck();
-                        }
-                    }
-                } catch (e: any) {
-                    console.warn(`Could not fill field ${name}:`, e.message);
-                }
-            });
-
-            // Make fields read-only
-            fields?.forEach((field: PDFField) => {
-                try {
-                    if (typeof (field as any).enableReadOnly === 'function') {
-                        (field as any).enableReadOnly();
-                    }
-                } catch (e: any) {
-                    console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
-                }
-            });
-
-        } catch (err: any) {
-            console.warn(`Error processing form in ${type}:`, err.message);
+        // --- If flag is on, strip content but keep fields ---
+        if (stripContent) {
+            pdfBytes = await stripContentButKeepFields(pdfBytes);
         }
 
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const form = pdfDoc.getForm();
+        const fields = form.getFields();
+        const fieldMapping = buildFieldMapping(formData, senerio);
+
+        // --- Fill fields ---
+        fields?.forEach((field: any) => {
+            const name = field.getName();
+            const value = fieldMapping[name];
+
+            try {
+                if (field instanceof PDFTextField) {
+                    if (value !== undefined && value !== null) {
+                        field.setText(String(value));
+                        // field.setFontSize(7);
+                    }
+                } else if (field instanceof PDFCheckBox) {
+                    if (value === true || value === "true") {
+                        field.check();
+                    } else {
+                        field.uncheck();
+                    }
+                }
+            } catch (e: any) {
+                console.warn(`⚠️ Could not fill field ${name}:`, e.message);
+            }
+        });
+
+        // --- Lock fields (optional) ---
+        fields?.forEach((field: any) => {
+            try {
+                if (typeof field.enableReadOnly === "function") {
+                    field.enableReadOnly();
+                }
+            } catch (e: any) {
+                console.warn(`⚠️ Could not set read-only for ${field.getName()}:`, e.message);
+            }
+        });
+
+        // Save and copy pages
         const finalBytes = await pdfDoc.save();
         const loadedFilledPdf = await PDFDocument.load(finalBytes);
-        const pages = await mergedPdf.copyPages(loadedFilledPdf, loadedFilledPdf.getPageIndices());
+        const pages = await mergedPdf.copyPages(
+            loadedFilledPdf,
+            loadedFilledPdf.getPageIndices()
+        );
         pages.forEach((page) => mergedPdf.addPage(page));
     }
 
@@ -1718,7 +2027,7 @@ async function handleOnPDF(form: any, senerio: any) {
         if (senerio?.includes("Personalized Plates")) {
             formTypes.push("REG17");
         }
-        const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio);
+        const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio, true);
         return mergedBytes;
 
     } catch (e) {
