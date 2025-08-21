@@ -224,7 +224,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     const rawDate = formData.ownersData?.[0]?.['Date of Sale'] || '';
     const { month, day, year } = extractDateParts(rawDate);
     const isTitleAvailable = formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title")
-    console.log(isTitleAvailable);
+    // console.log(isTitleAvailable);
 
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
