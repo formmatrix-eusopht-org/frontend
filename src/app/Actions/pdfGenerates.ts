@@ -1872,16 +1872,16 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 };
 
 
-export const mergeFilledPDFs = async (
+
+const mergeFilledPDFs = async (
     formTypes: string[],
     formData: FormData,
     senerio: string,
-    stripContent: boolean = false // 👈 flag
+    plainPdf?: boolean,
 ): Promise<Uint8Array> => {
     const mergedPdf = await PDFDocument.create();
-
     for (const type of formTypes) {
-        const pdfUrl = `/pdfs/${type}.pdf`;
+        const pdfUrl = `/${plainPdf ? "plain pdf" : 'pdfs'}/${type}.pdf`;
         const res = await fetch(pdfUrl);
 
         if (!res.ok) {
@@ -1889,59 +1889,55 @@ export const mergeFilledPDFs = async (
             continue;
         }
 
-        let pdfBytes = await res.arrayBuffer();
+        const pdfBytes = await res.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(pdfBytes);
 
-        // --- If flag is on, strip content but keep fields ---
-        if (stripContent) {
-            pdfBytes = await stripContentButKeepFields(pdfBytes);
+        try {
+            const form = pdfDoc.getForm();
+            const fields = form.getFields();
+
+            const fieldMapping = buildFieldMapping(formData, senerio);
+
+            // Fill fields
+            fields?.forEach((field: PDFField) => {
+                const name = field.getName();
+                const value = fieldMapping[name];
+                // console.log(name, value);
+
+                try {
+                    if (field instanceof PDFTextField) {
+                        field.setText(value);
+                        field.setFontSize(11);
+                    } else if (field instanceof PDFCheckBox) {
+                        if (value === true || value === 'true') {
+                            field.check();
+                        } else {
+                            field.uncheck();
+                        }
+                    }
+                } catch (e: any) {
+                    console.warn(`Could not fill field ${name}:`, e.message);
+                }
+            });
+
+            // Make fields read-only
+            fields?.forEach((field: PDFField) => {
+                try {
+                    if (typeof (field as any).enableReadOnly === 'function') {
+                        (field as any).enableReadOnly();
+                    }
+                } catch (e: any) {
+                    console.warn(`Could not set read-only for field ${field.getName()}:`, e.message);
+                }
+            });
+
+        } catch (err: any) {
+            console.warn(`Error processing form in ${type}:`, err.message);
         }
 
-        const pdfDoc = await PDFDocument.load(pdfBytes);
-        const form = pdfDoc.getForm();
-        const fields = form.getFields();
-        const fieldMapping = buildFieldMapping(formData, senerio);
-
-        // --- Fill fields ---
-        fields?.forEach((field: any) => {
-            const name = field.getName();
-            const value = fieldMapping[name];
-
-            try {
-                if (field instanceof PDFTextField) {
-                    if (value !== undefined && value !== null) {
-                        field.setText(String(value));
-                        // field.setFontSize(7);
-                    }
-                } else if (field instanceof PDFCheckBox) {
-                    if (value === true || value === "true") {
-                        field.check();
-                    } else {
-                        field.uncheck();
-                    }
-                }
-            } catch (e: any) {
-                console.warn(`⚠️ Could not fill field ${name}:`, e.message);
-            }
-        });
-
-        // --- Lock fields (optional) ---
-        fields?.forEach((field: any) => {
-            try {
-                if (typeof field.enableReadOnly === "function") {
-                    field.enableReadOnly();
-                }
-            } catch (e: any) {
-                console.warn(`⚠️ Could not set read-only for ${field.getName()}:`, e.message);
-            }
-        });
-
-        // Save and copy pages
         const finalBytes = await pdfDoc.save();
         const loadedFilledPdf = await PDFDocument.load(finalBytes);
-        const pages = await mergedPdf.copyPages(
-            loadedFilledPdf,
-            loadedFilledPdf.getPageIndices()
-        );
+        const pages = await mergedPdf.copyPages(loadedFilledPdf, loadedFilledPdf.getPageIndices());
         pages.forEach((page) => mergedPdf.addPage(page));
     }
 
@@ -2027,7 +2023,7 @@ async function handleOnPDF(form: any, senerio: any) {
         if (senerio?.includes("Personalized Plates")) {
             formTypes.push("REG17");
         }
-        const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio, true);
+        const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio, false);
         return mergedBytes;
 
     } catch (e) {

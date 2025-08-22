@@ -46,8 +46,6 @@ import PlatePurchaserAndOwner from '../Containers/PlatePurchaserAndOwner';
 import ReplacementOnlySection from '../Containers/forReplacementOnly';
 import SpecialInterestSection from '../Containers/SpecialInterest';
 import { Dialog } from '../Components/DialogBox';
-import { pdftest } from '../Actions/pdftest';
-import { pdfTest2 } from '../Actions/pdftest2';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
 
@@ -1441,11 +1439,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             if (optionsForValidation.length < 1) {
                                 setOpen(true)
                                 setIsLoading(false);
-
                                 return
                             }
-                            // await pdfTest2()
-                            // await pdftest();
                             await headHandlerForPDf("combineForm")
                             setIsLoading(false);
                         }}
