@@ -40,6 +40,9 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
       if (data.user && auth.currentUser) {
         setUser(auth.currentUser);
+        if (window.location.pathname === '/') {
+          router.push('/home')
+        }
       } else {
         await logout();
       }
@@ -63,8 +66,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log(userCredential);
-      
+
       const token = await userCredential.user.getIdToken(true);
 
       const { data } = await axios.post(
@@ -76,6 +78,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       if (data.success) {
         setUser(userCredential.user);
         localStorage.setItem('userRole', JSON.stringify(data.role));
+        localStorage.setItem('uid', userCredential.user.uid);
         router.push('/home');
       }
     } catch (error) {

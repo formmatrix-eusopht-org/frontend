@@ -7,7 +7,6 @@ import '../globals.css';
 export default function Home() {
     return (
         <>
-            <Nav />
             <div className="flex bg-gray-100">
                 <div className='min-w-12/20'>
                     <FormContainer />

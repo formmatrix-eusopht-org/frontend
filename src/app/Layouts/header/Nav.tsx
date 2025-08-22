@@ -1,28 +1,37 @@
 'use client'
 
 import { UserAuth } from '@/app/Contexts/AuthContext'
+import { useRouter, usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
 
 export default function Nav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [userRole, setUserRole] = useState(0);
+
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const { logout, user } = UserAuth()
-  const NavItem = ['Home', 'Search Transactions', 'Contact Us']
+  const router = useRouter()
+  const pathname = usePathname()   // ✅ get current route
 
+  const NavItem = [
+    { name: "Home", route: "/home" },
+    { name: "Transactions", route: "/transactions" },
+    { name: "Contact Us", route: "/contact" },
+  ]
+  useEffect(() => {
+    localStorage.getItem('userRole')
+      ? setUserRole(JSON.parse(localStorage.getItem('userRole') || '0'))
+      : setUserRole(0);
+  }, [])
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   return (
@@ -53,7 +62,7 @@ export default function Nav() {
           {/* Logo */}
           <div className="mx-auto md:mx-0">
             <a
-              href="#"
+              href="/"
               className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent"
             >
               FormMatic
@@ -63,17 +72,22 @@ export default function Nav() {
 
         {/* Desktop Nav Links */}
         <ul className="hidden md:flex flex-row space-x-8 flex-1 justify-end">
-          {NavItem.map((item, index) => (
-            <li key={index}>
-              <a
-                href="#"
-                className="relative text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-white transition-colors duration-200
-                after:content-[''] after:absolute after:w-0 after:h-[2px] after:bg-blue-600 after:left-0 after:-bottom-1 after:transition-all after:duration-300 hover:after:w-full"
-              >
-                {item}
-              </a>
-            </li>
-          ))}
+          {NavItem.map((item, index) => {
+            const isActive = pathname === item.route
+            return (
+              <li key={index} onClick={() => router.push(item.route)}>
+                <a
+                  className={`relative font-medium transition-colors duration-200
+                    ${isActive
+                      ? "text-blue-600 dark:text-white after:w-full"
+                      : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white after:w-0"}
+                    after:content-[''] after:absolute after:h-[2px] after:bg-blue-600 after:left-0 after:-bottom-1 after:transition-all after:duration-300 hover:after:w-full`}
+                >
+                  {item.name}
+                </a>
+              </li>
+            )
+          })}
         </ul>
 
         {/* Profile Avatar + Dropdown */}
@@ -82,7 +96,6 @@ export default function Nav() {
             className="w-9 h-9 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 "
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {/* Placeholder avatar (could use user.photoURL) */}
             <div className="w-full h-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold">
               {user?.displayName?.[0] || 'U'}
             </div>
@@ -99,25 +112,18 @@ export default function Nav() {
                 </p>
               </div>
               <ul className="py-2">
-                {/* <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Dashboard
-                  </a>
-                </li> */}
+                {userRole === 0 &&
+                  <li>
+                    <button
+                      onClick={() => router.push('/user')}
+                      className="w-full text-left block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      User
+                    </button>
+                  </li>
+                }
                 <li>
                   <button
-                    // onClick={logout}
-                    className="w-full text-left block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    User
-                  </button>
-                </li>
-                <li>
-                  <button
-                    // onClick={logout}
                     className="w-full text-left block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Settings
@@ -141,16 +147,21 @@ export default function Nav() {
       {isMenuOpen && (
         <div className="md:hidden bg-gray-50 dark:bg-gray-800 p-4 animate-slideDown">
           <ul className="space-y-3">
-            {NavItem.map((item, index) => (
-              <li key={index}>
-                <a
-                  href="#"
-                  className="block text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-white transition-colors"
-                >
-                  {item}
-                </a>
-              </li>
-            ))}
+            {NavItem.map((item, index) => {
+              const isActive = pathname === item.route
+              return (
+                <li key={index} onClick={() => router.push(item.route)}>
+                  <a
+                    className={`block font-medium transition-colors
+                      ${isActive
+                        ? "text-blue-600 dark:text-white"
+                        : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white"}`}
+                  >
+                    {item.name}
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}
