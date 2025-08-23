@@ -78,6 +78,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       if (data.success) {
         setUser(userCredential.user);
         localStorage.setItem('userRole', JSON.stringify(data.role));
+        localStorage.setItem('trialExpires', data.userData.trialExpires);
         localStorage.setItem('uid', userCredential.user.uid);
         router.push('/home');
       }

@@ -9,7 +9,6 @@ interface FormData {
     email: string;
     password: string;
     confirmPassword: string;
-    trialPeriod: number;
 }
 
 export default function UserRegistrationForm() {
@@ -18,8 +17,7 @@ export default function UserRegistrationForm() {
         address: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        trialPeriod: 7,
+        confirmPassword: ''
     });
 
     const [loading, setLoading] = useState(false);
@@ -48,8 +46,12 @@ export default function UserRegistrationForm() {
 
         setLoading(true);
         const uid = localStorage.getItem("uid");
+        console.log("TRIAL_PERIOD", process.env.NEXT_PUBLIC_TRIAL_PERIOD);
+
         const data = {
-            ...form, createdBy: uid
+            ...form,
+            createdBy: uid,
+            trialPeriod: process.env.NEXT_PUBLIC_TRIAL_PERIOD
         };
 
         try {
@@ -60,11 +62,11 @@ export default function UserRegistrationForm() {
             });
 
             if (res.ok) {
-                setMessage('✅ User registered successfully!');
-                setForm({ name: '', address: '', email: '', password: '', confirmPassword: '', trialPeriod: 7 });
+                setMessage('User registered successfully!');
+                setForm({ name: '', address: '', email: '', password: '', confirmPassword: '' });
             } else {
                 const error = await res.json();
-                setMessage(`❌ Error: ${error.message || 'Something went wrong'}`);
+                setMessage(`Error: ${error.message || 'Something went wrong'}`);
             }
         } catch (err) {
             console.error(err);
@@ -173,7 +175,7 @@ export default function UserRegistrationForm() {
                     </div>
 
                     {/* Trial Period */}
-                    <div>
+                    {/* <div>
                         <label className="block text-sm font-semibold mb-1 text-gray-700">Trial Period (days)</label>
                         <input
                             type="number"
@@ -186,7 +188,7 @@ export default function UserRegistrationForm() {
                             className="w-full px-4 py-2 border rounded-xl shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
                             placeholder="Enter trial period in days"
                         />
-                    </div>
+                    </div> */}
 
                     {/* Submit */}
                     <button

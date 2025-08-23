@@ -8,7 +8,8 @@ interface User {
     name: string;
     email: string;
     role: string;
-    status: "active" | "inactive";
+    status: any;
+    trialExpires: string;
 }
 
 interface UserTableProps {
@@ -38,7 +39,7 @@ export default function UserTable({ users }: UserTableProps) {
                             <th className="px-4 py-2 text-left font-medium text-gray-700">Name</th>
                             <th className="px-4 py-2 text-left font-medium text-gray-700">Email</th>
                             <th className="px-4 py-2 text-left font-medium text-gray-700">Role</th>
-                            {/* <th className="px-4 py-2 text-left font-medium text-gray-700">Status</th> */}
+                            <th className="px-4 py-2 text-left font-medium text-gray-700">Trial Expires</th>
                             <th className="px-4 py-2 text-right font-medium text-gray-700">Actions</th>
                         </tr>
                     </thead>
@@ -49,19 +50,21 @@ export default function UserTable({ users }: UserTableProps) {
                                     <td className="px-4 py-2 font-medium">{user.name}</td>
                                     <td className="px-4 py-2">{user.email}</td>
                                     <td className="px-4 py-2">{user.role == '1' ? "User" : "Admin"}</td>
-                                    {/* <td className="px-4 py-2">
-                                        <span
-                                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${user.status === "active"
-                                                    ? "bg-green-100 text-green-700"
-                                                    : "bg-red-100 text-red-700"
-                                                }`}
-                                        >
-                                            {user.status}
-                                        </span>
-                                    </td> */}
-                                    <td className="px-4 py-2 text-right">
-                                        <button className="text-blue-600 hover:underline">Edit</button>
-                                        <button className="ml-3 text-red-600 hover:underline">Delete</button>
+                                    <td className="px-4 py-2">
+                                        {new Date(user.trialExpires).toLocaleString("en-US", {
+                                            month: "2-digit",
+                                            day: "2-digit",
+                                            year: "numeric",
+                                        })}
+                                    </td>
+                                    <td className="px-4 py-2 text-right ">
+                                        <button className="text-blue-600">Edit</button>
+                                        {user.status == 1 ?
+                                            <button className="ml-3 text-yellow-600">Deactivate</button>
+                                            :
+                                            <button className="ml-3 text-gray-600">Activate</button>
+                                        }
+                                        <button className="ml-3 text-red-600">Delete</button>
                                     </td>
                                 </tr>
                             ))
