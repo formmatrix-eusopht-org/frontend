@@ -7,7 +7,7 @@ import { VehicleInformationDetails } from './VehicleInformation';
 import { VehicleStorageLocationDetails } from './VehicleStorageLocation';
 import { RegisteredOwnerDetails } from './RegisteredOwner';
 import { OwnerAddress } from './Address';
-import { NewRegisteredOwnerAddress } from '@/app/Containers/NewRegisteredOwnerAddress'
+import { NewRegisteredOwnerAddress } from '@/Containers/NewRegisteredOwnerAddress'
 import { LegalOwnerOfRecord } from './LegalOwnerOfRecord';
 import { NewRegisteredOwnerDetails } from './NewRegisteredOwners';
 import { DateInformation } from './DateInfo';

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAuth } from 'firebase/auth';
 import { doc, onSnapshot, getFirestore, deleteDoc } from 'firebase/firestore';
-import { auth, initFirebase } from '../../../firebase-config';
+import { auth, initFirebase } from '../../firebase-config';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { getCookie } from '../Actions/cookie';
@@ -37,11 +37,15 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/checksession`,
         { withCredentials: true }
       );
-
+      const role = localStorage.getItem("userRole")
       if (data.user && auth.currentUser) {
         setUser(auth.currentUser);
         if (window.location.pathname === '/') {
-          router.push('/home')
+          if (role == "1") {
+            router.push('/home')
+          } else {
+            router.push('/dashboard')
+          }
         }
       } else {
         await logout();
@@ -80,7 +84,11 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
         localStorage.setItem('userRole', JSON.stringify(data.role));
         localStorage.setItem('trialExpires', data.userData.trialExpires);
         localStorage.setItem('uid', userCredential.user.uid);
-        router.push('/home');
+        if (data.role == "1") {
+          router.push('/home')
+        } else {
+          router.push('/dashboard')
+        }
       }
     } catch (error) {
       console.error('Login failed:', error);

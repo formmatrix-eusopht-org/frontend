@@ -1,6 +1,6 @@
-import Nav from '../Layouts/header/Nav';
-import Sidebar from '../Layouts/sidebar/Sidebar';
-import FormContainer from '../Layouts/transactionContainer/FormContainer';
+import Nav from '../../Layouts/header/Nav';
+import Sidebar from '../../Layouts/sidebar/Sidebar';
+import FormContainer from '../../Layouts/transactionContainer/FormContainer';
 import '../globals.css';
 
 

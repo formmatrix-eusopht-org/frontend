@@ -1,9 +1,9 @@
 'use client'
 
-import Checkbox from "@/app/Components/CheckBox";
-import Section from "@/app/Components/FieldSection";
-import { useSenerioContext } from "@/app/Contexts/SenerioContext";
-import { sidebarSections } from "@/app/Data/sidebarCheckboxData";
+import Checkbox from "@/Components/CheckBox";
+import Section from "@/Components/FieldSection";
+import { useSenerioContext } from "@/Contexts/SenerioContext";
+import { sidebarSections } from "@/Data/sidebarCheckboxData";
 
 export default function Sidebar() {
   const { senerio, setSenerio } = useSenerioContext();
@@ -44,7 +44,7 @@ export default function Sidebar() {
 
 
   return (
-    <div className="min-w-8/20 fixed right-0 top-[90px] bottom-[30px] rounded-xl shadow-lg z-40 bg-white flex flex-col">
+    <div className="min-w-8/20 fixed right-0 top-[112px] bottom-[30px] rounded-xl shadow-lg z-40 bg-white flex flex-col">
       <aside className="flex flex-col h-full">
         <div className="p-6">
           <h2 className="text-2xl font-bold">Transactions</h2>

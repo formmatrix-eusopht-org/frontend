@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SenerioProvider } from "./Contexts/SenerioContext";
-import { AuthContextProvider } from "./Contexts/AuthContext";
-import NavWrapper from "./Layouts/header/NavWrapper";
+import { SenerioProvider } from "../Contexts/SenerioContext";
+import { AuthContextProvider } from "../Contexts/AuthContext";
+import NavWrapper from "../Layouts/header/NavWrapper";
+import StripeProvider from "../Contexts/PaymentContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +30,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthContextProvider>
-          <NavWrapper />
-          <SenerioProvider>{children}</SenerioProvider>
+          <StripeProvider>
+            <NavWrapper />
+            <SenerioProvider>{children}</SenerioProvider>
+          </StripeProvider>
         </AuthContextProvider>
       </body>
     </html>

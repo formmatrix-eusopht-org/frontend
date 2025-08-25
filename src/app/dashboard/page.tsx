@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import UserTable from '../ui/UserTable';
+import UserTable from '../../ui/UserTable';
 
 export default function User() {
     const [users, setUsers] = useState([])

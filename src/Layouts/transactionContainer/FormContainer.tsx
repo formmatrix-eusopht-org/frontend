@@ -1,6 +1,6 @@
 'use client'
-import { useSenerioContext } from '@/app/Contexts/SenerioContext'
-import CombineForm from '@/app/Forms/CombineForm';
+import { useSenerioContext } from '@/Contexts/SenerioContext'
+import CombineForm from '@/Forms/CombineForm';
 
 const FormContainer = () => {
   const { formData } = useSenerioContext();
