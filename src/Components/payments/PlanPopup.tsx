@@ -56,15 +56,13 @@ const PlanPopup: React.FC<PlanPopupProps> = ({
             >
                 <button
                     onClick={() => setBillingCycle("yearly")}
-                    className={`flex-1 ${billingCycle === "yearly" ? "bg-[#1A2956] text-white" : ""} 
-            h-[2.6rem] rounded-md`}
+                    className={`flex-1 ${billingCycle === "yearly" ? "bg-[#1A2956] text-white" : ""} h-[2.6rem] rounded-md`}
                 >
                     Billed Annually
                 </button>
                 <button
                     onClick={() => setBillingCycle("monthly")}
-                    className={`flex-1 ${billingCycle === "monthly" ? "bg-[#1A2956] text-white" : ""} 
-            h-[2.6rem] rounded-md`}
+                    className={`flex-1 ${billingCycle === "monthly" ? "bg-[#1A2956] text-white" : ""} h-[2.6rem] rounded-md`}
                 >
                     Billed Monthly
                 </button>
@@ -90,7 +88,7 @@ const PlanPopup: React.FC<PlanPopupProps> = ({
 
                             {/* Price */}
                             <div className="flex items-end mt-6">
-                                <h2 className="text-[#41CCAD]">${price}</h2>
+                                <h2 className="text-[#41CCAD] text-3xl font-bold">${price}</h2>
                                 <h4 className="text-[#41CCAD]">.00</h4>
                                 <h6 className="text-[#41CCAD] ml-1">
                                     USD {plan.isFree ? "" : billingCycle === "monthly" ? "/mo" : "/yr"}

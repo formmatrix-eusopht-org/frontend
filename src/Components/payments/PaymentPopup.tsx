@@ -1,59 +1,113 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
-import CardInputElement from "./CardElement";
-import CloseIcon from "../../../public/imcross.svg"; // put your cross.svg in public folder
-import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import CloseIcon from "../../../public/imcross.svg";
+import { countries } from "@/Data/countries";
+import AutoCompleteInput from "@/ui/AutoCompleteInput";
 
 interface PaymentPopupProps {
-    selectedPlanData?: { name: string; price: number };
+    user?: any;
+    selectedPlanData?: { name: string; price: number; billingCycle: "monthly" | "yearly" };
     onClose?: () => void;
-    onChangePlan?: () => void;
-    onSubmit?: () => void;
 }
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-export default function PaymentPopup({
-    selectedPlanData,
-    onClose,
-}: PaymentPopupProps) {
+
+export default function PaymentPopup({ user, selectedPlanData, onClose }: PaymentPopupProps) {
     const stripe = useStripe();
     const elements = useElements();
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const validateAddress = () => {
+        if (!address.line1.trim()) return "Address line is required";
+        if (!address.city.trim()) return "City is required";
+        if (!address.state.trim()) return "State is required";
+        if (!address.postal_code.trim()) return "Postal code is required";
+        if (!/^[A-Za-z0-9\s-]+$/.test(address.postal_code))
+            return "Invalid postal code";
+        if (!address.country) return "Country is required";
+        // if you want to enforce checkbox
+        // if (!address.autoSubscribe) return "You must accept Not One-Time option";
+        return null;
+    };
+    const [address, setAddress] = useState({
+        line1: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "",
+        countryName: "",
+        autoSubscribe: false
+    });
 
     const handleSubmit = async () => {
         if (!stripe || !elements) return;
+
+        const validationError = validateAddress();
+        if (validationError) {
+            setErrorMessage(validationError);
+            return;
+        }
 
         setLoading(true);
         setErrorMessage("");
 
         try {
-            // 1. Ask backend for clientSecret
-            const res = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + "/api/payment", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: (selectedPlanData?.price || 14) * 100 }), // cents
-            });
-            // console.log("res", res);
-
-            const { clientSecret } = await res.json();
-
-            // console.log("clientSecret", typeof clientSecret);
-            // 2. Confirm card payment
-            const result = await stripe!.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: elements!.getElement(CardElement)!,
+            // 1. Create a PaymentMethod
+            const cardElement = elements.getElement(CardElement);
+            const { error, paymentMethod } = await stripe.createPaymentMethod({
+                type: "card",
+                card: cardElement!,
+                billing_details: {
+                    email: user.email,
+                    address: {
+                        line1: address.line1,
+                        city: address.city,
+                        state: address.state,
+                        postal_code: address.postal_code,
+                        country: address.country,
+                    },
                 },
             });
 
-            // console.log("result", result);
+            if (error) {
+                setErrorMessage(error.message || "Payment method failed");
+                setLoading(false);
+                return;
+            }
 
-            if (result.error) {
-                setErrorMessage(result.error.message || "Payment failed");
-            } else if (result.paymentIntent?.status === "succeeded") {
-                alert("🎉 Payment successful!");
+            // 2. Ask backend to create subscription
+            const res = await fetch(
+                process.env.NEXT_PUBLIC_API_BASE_URL + "/api/payment",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: user.email,
+                        address: {
+                            line1: address.line1,
+                            city: address.city,
+                            state: address.state,
+                            postal_code: address.postal_code,
+                            country: address.country,
+                        },
+                        userId: user.uid,
+                        name: user.displayName,
+                        priceId: selectedPlanData?.billingCycle,
+                        paymentMethodId: paymentMethod.id,
+                        autoSubscribe: address.autoSubscribe
+                    }),
+                }
+            );
+
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+
+            if (!res.ok) {
+                setErrorMessage("Payment failed");
+                return
+            } else {
+                alert("🎉 Subscription successful!");
                 onClose?.();
             }
             debugger
@@ -66,7 +120,7 @@ export default function PaymentPopup({
 
     return (
         <div className="bg-white rounded-lg p-5 w-[95%] sm:w-[500px] shadow-xl">
-            {/* CLOSE ICON  */}
+            {/* CLOSE ICON */}
             <div className="flex justify-between items-center">
                 <h4 className="text-[#1A2956] font-semibold">Billing Information</h4>
                 <Image
@@ -81,7 +135,7 @@ export default function PaymentPopup({
 
             {/* USER INFO */}
             <div className="mt-2">
-                <h5 className="mb-0 text-[#A3A9BB]">Hello, User 👋</h5>
+                <h5 className="mb-0 text-[#A3A9BB]">Hello, {user.displayName.charAt(0).toUpperCase() + user.displayName.slice(1)}! 👋</h5>
                 <h4 className="text-[#1A2956]">Your Free Trial Has Expired</h4>
             </div>
 
@@ -92,8 +146,7 @@ export default function PaymentPopup({
                 </h2>
                 <h4 className="text-[#41CCAD]">.00</h4>
                 <h6 className="text-[#41CCAD] ml-1">
-                    USD{" "}
-                    <span className="text-[#A3A9BB]">/month/entity</span>
+                    USD <span className="text-[#A3A9BB]">/month/entity</span>
                 </h6>
             </div>
 
@@ -119,33 +172,59 @@ export default function PaymentPopup({
                 <input
                     type="text"
                     placeholder="Full Address"
+                    value={address.line1}
+                    onChange={(e) => { setAddress({ ...address, line1: e.target.value }); setErrorMessage(""); }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <input
                     type="text"
                     placeholder="City"
+                    value={address.city}
+                    onChange={(e) => { setAddress({ ...address, city: e.target.value }); setErrorMessage(""); }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <input
                     type="text"
                     placeholder="State"
+                    value={address.state}
+                    onChange={(e) => { setAddress({ ...address, state: e.target.value }); setErrorMessage(""); }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <input
                     type="text"
                     placeholder="Postal Code"
+                    value={address.postal_code}
+                    onChange={(e) => { setAddress({ ...address, postal_code: e.target.value }); setErrorMessage(""); }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
-                <input
-                    type="text"
-                    placeholder="Country"
-                    className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
+                <AutoCompleteInput
+                    options={countries}
+                    value={address.countryName}  // input shows full country name
+                    onChange={(val) => {
+                        const selected = countries.find(c => c.name === val);
+                        if (selected) {
+                            setAddress({ ...address, country: selected.code, countryName: selected.name });
+                        } else {
+                            setAddress({ ...address, country: "", countryName: val });
+                        }
+                    }}
                 />
                 <div className="block w-full p-[10px] border border-divider rounded mt-3">
-                    <CardInputElement />
+                    <CardElement />
                 </div>
-            </div>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={address.autoSubscribe}
+                        onChange={(e) =>
+                            setAddress({ ...address, autoSubscribe: !address.autoSubscribe })
+                        }
+                        className="h-3 w-3 rounded border-gray-300 text-[#41CCAD] focus:ring-[#41CCAD]"
+                    />
+                    <span className="text-sm text-gray-700">Auto-Subscribe Next Time</span>
+                </label>
 
+            </div>
             {errorMessage && (
                 <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
             )}

@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAu
 import { doc, onSnapshot, getFirestore, deleteDoc } from 'firebase/firestore';
 import { auth, initFirebase } from '../../firebase-config';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { getCookie } from '../Actions/cookie';
 
 initFirebase(); // Ensure Firebase is initialized once
@@ -28,7 +28,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const [sessionChecked, setSessionChecked] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const router = useRouter();
-
+  const pathname = usePathname();
   // ✅ Session Check with Backend Cookie
   const checkSession = async () => {
     try {
@@ -61,7 +61,17 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     checkSession();
   }, []);
+  useEffect(() => {
+    const role = localStorage.getItem("userRole") || '';
 
+    if (role === "0" && pathname !== "/dashboard") {
+      router.replace("/dashboard"); // force dashboard
+    } else if (role === "1" && pathname == "/dashboard") {
+      router.replace("/home");
+    } else if (role === "" && pathname !== "/") {
+      router.replace("/");
+    }
+  }, [pathname, router]);
   // ✅ Email/Password Login
   const emailSignIn = async (email: string, password: string) => {
     if (isLoggingIn) return;

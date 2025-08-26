@@ -30,7 +30,7 @@ export default function Nav() {
     name: "Business Plan",
     description: "For growing businesses",
     monthlyPrice: 14,
-    yearlyPrice: 9,
+    yearlyPrice: 120,
     features: ["Dashboards & Graphs", "Unlimited Users", "Export Data"],
   },]
   const NavItem = [
@@ -252,6 +252,7 @@ export default function Nav() {
             />
           ) : (
             <PaymentPopup
+              user={user}
               selectedPlanData={selectedPlan}
               onClose={() => setSelectedPlan(null)}
             />
