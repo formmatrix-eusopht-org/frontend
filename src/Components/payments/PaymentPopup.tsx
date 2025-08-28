@@ -6,18 +6,35 @@ import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import CloseIcon from "../../../public/imcross.svg";
 import { countries } from "@/Data/countries";
 import AutoCompleteInput from "@/ui/AutoCompleteInput";
+import toast from "react-hot-toast";
 
 interface PaymentPopupProps {
     user?: any;
-    selectedPlanData?: { name: string; price: number; billingCycle: "monthly" | "yearly" };
+    selectedPlanData?: { name: string; price: number, color: string };
     onClose?: () => void;
+    setShowSubscriptionPopup?: (show: boolean) => void;
 }
 
-export default function PaymentPopup({ user, selectedPlanData, onClose }: PaymentPopupProps) {
+export default function PaymentPopup({
+    user,
+    selectedPlanData,
+    onClose,
+    setShowSubscriptionPopup
+}: PaymentPopupProps) {
     const stripe = useStripe();
     const elements = useElements();
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [address, setAddress] = useState({
+        line1: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "",
+        countryName: "",
+        autoSubscribe: true,
+    });
+
     const validateAddress = () => {
         if (!address.line1.trim()) return "Address line is required";
         if (!address.city.trim()) return "City is required";
@@ -26,19 +43,8 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
         if (!/^[A-Za-z0-9\s-]+$/.test(address.postal_code))
             return "Invalid postal code";
         if (!address.country) return "Country is required";
-        // if you want to enforce checkbox
-        // if (!address.autoSubscribe) return "You must accept Not One-Time option";
         return null;
     };
-    const [address, setAddress] = useState({
-        line1: "",
-        city: "",
-        state: "",
-        postal_code: "",
-        country: "",
-        countryName: "",
-        autoSubscribe: false
-    });
 
     const handleSubmit = async () => {
         if (!stripe || !elements) return;
@@ -76,9 +82,9 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
                 return;
             }
 
-            // 2. Ask backend to create subscription
+            // 2. Ask backend to create subscription/order
             const res = await fetch(
-                process.env.NEXT_PUBLIC_API_BASE_URL + "/api/payment",
+                process.env.NEXT_PUBLIC_API_BASE_URL + "/api/subscribe_user",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -93,7 +99,7 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
                         },
                         userId: user.uid,
                         name: user.displayName,
-                        priceId: selectedPlanData?.billingCycle,
+                        priceId: selectedPlanData?.name,
                         paymentMethodId: paymentMethod.id,
                         autoSubscribe: address.autoSubscribe
                     }),
@@ -105,14 +111,18 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
 
             if (!res.ok) {
                 setErrorMessage("Payment failed");
-                return
+                setLoading(false);
+                return;
             } else {
-                alert("🎉 Subscription successful!");
+                toast.success(
+                    "🎉 Your request for subscription is sent! Please check your email for confirmation."
+                );
                 onClose?.();
+                setShowSubscriptionPopup?.(false);
             }
-            debugger
         } catch (err: any) {
             setErrorMessage(err.message);
+            setLoading(false);
         }
 
         setLoading(false);
@@ -134,21 +144,22 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
             </div>
 
             {/* USER INFO */}
-            <div className="mt-2">
-                <h5 className="mb-0 text-[#A3A9BB]">Hello, {user.displayName.charAt(0).toUpperCase() + user.displayName.slice(1)}! 👋</h5>
-                <h4 className="text-[#1A2956]">Your Free Trial Has Expired</h4>
-            </div>
+            {/* <div className="mt-2">
+        <h5 className="mb-0 text-[#A3A9BB]">
+          Hello,{" "}
+          {user.displayName.charAt(0).toUpperCase() + user.displayName.slice(1)}! 👋
+        </h5>
+        <h4 className="text-[#1A2956]">Your Free Trial Has Expired</h4>
+      </div> */}
 
             {/* PRICE */}
-            <div className="flex items-end mt-3">
-                <h2 className="text-[#41CCAD] text-3xl font-bold">
-                    ${selectedPlanData?.price || 14}
-                </h2>
-                <h4 className="text-[#41CCAD]">.00</h4>
-                <h6 className="text-[#41CCAD] ml-1">
-                    USD <span className="text-[#A3A9BB]">/month/entity</span>
-                </h6>
-            </div>
+            {/* <div className="flex items-end mt-3">
+        <h2 className="text-[#41CCAD] text-3xl font-bold">
+          ${selectedPlanData?.price || 0}
+        </h2>
+        <h4 className="text-[#41CCAD]">.00</h4>
+        <h6 className="text-[#41CCAD] ml-1">USD</h6>
+      </div> */}
 
             <div className="w-full h-[1px] bg-[#E9EAEF] my-3"></div>
 
@@ -157,15 +168,14 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
                 Subscription Charges:{" "}
                 <span className="text-[#41CCAD] font-semibold">
                     ${selectedPlanData?.price}.00 USD
-                </span>{" "}
-                <span className="text-black">/month</span>
-            </p>
-            <p className="text-[#A3A9BB]">
-                Billed Today:{" "}
-                <span className="text-[#41CCAD] font-semibold">
-                    ${selectedPlanData?.price}.00 USD
                 </span>
             </p>
+            {/* <p className="text-[#A3A9BB]">
+        Billed Today:{" "}
+        <span className="text-[#41CCAD] font-semibold">
+          ${selectedPlanData?.price}.00 USD
+        </span>
+      </p> */}
 
             {/* ADDRESS */}
             <div className="mt-3 space-y-3">
@@ -173,37 +183,53 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
                     type="text"
                     placeholder="Full Address"
                     value={address.line1}
-                    onChange={(e) => { setAddress({ ...address, line1: e.target.value }); setErrorMessage(""); }}
+                    onChange={(e) => {
+                        setAddress({ ...address, line1: e.target.value });
+                        setErrorMessage("");
+                    }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <input
                     type="text"
                     placeholder="City"
                     value={address.city}
-                    onChange={(e) => { setAddress({ ...address, city: e.target.value }); setErrorMessage(""); }}
+                    onChange={(e) => {
+                        setAddress({ ...address, city: e.target.value });
+                        setErrorMessage("");
+                    }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <input
                     type="text"
                     placeholder="State"
                     value={address.state}
-                    onChange={(e) => { setAddress({ ...address, state: e.target.value }); setErrorMessage(""); }}
+                    onChange={(e) => {
+                        setAddress({ ...address, state: e.target.value });
+                        setErrorMessage("");
+                    }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <input
                     type="text"
                     placeholder="Postal Code"
                     value={address.postal_code}
-                    onChange={(e) => { setAddress({ ...address, postal_code: e.target.value }); setErrorMessage(""); }}
+                    onChange={(e) => {
+                        setAddress({ ...address, postal_code: e.target.value });
+                        setErrorMessage("");
+                    }}
                     className="w-full h-10 rounded-md border px-3 border-[#E9EAEF] font-medium text-sm"
                 />
                 <AutoCompleteInput
                     options={countries}
-                    value={address.countryName}  // input shows full country name
+                    value={address.countryName}
                     onChange={(val) => {
-                        const selected = countries.find(c => c.name === val);
+                        const selected = countries.find((c) => c.name === val);
                         if (selected) {
-                            setAddress({ ...address, country: selected.code, countryName: selected.name });
+                            setAddress({
+                                ...address,
+                                country: selected.code,
+                                countryName: selected.name,
+                            });
                         } else {
                             setAddress({ ...address, country: "", countryName: val });
                         }
@@ -216,15 +242,17 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
                     <input
                         type="checkbox"
                         checked={address.autoSubscribe}
-                        onChange={(e) =>
+                        onChange={() =>
                             setAddress({ ...address, autoSubscribe: !address.autoSubscribe })
                         }
                         className="h-3 w-3 rounded border-gray-300 text-[#41CCAD] focus:ring-[#41CCAD]"
                     />
-                    <span className="text-sm text-gray-700">Auto-Subscribe Next Time</span>
+                    <span className="text-sm text-gray-700">
+                        Auto-Subscribe Next Time
+                    </span>
                 </label>
-
             </div>
+
             {errorMessage && (
                 <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
             )}
@@ -234,7 +262,7 @@ export default function PaymentPopup({ user, selectedPlanData, onClose }: Paymen
                 <button
                     onClick={handleSubmit}
                     disabled={!stripe || loading}
-                    className="bg-[#41CCAD] text-white w-full h-11 rounded-md hover:bg-[#36b699] transition disabled:opacity-50"
+                    className={`bg-[#41CCAD] text-white w-full h-11 rounded-md hover:bg-[#36b699] transition disabled:opacity-50 ${loading ? "cursor-not-allowed" : "cursor-pointer"} ${selectedPlanData?.color}`}
                 >
                     {loading ? "Processing..." : "Upgrade Subscription"}
                 </button>

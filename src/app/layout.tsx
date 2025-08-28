@@ -5,6 +5,7 @@ import { SenerioProvider } from "../Contexts/SenerioContext";
 import { AuthContextProvider } from "../Contexts/AuthContext";
 import NavWrapper from "../Layouts/header/NavWrapper";
 import StripeProvider from "../Contexts/PaymentContext";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,9 @@ export default function RootLayout({
             <SenerioProvider>{children}</SenerioProvider>
           </StripeProvider>
         </AuthContextProvider>
+
+        {/* 🔔 Toast provider for global popups */}
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

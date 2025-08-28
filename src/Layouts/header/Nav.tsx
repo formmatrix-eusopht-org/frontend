@@ -12,27 +12,36 @@ export default function Nav() {
   const [userRole, setUserRole] = useState(0)
   const [trialExpires, setTrialExpires] = useState<string | null>(null)
   const [showSubscriptionPopup, setShowSubscriptionPopup] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<null | { name: string; price: number; billingCycle: "monthly" | "yearly" }>(null);
+  const [selectedPlan, setSelectedPlan] = useState<null | { name: string; price: number, color: string }>(null);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const { logout, user } = UserAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const Plans = [{
-    name: "Free Plan",
-    description: "Free forever for small teams",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    features: ["Purchases Dashboard", "Admin Access", "Bill Notifications"],
-    isFree: true,
-  },
-  {
-    name: "Business Plan",
-    description: "For growing businesses",
-    monthlyPrice: 14,
-    yearlyPrice: 120,
-    features: ["Dashboards & Graphs", "Unlimited Users", "Export Data"],
-  },]
+  const Plans = [
+    {
+      name: "Daily Plan",
+      description: "Pay per day, flexible usage",
+      price: 5,
+      features: [],
+      color: "bg-blue-500"
+    },
+    {
+      name: "Monthly Plan",
+      description: "Great for regular users",
+      price: 50,
+      features: [],
+      color: "bg-green-500"
+    },
+    {
+      name: "Yearly Plan",
+      description: "Best value for long-term users",
+      price: 500,
+      features: [],
+      color: "bg-red-500"
+    },
+  ];
+
   const NavItem = [
     { name: "Home", route: "/home" },
     { name: "Transactions", route: "/transactions" },
@@ -186,8 +195,8 @@ export default function Nav() {
                     </li>
                   } */}
                   <li>
-                    <button className="w-full text-left block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      Settings
+                    <button onClick={() => router.push('/subscriptions')} className="w-full text-left block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      Subscriptions
                     </button>
                   </li>
                   <li>
@@ -254,7 +263,8 @@ export default function Nav() {
             <PaymentPopup
               user={user}
               selectedPlanData={selectedPlan}
-              onClose={() => setSelectedPlan(null)}
+              onClose={() => { setSelectedPlan(null) }}
+              setShowSubscriptionPopup={setShowSubscriptionPopup}
             />
           )}
         </div>

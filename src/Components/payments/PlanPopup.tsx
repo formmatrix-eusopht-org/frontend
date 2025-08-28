@@ -1,20 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 export interface Plan {
     name: string;
     description: string;
-    monthlyPrice: number;
-    yearlyPrice: number;
+    price: number;
     features: string[];
-    isFree?: boolean;
+    color: string;
 }
 
 interface PlanPopupProps {
     username: string;
     onClose: () => void;
-    onSelectPlan: (plan: { name: string; price: number; billingCycle: "monthly" | "yearly" }) => void;
+    onSelectPlan: (plan: { name: string; price: number, color: string }) => void;
     plans: Plan[];
     CheckIcon?: React.ReactNode;
     CloseIcon?: React.ReactNode;
@@ -30,7 +29,6 @@ const PlanPopup: React.FC<PlanPopupProps> = ({
     CloseIcon = <span>✖</span>,
     className = "",
 }) => {
-    const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("yearly");
     const borderColor = "1px solid #E9EAEF";
 
     return (
@@ -49,82 +47,54 @@ const PlanPopup: React.FC<PlanPopupProps> = ({
                 <p className="mt-1 text-[#A3A9BB]">Choose a plan to get started</p>
             </div>
 
-            {/* BILLING TOGGLE */}
-            <div
-                style={{ border: borderColor }}
-                className="w-full mt-2 rounded-md h-[3.3rem] p-2 flex justify-between items-center"
-            >
-                <button
-                    onClick={() => setBillingCycle("yearly")}
-                    className={`flex-1 ${billingCycle === "yearly" ? "bg-[#1A2956] text-white" : ""} h-[2.6rem] rounded-md`}
-                >
-                    Billed Annually
-                </button>
-                <button
-                    onClick={() => setBillingCycle("monthly")}
-                    className={`flex-1 ${billingCycle === "monthly" ? "bg-[#1A2956] text-white" : ""} h-[2.6rem] rounded-md`}
-                >
-                    Billed Monthly
-                </button>
-            </div>
-
             {/* PLAN CARDS */}
             <div className="flex items-start gap-x-3 mt-5 overflow-x-auto w-full">
-                {plans.map((plan) => {
-                    const price =
-                        billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+                {plans.map((plan) => (
+                    <div
+                        key={plan.name}
+                        style={{ border: borderColor }}
+                        className="flex-1 min-w-[18rem] sm:min-w-[20rem] md:min-w-[17rem] p-3 rounded-md pb-9"
+                    >
+                        {/* Headings */}
+                        <div>
+                            <h5 className="text-[#1A2956]">{plan.name}</h5>
+                            <p className="mt-1 text-[#A3A9BB]">{plan.description}</p>
+                        </div>
 
-                    return (
-                        <div
-                            key={plan.name}
-                            style={{ border: borderColor }}
-                            className="flex-1 min-w-[18rem] sm:min-w-[20rem] md:min-w-[17rem] p-3 rounded-md pb-9"
-                        >
-                            {/* Headings */}
-                            <div>
-                                <h5 className="text-[#1A2956]">{plan.name}</h5>
-                                <p className="mt-1 text-[#A3A9BB]">{plan.description}</p>
-                            </div>
+                        {/* Price */}
+                        <div className="flex items-end mt-6">
+                            <h2 className="text-[#41CCAD] text-3xl font-bold">${plan.price}</h2>
+                            <h4 className="text-[#41CCAD]">.00</h4>
+                        </div>
 
-                            {/* Price */}
-                            <div className="flex items-end mt-6">
-                                <h2 className="text-[#41CCAD] text-3xl font-bold">${price}</h2>
-                                <h4 className="text-[#41CCAD]">.00</h4>
-                                <h6 className="text-[#41CCAD] ml-1">
-                                    USD {plan.isFree ? "" : billingCycle === "monthly" ? "/mo" : "/yr"}
-                                </h6>
-                            </div>
+                        {/* Button */}
+                        <div>
+                            <button
+                                onClick={() => onSelectPlan({
+                                    name: plan.name, price: plan.price,
+                                    color: ""
+                                })}
+                                className={`w-full h-[2.6rem] rounded-md text-white bg-[#41CCAD] mt-3 ${plan.color}`}
+                            >
+                                Get Started
+                            </button>
+                        </div>
 
-                            {/* Button */}
-                            <div className="">
-                                {plan.isFree ? (
-                                    <div className="w-full h-[2.6rem] flex justify-center items-center rounded-md border-2 border-[#41CCAD] bg-white text-[#41CCAD] mt-3">
-                                        Currently Active
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() =>
-                                            onSelectPlan({ name: plan.name, price, billingCycle })
-                                        }
-                                        className="w-full h-[2.6rem] rounded-md text-white bg-[#41CCAD] mt-3"
-                                    >
-                                        Get Started
-                                    </button>
-                                )}
-                            </div>
-
-                            {/* Features */}
-                            <div className="mt-3">
-                                {plan.features.map((feature, idx) => (
+                        {/* Features */}
+                        <div className="mt-3">
+                            {plan.features.length > 0 ? (
+                                plan.features.map((feature, idx) => (
                                     <div key={idx} className="flex gap-x-3 items-center mb-2">
                                         {CheckIcon}
                                         <p>{feature}</p>
                                     </div>
-                                ))}
-                            </div>
+                                ))
+                            ) : (
+                                <p className="text-[#A3A9BB]">No extra features</p>
+                            )}
                         </div>
-                    );
-                })}
+                    </div>
+                ))}
             </div>
         </div>
     );

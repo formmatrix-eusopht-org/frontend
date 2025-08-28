@@ -62,16 +62,26 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     checkSession();
   }, []);
   useEffect(() => {
-    const role = localStorage.getItem("userRole") || '';
+    const role = localStorage.getItem("userRole") || "";
 
-    if (role === "0" && pathname !== "/dashboard") {
-      router.replace("/dashboard"); // force dashboard
-    } else if (role === "1" && pathname == "/dashboard") {
-      router.replace("/home");
-    } else if (role === "" && pathname !== "/") {
-      router.replace("/");
+    if (role === "0") {
+      // role 0 can only see dashboard and adduser
+      if (pathname !== "/dashboard" && pathname !== "/add_user") {
+        router.replace("/dashboard");
+      }
+    } else if (role === "1") {
+      // role 1 can see everything except dashboard and adduser
+      if (pathname === "/dashboard" || pathname === "/add_user") {
+        router.replace("/home");
+      }
+    } else if (role === "") {
+      // if not logged in, only allow landing page
+      if (pathname !== "/") {
+        router.replace("/");
+      }
     }
   }, [pathname, router]);
+
   // ✅ Email/Password Login
   const emailSignIn = async (email: string, password: string) => {
     if (isLoggingIn) return;
@@ -120,9 +130,9 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
         { sessionId },
         { withCredentials: true }
       );
-
       await auth.signOut();
       setUser(null);
+      localStorage.clear()
       router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
