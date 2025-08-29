@@ -97,8 +97,8 @@ export default function PaymentPopup({
                             postal_code: address.postal_code,
                             country: address.country,
                         },
-                        userId: user.uid,
-                        name: user.displayName,
+                        userId: user.firebase_uid,
+                        name: user.name,
                         priceId: selectedPlanData?.name,
                         paymentMethodId: paymentMethod.id,
                         autoSubscribe: address.autoSubscribe

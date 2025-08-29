@@ -2,10 +2,12 @@
 import SubscriptionTable from '@/ui/SubscribtionTable';
 import '../globals.css';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 
 export default function Subscriptions() {
     const [subscriptions, setSubscriptions] = useState([]);
+    const [loading, setLoading] = useState(false);
     const fetchSubscriptions = async (uid: string | null) => {
         if (!uid) return console.log("uid Not Found");
 
@@ -38,18 +40,38 @@ export default function Subscriptions() {
             console.error("Error fetching subscriptions:", error);
         }
     };
-    const handleCancelSubscription = (subscriptionId: string) => {
-        // Call API to cancel subscription
+
+    const handleCancelSubscription = () => {
+        setLoading(true);
+        const firebaseUid = localStorage.getItem("uid");
+        if (!firebaseUid) {
+            toast.error("User ID not found");
+            setLoading(false);
+            return;
+        }
+
         fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cancel_subscription`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ subscriptionId }),
+            body: JSON.stringify({ firebaseUid }),
         })
             .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    toast.success("Subscription canceled successfully");
+                } else {
+                    toast.error(data.message || "Failed to cancel subscription");
+                }
+            })
             .catch((error) => {
                 console.error("Error canceling subscription:", error);
+                toast.error("Error canceling subscription");
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
+
     useEffect(() => {
         const uid = localStorage.getItem("uid");
         fetchSubscriptions(uid);
@@ -58,7 +80,7 @@ export default function Subscriptions() {
     return (
         <>
             <div className="flex bg-gray-100">
-                <SubscriptionTable subscriptions={subscriptions} onCancel={handleCancelSubscription} />
+                <SubscriptionTable subscriptions={subscriptions} loading={loading} onCancel={handleCancelSubscription} />
             </div>
         </>
     )
