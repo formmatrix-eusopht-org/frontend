@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react'; // 👈 install lucide-react for icons
+import { useRouter } from 'next/navigation';
 
 interface FormData {
     name: string;
@@ -19,7 +20,7 @@ export default function UserRegistrationForm() {
         password: '',
         confirmPassword: ''
     });
-
+const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
@@ -73,6 +74,7 @@ export default function UserRegistrationForm() {
             setMessage('❌ Error: Could not register user');
         } finally {
             setLoading(false);
+            router.push('/dashboard');
         }
     };
 

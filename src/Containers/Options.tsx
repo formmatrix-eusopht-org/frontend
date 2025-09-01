@@ -12,7 +12,7 @@ interface OptionsProps {
 }
 
 const Options: React.FC<OptionsProps> = ({ selected, onChange, block }) => {
-    const options = block.fields;
+    const options = block?.fields || [];
 
     const handleCheckboxChange = (option: string) => {
         const updated = selected.includes(option)

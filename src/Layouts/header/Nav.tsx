@@ -13,6 +13,7 @@ type UserType = {
   role?: number // 1 = user, 2 = admin
   planExpiration?: string | null
   plan?: string
+  subscriptionID?: string | null
 }
 
 type PlanType = { name: string; price: number; color: string }
@@ -22,12 +23,18 @@ export default function Nav() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [trialExpires, setTrialExpires] = useState<string | null>(null)
   const [showSubscriptionPopup, setShowSubscriptionPopup] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null)
 
   const dropdownRef = useRef<HTMLDivElement | null>(null)
-  const { logout, user }: { logout: () => void; user: UserType | null } = UserAuth()
+  const { logout, user, checkSession }: { logout: () => void; user: UserType | null; checkSession: () => void } = UserAuth()
   const router = useRouter()
   const pathname = usePathname()
+
+  useEffect(() => {
+    checkSession();
+    // setIsSubscribed(!!user?.subscriptionID);
+  }, []);
 
   const Plans = [
     {
@@ -169,7 +176,7 @@ export default function Nav() {
                   <p className="text-sm text-gray-500 dark:text-gray-300 truncate">{user?.email}</p>
                 </div>
                 <ul className="py-2">
-                  {user?.role === 1 && (
+                  {user?.role === 1 && user.subscriptionID !== null && (
                     <li>
                       <button
                         onClick={() => router.push('/subscriptions')}
@@ -194,7 +201,7 @@ export default function Nav() {
         </div>
 
         {/* ✅ Trial Info Banner - Only for USER */}
-        {trialExpires && user?.role === 1 && user?.plan === "trial" && (
+        {trialExpires && user?.role === 1 && user?.plan === "trial" && !isSubscribed && (
           <div
             className="bg-cyan-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 text-center py-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
             onClick={() => setShowSubscriptionPopup(true)}

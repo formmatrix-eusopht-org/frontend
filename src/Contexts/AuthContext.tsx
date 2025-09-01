@@ -17,6 +17,7 @@ interface AuthContextType {
   isSubscribed: boolean;
   loading: boolean;
   isLoggingIn: boolean;
+  checkSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -202,7 +203,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
   return (
     <AuthContext.Provider
-      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn }}
+      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn, checkSession }}
     >
       {children}
     </AuthContext.Provider>

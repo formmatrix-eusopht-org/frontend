@@ -3,41 +3,41 @@ import SubscriptionTable from '@/ui/SubscribtionTable';
 import '../globals.css';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { UserAuth } from '@/Contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
-
+interface AuthUser {
+    subscriptionID?: string;
+    [key: string]: any;
+}
 export default function Subscriptions() {
     const [subscriptions, setSubscriptions] = useState([]);
     const [loading, setLoading] = useState(false);
-    const fetchSubscriptions = async (uid: string | null) => {
-        if (!uid) return console.log("uid Not Found");
+    const router = useRouter()
+    const { user }: { user: AuthUser | null; } = UserAuth()
+
+    const fetchSubscriptions = async () => {
+        if (!user?.subscriptionID) {
+            console.log("Subscription ID Not Found", user?.subscriptionID);
+            return;
+        }
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get_user_subscriptions`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ uid }),
-            });
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get_user_subscriptions`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ subscriptionID: user?.subscriptionID }),
+                }
+            );
 
             const data = await res.json();
 
-            // map backend fields → UI fields
-            const formatted = data.map((sub: any) => ({
-                _id: sub._id,
-                planName: sub.planType || "N/A",
-                price: sub.price || 0, // if you don’t store price, you can resolve via Stripe API
-                billingCycle: sub.planType?.toLowerCase().includes("daily")
-                    ? "daily"
-                    : sub.planType?.toLowerCase().includes("monthly")
-                        ? "monthly"
-                        : "custom",
-                startDate: sub.currentPeriodStart,
-                endDate: sub.currentPeriodEnd,
-                status: sub.status,
-            }));
-
-            setSubscriptions(formatted);
+            setSubscriptions(data);
         } catch (error) {
             console.error("Error fetching subscriptions:", error);
+            toast.error("Failed to load subscriptions");
         }
     };
 
@@ -69,12 +69,13 @@ export default function Subscriptions() {
             })
             .finally(() => {
                 setLoading(false);
+                router.push("/home");
             });
     };
 
     useEffect(() => {
         const uid = localStorage.getItem("uid");
-        fetchSubscriptions(uid);
+        fetchSubscriptions();
     }, []);
 
     return (

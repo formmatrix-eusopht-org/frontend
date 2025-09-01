@@ -115,10 +115,11 @@ export default function PaymentPopup({
                 return;
             } else {
                 toast.success(
-                    "🎉 Your request for subscription is sent! Please check your email for confirmation."
+                    "Your request for subscription is sent! Please check your email for confirmation."
                 );
                 onClose?.();
                 setShowSubscriptionPopup?.(false);
+                window.location.reload();
             }
         } catch (err: any) {
             setErrorMessage(err.message);
