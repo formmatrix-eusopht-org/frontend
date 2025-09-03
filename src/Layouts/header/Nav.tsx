@@ -144,7 +144,7 @@ export default function Nav() {
                 return (
                   <li key={index} onClick={() => router.push(item.route)}>
                     <a
-                      className={`relative font-medium transition-colors duration-200
+                      className={`relative font-medium transition-colors duration-200 cursor-pointer
                         ${isActive
                           ? "text-blue-600 dark:text-white after:w-full"
                           : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white after:w-0"}

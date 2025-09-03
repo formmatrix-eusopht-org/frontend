@@ -32,8 +32,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthContextProvider>
           <StripeProvider>
-            <NavWrapper />
-            <SenerioProvider>{children}</SenerioProvider>
+            <SenerioProvider>
+              <NavWrapper />
+              {children}
+            </SenerioProvider>
           </StripeProvider>
         </AuthContextProvider>
 

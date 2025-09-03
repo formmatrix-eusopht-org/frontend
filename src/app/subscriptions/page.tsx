@@ -69,7 +69,7 @@ export default function Subscriptions() {
             })
             .finally(() => {
                 setLoading(false);
-                router.push("/home");
+                window.location.reload();
             });
     };
 

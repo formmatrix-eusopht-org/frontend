@@ -24,13 +24,14 @@ const Options: React.FC<OptionsProps> = ({ selected, onChange, block }) => {
 
     return (
         <div className="grid">
-            <Section title="Options">
+            <Section title="Collections">
                 {options.map((option: any) => (
                     <Checkbox
                         key={option.label}
                         label={option.label}
                         checked={selected.includes(option.label)}
                         onChange={() => handleCheckboxChange(option.label)}
+                        className='mt-4'
                     />
                 ))}
             </Section>

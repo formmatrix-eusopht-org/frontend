@@ -3,7 +3,7 @@ import { useSenerioContext } from '@/Contexts/SenerioContext'
 import CombineForm from '@/Forms/CombineForm';
 
 const FormContainer = () => {
-  const { formData } = useSenerioContext();
+  const { formData }: { formData: any } = useSenerioContext();
 
   return (
 

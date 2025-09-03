@@ -24,6 +24,7 @@ import { LicensePlateMissingBlock } from '../Containers/LicensePlate';
 import PlannedNonOperation from '../Containers/PlannedNon-OperationCertificate';
 import { VehicleStorageLocationDetails } from '../Containers/VehicleStorageLocation';
 import { handleOnSave } from "../Actions/save"
+import { handleOnUpdate } from "../Actions/edit"
 import Options from '../Containers/Options';
 import { UserAuth } from '../Contexts/AuthContext';
 import VehicleBodyChange from '../Containers/StatementForVehicleBodyChange';
@@ -84,6 +85,7 @@ type SalvageCertificateState = {
 };
 const CombineForm = ({ formData }: CombineFormProps) => {
     const [open, setOpen] = useState(false);
+    const [isEditAndId, setIsEditAndId] = useState("");
     const isInitialMount = useRef(true);
     const schemaForMultipletransfer = {
         "transferNumber": 1,
@@ -116,7 +118,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const LOCAL_STORAGE_KEY = "formStates";
+    const LOCAL_STORAGE_KEY_form = "formStates";
+    const LOCAL_STORAGE_KEY_senerio = "senerio";
     // State management for various form sections
     // Transaction details
     const [transactionSelections, setTransactionSelections] = useState<string[]>([]);
@@ -805,7 +808,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const documentsReceivedBlock = findBlock("Documents Received");
 
     useEffect(() => {
-        const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_form);
+        const isEditCheck = localStorage.getItem("isEditAndId") || "";
         if (savedState) {
             const parsed = JSON.parse(savedState);
             setTransactionSelections(parsed.transactionSelections || []);
@@ -910,6 +914,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             })
             setPersonalizePlatesState(parsed.personalizePlatesState || '')
             setOptionsForValidation(parsed.optionsForValidation || [])
+            setIsEditAndId(isEditCheck)
         }
     }, []);
 
@@ -970,7 +975,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             optionsForValidation
         };
 
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(combinedState));
+        localStorage.setItem(LOCAL_STORAGE_KEY_form, JSON.stringify(combinedState));
     }, [
         transactionSelections,
         typeOfVehicleSelection,
@@ -1048,6 +1053,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     return (
         <>
+            <div>{isEditAndId ? "Editing Transaction" : "Creating Transaction"}</div>
             {senerio?.includes("Multiple Transfer") ?
                 <MultipleTransfer
                     title="Multiple Transfer"
@@ -1429,9 +1435,9 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         loading={isLoading}
                         onSave={async () => {
                             setIsLoading(true);
-                            await handleOnSave(user);
+                            isEditAndId ? await handleOnUpdate(user) : await handleOnSave(user);
                             setIsLoading(false);
-                            window.location.reload();
+                            // window.location.reload();
 
                         }}
                         onPrint={async () => {
@@ -1446,10 +1452,21 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         }}
                         onInvoice={() => console.log('Generate Invoice clicked')}
                         onClear={() => {
-                            localStorage.removeItem(LOCAL_STORAGE_KEY);
-                            // localStorage.removeItem("senerio");
-                            window.location.reload();
+                            if (isEditAndId) {
+                                localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+                                localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
+                                // localStorage.removeItem("senerio");
+                                window.location.reload();
+                            } else {
+                                localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+                                localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
+                                localStorage.setItem("isEdit", "false");
+                                window.location.reload();
+
+                            }
+
                         }}
+                        isEdit={isEditAndId}
                     />
                     <Dialog
                         open={open}

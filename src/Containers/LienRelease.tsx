@@ -64,7 +64,7 @@ export const LeinRealease = ({
                             addressFields[0].type === "dropdown" ? states : []
                         }
                         value={
-                            lienReleaseState.companyAddress[addressFields[0].label] || ""
+                            lienReleaseState?.companyAddress?.[addressFields?.[0].label] || ""
                         }
                         onChange={(val) =>
                             onLienReleaseChange(
@@ -94,10 +94,10 @@ export const LeinRealease = ({
                             }
                             options={field.type === "dropdown" ? states : []}
                             value={
-                                lienReleaseState.companyAddress[field.label] || ""
+                                lienReleaseState?.companyAddress?.[field?.label] || ""
                             }
                             onChange={(val) =>
-                                onLienReleaseChange("companyAddress", field.label, val)
+                                onLienReleaseChange("companyAddress", field?.label, val)
                             }
                         />
                     ))}
@@ -116,19 +116,19 @@ export const LeinRealease = ({
                                 : "text"
                         }
                         options={
-                            addressFields[addressFields.length - 1].type === "dropdown"
+                            addressFields?.[addressFields?.length - 1].type === "dropdown"
                                 ? states
                                 : []
                         }
                         value={
-                            lienReleaseState.companyAddress[
-                            addressFields[addressFields.length - 1].label
+                            lienReleaseState?.companyAddress?.[
+                            addressFields?.[addressFields?.length - 1]?.label
                             ] || ""
                         }
                         onChange={(val) =>
                             onLienReleaseChange(
                                 "companyAddress",
-                                addressFields[addressFields.length - 1].label,
+                                addressFields?.[addressFields?.length - 1]?.label,
                                 val
                             )
                         }
@@ -155,7 +155,7 @@ export const LeinRealease = ({
                                     }
                                     options={field.type === "dropdown" ? states : []}
                                     value={
-                                        lienReleaseState.mailing[field.label] || ""
+                                        lienReleaseState?.mailing?.[field.label] || ""
                                     }
                                     onChange={(val) =>
                                         onLienReleaseChange("mailing", field.label, val)

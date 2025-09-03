@@ -35,11 +35,11 @@ const StatementForSmogExemption = ({
     // Auto-uncheck subOptions if parent is unchecked
     useEffect(() => {
         checkboxFields.forEach((field) => {
-            const isChecked = Boolean(values[field.label]);
+            const isChecked = Boolean(values?.[field?.label]);
 
             if (!isChecked && field.subOptions?.length) {
                 field.subOptions.forEach((sub) => {
-                    if (values[sub.label]) {
+                    if (values?.[sub?.label]) {
                         onFieldChange(sub.label, false);
                     }
                 });
@@ -54,7 +54,7 @@ const StatementForSmogExemption = ({
                 <p>The vehicle does not require a smog certification for transfer of ownership because:</p>
                 <div className="grid gap-4">
                     {checkboxFields.map((field, index) => {
-                        const isChecked = Boolean(values[field.label]);
+                        const isChecked = Boolean(values?.[field?.label]);
 
                         return (
                             <div key={index}>
@@ -71,7 +71,7 @@ const StatementForSmogExemption = ({
                                 {/* Sub-options */}
                                 <div key={`${index}-subOptions`} className="flex items-center gap-4 flex-wrap ml-4">
                                     {field.subOptions?.map((subOption, subIdx) => {
-                                        const subValue = Boolean(values[subOption.label]);
+                                        const subValue = Boolean(values?.[subOption?.label]);
 
                                         return (
                                             <div key={`${index}-${subIdx}`} className="flex items-center gap-2">

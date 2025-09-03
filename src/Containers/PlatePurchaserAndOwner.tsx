@@ -69,7 +69,7 @@ const PlatePurchaserAndOwner = ({ block, values, onChange }: Props) => {
                                 label={field.label}
                                 type={field.type}
                                 options={field.type === "dropdown" ? states : []}
-                                value={values.platePurchase[field.label] || ""}
+                                value={values?.platePurchase?.[field?.label] || ""}
                                 placeholder={field.placeholder || ""}
                                 onChange={(val) =>
                                     handlePurchaserChange(field.label, val)
