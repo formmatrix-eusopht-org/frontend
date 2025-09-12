@@ -70,10 +70,9 @@ const PlanPopup: React.FC<PlanPopupProps> = ({
                         {/* Button */}
                         <div>
                             <button
-                                onClick={() => onSelectPlan({
-                                    name: plan.name, price: plan.price,
-                                    color: ""
-                                })}
+                                onClick={() => onSelectPlan(
+                                    plan
+                                )}
                                 className={`w-full h-[2.6rem] rounded-md text-white bg-[#41CCAD] mt-3 ${plan.color}`}
                             >
                                 Get Started

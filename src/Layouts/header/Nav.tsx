@@ -215,27 +215,42 @@ export default function Nav() {
         )}
 
         {/* Mobile Nav Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-gray-50 dark:bg-gray-800 p-4 animate-slideDown">
-            <ul className="space-y-3">
+        {isMenuOpen && user?.role === 1 && (
+          <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg animate-slideDown">
+            <div className="flex justify-end p-3">
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="text-gray-500 dark:text-gray-300 hover:text-red-500 transition"
+              >
+                ✕
+              </button>
+            </div>
+            <ul className="space-y-2 px-4 pb-4">
               {NavItem.map((item, index) => {
                 const isActive = pathname === item.route
                 return (
-                  <li key={index} onClick={() => router.push(item.route)}>
-                    <a
-                      className={`block font-medium transition-colors
-                        ${isActive
-                          ? "text-blue-600 dark:text-white"
-                          : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white"}`}
+                  <li key={index}>
+                    <button
+                      onClick={() => {
+                        router.push(item.route)
+                        setIsMenuOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition
+                ${isActive
+                          ? "bg-blue-100 dark:bg-blue-600 text-blue-700 dark:text-white shadow-sm"
+                          : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"}`}
                     >
+                      {/* You can replace with lucide icons */}
+                      <span className="w-5 h-5 text-blue-500">•</span>
                       {item.name}
-                    </a>
+                    </button>
                   </li>
                 )
               })}
             </ul>
           </div>
         )}
+
       </nav>
 
       {/* ✅ Payment Popup */}

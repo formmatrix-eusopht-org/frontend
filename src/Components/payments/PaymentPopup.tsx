@@ -47,7 +47,10 @@ export default function PaymentPopup({
     };
 
     const handleSubmit = async () => {
-        if (!stripe || !elements) return;
+        if (!stripe || !elements) {
+            console.warn("Stripe.js has not loaded yet");
+            return;
+        }
 
         const validationError = validateAddress();
         if (validationError) {
@@ -61,9 +64,16 @@ export default function PaymentPopup({
         try {
             // 1. Create a PaymentMethod
             const cardElement = elements.getElement(CardElement);
+            if (!cardElement) {
+                console.error("CardElement not found");
+                setErrorMessage("Card input not found");
+                setLoading(false);
+                return;
+            }
+
             const { error, paymentMethod } = await stripe.createPaymentMethod({
                 type: "card",
-                card: cardElement!,
+                card: cardElement,
                 billing_details: {
                     email: user.email,
                     address: {
@@ -77,57 +87,64 @@ export default function PaymentPopup({
             });
 
             if (error) {
+                console.error("Stripe createPaymentMethod error:", error);
                 setErrorMessage(error.message || "Payment method failed");
                 setLoading(false);
                 return;
             }
 
             // 2. Ask backend to create subscription/order
+            const bodyPayload = {
+                email: user.email,
+                address: {
+                    line1: address.line1,
+                    city: address.city,
+                    state: address.state,
+                    postal_code: address.postal_code,
+                    country: address.country,
+                },
+                userId: user.firebase_uid,
+                name: user.name,
+                priceId: selectedPlanData?.name,
+                paymentMethodId: paymentMethod.id,
+                autoSubscribe: address.autoSubscribe,
+            };
+
             const res = await fetch(
                 process.env.NEXT_PUBLIC_API_BASE_URL + "/api/subscribe_user",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        email: user.email,
-                        address: {
-                            line1: address.line1,
-                            city: address.city,
-                            state: address.state,
-                            postal_code: address.postal_code,
-                            country: address.country,
-                        },
-                        userId: user.firebase_uid,
-                        name: user.name,
-                        priceId: selectedPlanData?.name,
-                        paymentMethodId: paymentMethod.id,
-                        autoSubscribe: address.autoSubscribe
-                    }),
+                    body: JSON.stringify(bodyPayload),
                 }
             );
 
             const data = await res.json();
-            if (data.error) throw new Error(data.error);
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
 
             if (!res.ok) {
                 setErrorMessage("Payment failed");
                 setLoading(false);
                 return;
-            } else {
-                toast.success(
-                    "Your request for subscription is sent! Please check your email for confirmation."
-                );
-                onClose?.();
-                setShowSubscriptionPopup?.(false);
-                window.location.reload();
             }
+
+            toast.success(
+                "Your request for subscription is sent! Please check your email for confirmation."
+            );
+            onClose?.();
+            setShowSubscriptionPopup?.(false);
+            window.location.reload();
         } catch (err: any) {
+            console.error("handleSubmit error:", err);
             setErrorMessage(err.message);
-            setLoading(false);
         }
 
         setLoading(false);
     };
+
 
     return (
         <div className="bg-white rounded-lg p-5 w-[95%] sm:w-[500px] shadow-xl">
