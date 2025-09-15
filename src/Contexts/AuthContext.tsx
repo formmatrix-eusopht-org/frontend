@@ -174,7 +174,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       try {
         if (!docSnap.exists()) {
           setIsSubscribed(false);
-          router.push('/signUp');
+          router.push('/');
           return;
         }
 
@@ -187,7 +187,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
           if (currentUser) await deleteUser(currentUser);
           await logout();
         } else if (!isSubscribed) {
-          router.push('/signUp');
+          router.push('/');
         }
       } catch (err) {
         console.error('Subscription check failed:', err);

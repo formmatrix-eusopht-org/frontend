@@ -254,7 +254,7 @@ export default function Nav() {
       </nav>
 
       {/* ✅ Payment Popup */}
-      {showSubscriptionPopup && user && user.role === 1 && user.plan === "trial" && (
+      {showSubscriptionPopup && user && user.role === 1 && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           {selectedPlan === null ? (
             <PlanPopup
