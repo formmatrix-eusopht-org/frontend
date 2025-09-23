@@ -31,22 +31,38 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   // ✅ Session Check with Backend Cookie
+  // ✅ Modify checkSession
   const checkSession = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
+
+      // Wait until Firebase restores user
+      await new Promise<void>((resolve) => {
+        const unsub = onAuthStateChanged(auth, () => {
+          unsub();
+          resolve();
+        });
+      });
+
+      // Now Firebase is ready
+      if (!auth.currentUser) {
+        await logout();
+        return;
+      }
+
+      // Check backend session
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/checksession`,
         { withCredentials: true }
       );
-      const role = localStorage.getItem("userRole")
+
+      const role = await localStorage.getItem("userRole");
+
       if (data.user && auth.currentUser) {
         setUser(data.userData);
         if (window.location.pathname === '/') {
-          if (role == "1") {
-            router.push('/home')
-          } else if (role == "2") {
-            router.push('/dashboard')
-          }
+          if (role == "1") router.push('/home');
+          else if (role == "2") router.push('/dashboard');
         }
       } else {
         await logout();
@@ -58,6 +74,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     checkSession();

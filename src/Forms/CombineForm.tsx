@@ -1062,6 +1062,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     state={multipleTransfer}
                     setState={setMultipleTransfer}
                     onTransferCountChange={handleTransferCountChange}
+                    isEditAndId={isEditAndId}
                 />
                 :
                 <div className="space-y-6">
@@ -1456,11 +1457,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                                 localStorage.removeItem(LOCAL_STORAGE_KEY_form);
                                 localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
                                 // localStorage.removeItem("senerio");
+                                localStorage.setItem("isEditAndId", "");
                                 window.location.reload();
                             } else {
                                 localStorage.removeItem(LOCAL_STORAGE_KEY_form);
                                 localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
-                                localStorage.setItem("isEdit", "false");
+                                localStorage.setItem("isEditAndId", "");
                                 window.location.reload();
 
                             }

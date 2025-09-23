@@ -3,15 +3,16 @@ import toast from "react-hot-toast";
 export async function handleOnSave(user) {
     try {
         const loadingToast = toast.loading('Saving data...');
-        const savedState = localStorage.getItem("formStates");
         const senerio = localStorage.getItem("senerio");
-        const parsed = JSON.parse(savedState);
         const parsedSenerio = JSON.parse(senerio);
+        const savedState = localStorage.getItem(parsedSenerio?.includes("Multiple Transfer") ? "multipleTransferStates" : "formStates");
+        const parsed = JSON.parse(savedState);
         const data = {
             userId: user._id,
             transactionType: parsedSenerio,
             formData: parsed
         }
+        // console.log(data);
 
         // Show loading toast
 

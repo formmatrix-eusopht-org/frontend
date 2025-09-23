@@ -29,6 +29,7 @@ import { handleOnSave } from '../Actions/save';
 import { UserAuth } from '../Contexts/AuthContext';
 import CustomDropdown from '../Components/CustomDropDown';
 import { headHandlerForPDf } from '../Actions/pdfGenerates';
+import { handleOnUpdate } from '@/Actions/edit';
 
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
@@ -58,6 +59,7 @@ interface CombineFormProps {
     title?: string;
     state?: any;
     setState?: React.Dispatch<React.SetStateAction<any>>;
+    isEditAndId?: any
 }
 
 interface TransferState {
@@ -174,14 +176,15 @@ const initialTransferState: Omit<TransferState, 'transferNumber'> = {
     vehicleStorageLocation: {}
 };
 
-const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block, formData }: CombineFormProps) => {
+const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block, formData, isEditAndId }: CombineFormProps) => {
     const isInitialMount = useRef(true);
     const numberOfTransfers = 5;
     const [transferCount, setTransferCount] = useState(state?.length || 1);
     const [activeTab, setActiveTab] = useState(1);
     const { user } = UserAuth();
     const { senerio } = useSenerioContext();
-    const LOCAL_STORAGE_KEY = "multipleTransferStates";
+    const LOCAL_STORAGE_KEY_form = "multipleTransferStates";
+    const LOCAL_STORAGE_KEY_senerio = "senerio";
     const [isLoading, setIsLoading] = useState(false);
     const [multipleTransfer, setMultipleTransfer] = useState<TransferState[]>([{ ...initialTransferState, transferNumber: 1 }]);
 
@@ -217,6 +220,14 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     residential: { ...fromTransfer.newOwnerAddress },
                     mailing: { ...fromTransfer.newOwnerMailingAddress },
                     isMailingDifferent: !!Object.keys(fromTransfer.newOwnerMailingAddress || {}).length
+                },
+                vehicleInfoState: {
+                    ...(nextTransfer?.vehicleInfoState || {}),
+                    // Sync only specific fields
+                    ["Vehicle/Hull Identification Number"]: fromTransfer.vehicleInfoState?.["Vehicle/Hull Identification Number"] || "",
+                    ["Vehicle License Plate or Vessel CF Number"]: fromTransfer.vehicleInfoState?.["Vehicle License Plate or Vessel CF Number"] || "",
+                    ["Year of Vehicle"]: fromTransfer.vehicleInfoState?.["Year of Vehicle"] || "",
+                    ["Make of Vehicle OR Vessel Builder"]: fromTransfer.vehicleInfoState?.["Make of Vehicle OR Vessel Builder"] || ""
                 }
             };
 
@@ -229,22 +240,19 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             }
         });
     };
+
     useEffect(() => {
         const timeout = setTimeout(() => {
-            if (activeTab < multipleTransfer.length) {
-                syncToNextTransfer(activeTab);
-            }
-        }, 300); // Debounce typing
+            multipleTransfer.forEach((_, i) => {
+                if (i + 1 < multipleTransfer.length) {
+                    syncToNextTransfer(i + 1);
+                }
+            });
+        }, 300);
 
         return () => clearTimeout(timeout);
-    }, [
-        multipleTransfer[activeTab]?.newOwnerCount,
-        JSON.stringify(multipleTransfer[activeTab]?.newOwnerData),
-        JSON.stringify(multipleTransfer[activeTab]?.newOwnerAddress),
-        JSON.stringify(multipleTransfer[activeTab]?.newOwnerMailingAddress),
-        JSON.stringify(multipleTransfer[activeTab]?.newOwnerLesseeAddress),
-        JSON.stringify(multipleTransfer[activeTab]?.newOwnerKeptAddress),
-    ]);
+    }, [JSON.stringify(multipleTransfer)]);
+
 
 
 
@@ -363,23 +371,28 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
     };
 
     // ===> Handler for new owner fields
-    const handleNewOwnerFieldChange = (ownerIndex: number, label: string, value: string) => {
-        const current = getCurrentTransfer();
+    const handleNewOwnerFieldChange = (index: number, field: string, value: string) => {
+        setMultipleTransfer(prev =>
+            prev.map(t =>
+                t.transferNumber === activeTab
+                    ? {
+                        ...t,
+                        newOwnerData: {
+                            ...t.newOwnerData,
+                            [index]: {
+                                ...t.newOwnerData?.[index],
+                                [field]: value,
+                            },
+                        },
+                    }
+                    : t
+            )
+        );
 
-        const updatedOwner = {
-            ...(current.newOwnerData?.[ownerIndex] || {}),
-            [label]: value,
-        };
-
-        const updatedNewOwnerData = {
-            ...current.newOwnerData,
-            [ownerIndex]: updatedOwner
-        };
-
-        updateCurrentTransfer({
-            newOwnerData: updatedNewOwnerData
-        });
+        // 👇 Immediately sync to the next transfer
+        syncToNextTransfer(activeTab);
     };
+
 
 
     // ===> Handler for ownership type (AND/OR) radio buttons
@@ -768,8 +781,8 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
     // ===>  Update power of attorney data when owners change
     useEffect(() => {
         const current = getCurrentTransfer();
-        const owner = current.ownersData[0];
-        const newOwner = current.newOwnerData[0];
+        const owner = current?.ownersData?.[0];
+        const newOwner = current?.newOwnerData?.[0];
 
         const appointerParts = [
             owner?.firstName,
@@ -796,7 +809,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
 
     // ===>  Load saved state from localStorage
     useEffect(() => {
-        const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const savedState = localStorage.getItem(LOCAL_STORAGE_KEY_form);
         if (savedState) {
             try {
                 const parsed = JSON.parse(savedState);
@@ -817,7 +830,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             return;
         }
 
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({ multipleTransfer }));
+        localStorage.setItem(LOCAL_STORAGE_KEY_form, JSON.stringify({ multipleTransfer }));
     }, [multipleTransfer]);
 
     // ===>  Get current transfer data for validation
@@ -909,7 +922,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                                 .map(field => ({
                                     ...field,
                                     type: field.type as "checkbox" | "input field" | "dropdown",
-                                    value: currentTransfer.vehicleInfoState[field.label] ?? (field.type === "checkbox" ? false : ""),
+                                    value: currentTransfer?.vehicleInfoState?.[field.label] ?? (field.type === "checkbox" ? false : ""),
                                 }))
                         }}
                         onFieldChange={handleVehicleFieldChange}
@@ -1112,9 +1125,8 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     loading={isLoading}
                     onSave={async () => {
                         setIsLoading(true);
-                        await handleOnSave(user);
+                        isEditAndId ? await handleOnUpdate(user) : await handleOnSave(user);
                         setIsLoading(false);
-                        window.location.reload();
                     }}
                     //onPrint={() =>  console.log('Print clicked in MultipleTransfer')}
                     onPrint={async () => {
@@ -1124,10 +1136,21 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     }}
                     onInvoice={() => console.log('Generate Invoice clicked')}
                     onClear={() => {
-                        localStorage.removeItem(LOCAL_STORAGE_KEY);
-                        // localStorage.removeItem("senerio");
-                        window.location.reload();
+                        if (isEditAndId) {
+                            localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+                            localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
+                            // localStorage.removeItem("senerio");
+                            localStorage.setItem("isEditAndId", "");
+                            window.location.reload();
+                        } else {
+                            localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+                            localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
+                            localStorage.setItem("isEdit", "");
+                            window.location.reload();
+
+                        }
                     }}
+                    isEdit={isEditAndId}
                 />
             </div>
         </div>

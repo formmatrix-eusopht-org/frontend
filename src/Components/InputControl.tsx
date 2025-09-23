@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { DateInput } from "./DateInput";
 import CustomDropdown from "./CustomDropDown";
 import DatePickerInput from "./DatePicker"; // must return a Date | null
+import AddressUnit from "./AddressUnit";
 
 type Option = {
   value: string;
@@ -12,7 +13,7 @@ type InputProps = {
   label: string;
   placeholder?: string;
   value?: string;
-  type?: "text" | "phone" | "date" | "dropdown" | "datepicker";
+  type?: "text" | "phone" | "date" | "dropdown" | "datepicker" | "address";
   onChange?: (val: string) => void;
   className?: string;
   options?: Option[];
@@ -87,6 +88,13 @@ export default function Input({
           selectedDate={parseStringToDate(value)}
           onChange={(date) => onChange?.(formatDateToString(date))}
           placeholder={placeholder}
+        />
+      ) : type === "address" ? (
+        <AddressUnit
+          value={value}
+          onChange={(val: string) => onChange?.(val)}
+          placeholder="Unit number"
+          className={className}
         />
       ) : (
         <input

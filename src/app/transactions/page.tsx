@@ -44,7 +44,7 @@ export default function TransactionTable() {
     };
     const onEdit = (transaction: any) => {
         localStorage.setItem("senerio", JSON.stringify(transaction.transactionType));
-        localStorage.setItem("formStates", JSON.stringify(transaction.formData));
+        localStorage.setItem(transaction.transactionType?.includes("Multiple Transfer") ? "multipleTransferStates" : "formStates", JSON.stringify(transaction.formData));
         localStorage.setItem("isEditAndId", transaction._id);
 
         route.push("/home"); // navigate first

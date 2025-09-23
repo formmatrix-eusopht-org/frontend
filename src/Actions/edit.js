@@ -2,36 +2,36 @@ import toast from "react-hot-toast";
 
 export async function handleOnUpdate(user) {
     try {
-        const savedState = localStorage.getItem("formStates");
         const senerio = localStorage.getItem("senerio");
+        const parsedSenerio = JSON.parse(senerio);
+        const savedState = localStorage.getItem(parsedSenerio?.includes("Multiple Transfer") ? "multipleTransferStates" : "formStates");
         const isEditAndId = localStorage.getItem("isEditAndId");
         const parsed = JSON.parse(savedState);
-        const parsedSenerio = JSON.parse(senerio);
         const data = {
             transactionId: isEditAndId,
             userId: user._id,
-            transactionType: parsedSenerio, 
+            transactionType: parsedSenerio,
             formData: parsed
         }
 
         // Show loading toast
         const loadingToast = toast.loading('Updating data...');
-        
+
         // Make the API call
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/update`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
-        
+
         if (!response.ok) {
             throw new Error('Update failed');
         }
-        
+
         // Clear local storage
-        localStorage.removeItem("formStates");
+        localStorage.removeItem(parsedSenerio?.includes("Multiple Transfer") ? "multipleTransferStates" :"formStates");
         localStorage.removeItem("senerio");
-        localStorage.removeItem("isEditAndId");
+        localStorage.setItem("isEditAndId", "");
 
         // Update toast to success
         toast.success('Data updated successfully!', {
@@ -47,7 +47,7 @@ export async function handleOnUpdate(user) {
 
     } catch (e) {
         console.error("Error in saving data: ", e);
-        
+
         // Show error toast
         toast.error("Failed to update data. Please try again.", {
             duration: 3000,

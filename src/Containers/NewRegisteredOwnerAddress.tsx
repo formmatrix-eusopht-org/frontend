@@ -99,7 +99,7 @@ export const NewRegisteredOwnerAddress = ({
                       : "text"
                 }
                 options={field.type === "dropdown" ? states : []}
-                value={newOwnerAddress[field.label] || ""}
+                value={newOwnerAddress?.[field.label] || ""}
                 onChange={(val) =>
                   onAddressChange("residential", field.label, val)
                 }
@@ -133,7 +133,7 @@ export const NewRegisteredOwnerAddress = ({
                         : "text"
                   }
                   options={field.type === "dropdown" ? states : []}
-                  value={mapped.data[field.label] || ""}
+                  value={mapped?.data?.[field.label] || ""}
                   onChange={(val) =>
                     onAddressChange(mapped.sectionKey, field.label, val)
                   }

@@ -82,11 +82,7 @@ export const LegalOwnerOfRecord = ({
               key={fields[0]?.label}
               label={fields[0]?.label}
               type={
-                fields[0]?.type === "dropdown"
-                  ? "dropdown"
-                  : fields[0]?.type === "phone"
-                    ? "phone"
-                    : "text"
+                fields[0]?.type
               }
               placeholder={fields[0]?.placeholder ?? ""}
               options={fields[0]?.type === "dropdown" ? states : []}
@@ -105,11 +101,7 @@ export const LegalOwnerOfRecord = ({
               key={field?.label}
               label={field?.label}
               type={
-                field?.type === "dropdown"
-                  ? "dropdown"
-                  : field?.type === "phone"
-                    ? "phone"
-                    : "text"
+                field?.type
               }
               placeholder={field?.placeholder ?? ""}
               options={field?.type === "dropdown" ? states : []}
