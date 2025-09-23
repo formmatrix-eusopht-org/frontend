@@ -42,3 +42,4 @@ next-env.d.ts
 src/app/Actions/pdfGenerates copy.ts
 .env
 .env
+src/Actions/pdftest.txt
