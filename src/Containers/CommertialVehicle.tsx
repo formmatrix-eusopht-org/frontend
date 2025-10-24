@@ -38,18 +38,17 @@ const CommercialVehicleInfo: React.FC<Props> = ({ title, block, values, onChange
 
         <Checkbox
           label="ACTUAL"
-          checked={values["Weight Actual"] || false}
+          checked={values["ActualOrEstimated"] == "Actual" || false}
           onChange={() => {
-            onChange("Weight Actual", true);
-            onChange("Weight Estimated", false);
+            onChange("ActualOrEstimated", "Actual");
           }}
         />
         <Checkbox
           label="ESTIMATED (VEHICLES OVER 10,001 LBS. ONLY)"
-          checked={values["Weight Estimated"] || false}
+          checked={values["ActualOrEstimated"] == "Estimated" || false}
           onChange={() => {
-            onChange("Weight Estimated", true);
-            onChange("Weight Actual", false);
+            onChange("ActualOrEstimated", "Estimated");
+
           }}
         />
         {isCommercialVehicle && (
@@ -117,18 +116,16 @@ const CommercialVehicleInfo: React.FC<Props> = ({ title, block, values, onChange
           <div className="flex gap-4">
             <Checkbox
               label="Yes"
-              checked={values["Hire Transport Yes"] || false}
+              checked={values["Hire Transport"] == "Yes" || false}
               onChange={() => {
-                onChange("Hire Transport Yes", true);
-                onChange("Hire Transport No", false);
+                onChange("Hire Transport", "Yes");
               }}
             />
             <Checkbox
               label="No"
-              checked={values["Hire Transport No"] || false}
+              checked={values["Hire Transport"] == "No" || false}
               onChange={() => {
-                onChange("Hire Transport No", true);
-                onChange("Hire Transport Yes", false);
+                onChange("Hire Transport", "No");
               }}
             />
           </div>
@@ -142,18 +139,16 @@ const CommercialVehicleInfo: React.FC<Props> = ({ title, block, values, onChange
           <div className="flex gap-4">
             <Checkbox
               label="Yes"
-              checked={values["GVWR Yes"] || false}
+              checked={values["GVWR"] == "Yes" || false}
               onChange={() => {
-                onChange("GVWR Yes", true);
-                onChange("GVWR No", false);
+                onChange("GVWR", "Yes");
               }}
             />
             <Checkbox
               label="No"
-              checked={values["GVWR No"] || false}
+              checked={values["GVWR"] == "No" || false}
               onChange={() => {
-                onChange("GVWR No", true);
-                onChange("GVWR Yes", false);
+                onChange("GVWR", "No");
               }}
             />
           </div>

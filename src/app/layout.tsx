@@ -6,6 +6,7 @@ import { AuthContextProvider } from "../Contexts/AuthContext";
 import NavWrapper from "../Layouts/header/NavWrapper";
 import StripeProvider from "../Contexts/PaymentContext";
 import { Toaster } from "react-hot-toast";
+import { ConfirmProvider } from "@/Contexts/ConfirnContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,15 +31,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AuthContextProvider>
-          <StripeProvider>
-            <SenerioProvider>
-              <NavWrapper />
-              {children}
-            </SenerioProvider>
-          </StripeProvider>
-        </AuthContextProvider>
-
+        <ConfirmProvider>
+          <AuthContextProvider>
+            <StripeProvider>
+              <SenerioProvider>
+                <NavWrapper />
+                {children}
+              </SenerioProvider>
+            </StripeProvider>
+          </AuthContextProvider>
+        </ConfirmProvider>
         {/* 🔔 Toast provider for global popups */}
         <Toaster position="top-center" reverseOrder={false} />
       </body>

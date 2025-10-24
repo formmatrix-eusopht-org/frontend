@@ -47,6 +47,7 @@ import PlatePurchaserAndOwner from '../Containers/PlatePurchaserAndOwner';
 import ReplacementOnlySection from '../Containers/forReplacementOnly';
 import SpecialInterestSection from '../Containers/SpecialInterest';
 import { Dialog } from '../Components/DialogBox';
+import { useConfirm } from '@/Contexts/ConfirnContext';
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
 
@@ -84,6 +85,8 @@ type SalvageCertificateState = {
     [key: string]: string;
 };
 const CombineForm = ({ formData }: CombineFormProps) => {
+
+    const confirm = useConfirm();
     const [open, setOpen] = useState(false);
     const [isEditAndId, setIsEditAndId] = useState("");
     const isInitialMount = useRef(true);
@@ -1443,12 +1446,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         }}
                         onPrint={async () => {
                             setIsLoading(true);
-                            if (optionsForValidation.length < 1) {
-                                setOpen(true)
-                                setIsLoading(false);
-                                return
-                            }
-                            await headHandlerForPDf("combineForm")
+                            // if (optionsForValidation.length < 1) {
+                            //     setOpen(true)
+                            //     setIsLoading(false);
+                            //     return
+                            // }
+                            await headHandlerForPDf("combineForm", confirm)
                             setIsLoading(false);
                         }}
                         onInvoice={() => console.log('Generate Invoice clicked')}

@@ -30,6 +30,17 @@ import { UserAuth } from '../Contexts/AuthContext';
 import CustomDropdown from '../Components/CustomDropDown';
 import { headHandlerForPDf } from '../Actions/pdfGenerates';
 import { handleOnUpdate } from '@/Actions/edit';
+import { PlatesSelection } from './PersonalizePlates';
+import SelectConfiguration from './Configration';
+import PlatePurchaserAndOwner from './PlatePurchaserAndOwner';
+import DpPlacardSection from './DisablePersion';
+import DisablePersonVehicleInfo from './DisablePersonVehicleInfo';
+import CommercialVehicleInfo from './CommertialVehicle';
+import VehicleDeclarationEntry from './VehicleDeclarationEntry';
+import VehicleBodyChange from './StatementForVehicleBodyChange';
+import SalvageCertificate from './SalvageCertificate';
+import CertificateOfLicensePlateDisposition from './CertifiacteOf LicensePlateDisposition';
+import { useConfirm } from '@/Contexts/ConfirnContext';
 
 
 const initialVehicle = { plate: "", vin: "", make: "", equipment: "" };
@@ -63,9 +74,19 @@ interface CombineFormProps {
 }
 
 interface TransferState {
+    platePurchaseState: any;
+    certificateOfLicensePlateDispositionState: any;
+    dpState: any;
+    dpVehicleInfoState: any;
     transferNumber: number;
     transactionSelections: string[];
+    personalizePlatesState: string;
+    platesSelectionState: any;
+    selectConfigState: any;
     typeOfVehicleSelection: string;
+    salvageCertificateState: any;
+    commercialInfo: any;
+    vehicleDeclarationEntryData: any;
     vehicleInfoState: Record<string, string | boolean>;
     ownerCount: number;
     ownersData: Record<string, string>[];
@@ -77,7 +98,7 @@ interface TransferState {
     newOwnerMailingAddress: Record<string, string>;
     newOwnerLesseeAddress: Record<string, string>;
     newOwnerKeptAddress: Record<string, string>;
-    selectedRadio: string | null;
+    selectedRadio: string[];
     selectedOptions: string[];
     dateValues: Record<string, Record<string, string>>;
     powerOfAttorneyData: { appointer: string | null; appointee: string | null };
@@ -91,6 +112,7 @@ interface TransferState {
     vehicleStatusInfoData: Record<string, string | boolean>;
     vehiclePurchaseInfo: Record<string, string>;
     outOfStateVehicle: any;
+    vehicleBodyState: any;
     LegalOwnerOfRecordData: any;
     statementForSomgExemptionData: Record<string, string | boolean>;
     lienReleaseState: any;
@@ -126,6 +148,46 @@ const getInitialDateValues = () => ({
 const initialTransferState: Omit<TransferState, 'transferNumber'> = {
     transactionSelections: [],
     typeOfVehicleSelection: "",
+    salvageCertificateState: {},
+    commercialInfo: {},
+    vehicleDeclarationEntryData: [],
+    personalizePlatesState: "Order",
+    dpVehicleInfoState: {
+        plate: "",
+        vin: "",
+        make: "",
+        year: "",
+    },
+    platesSelectionState: {
+        selectedPlate: "",
+        veteranCode: "",
+        duplicatePlate: ""
+    },
+    platePurchaseState: {
+        platePurchase: {},
+        plateOwner: {},
+        ifPlateOwnerIsDifferent: false,
+    },
+    certificateOfLicensePlateDispositionState: {
+        licensePlatesAssignedTo: "", // only one value allowed from options
+        platesSurrendered: "",        // e.g., "Surrendered", "Lost", etc.
+        occupationalLicenseNumber: ""
+    },
+    dpState: {
+        selectedPlacard: "",
+        issuedPreviously: "",
+        plate: ''
+    },
+    selectConfigState: {
+        assignedTo: '',
+        assignedFor: "",
+        licensePlateNumber: "",
+        vehicleIdentificationNumber: "",
+        plateChoices: [{ text: "", meaning: "" }, { text: "", meaning: "" }, { text: "", meaning: "" }],
+        location: '',
+        deliveryType: "",
+        centered: "",
+    },
     vehicleInfoState: {},
     ownerCount: 1,
     ownersData: [{}],
@@ -141,7 +203,7 @@ const initialTransferState: Omit<TransferState, 'transferNumber'> = {
     newOwnerMailingAddress: {},
     newOwnerLesseeAddress: {},
     newOwnerKeptAddress: {},
-    selectedRadio: null,
+    selectedRadio: [],
     selectedOptions: [],
     dateValues: getInitialDateValues(),
     powerOfAttorneyData: { appointer: null, appointee: null },
@@ -159,6 +221,7 @@ const initialTransferState: Omit<TransferState, 'transferNumber'> = {
         salesTaxPaidAmount: "",
         outOfStatePlates: { value: "", label: "" }
     },
+    vehicleBodyState: {},
     LegalOwnerOfRecordData: {},
     statementForSomgExemptionData: {},
     lienReleaseState: {
@@ -179,6 +242,8 @@ const initialTransferState: Omit<TransferState, 'transferNumber'> = {
 const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block, formData, isEditAndId }: CombineFormProps) => {
     const isInitialMount = useRef(true);
     const numberOfTransfers = 5;
+
+    const confirm = useConfirm();
     const [transferCount, setTransferCount] = useState(state?.length || 1);
     const [activeTab, setActiveTab] = useState(1);
     const { user } = UserAuth();
@@ -201,60 +266,66 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             )
         );
     };
-
-
     const syncToNextTransfer = (fromTransferNumber: number) => {
         setMultipleTransfer((prevTransfers) => {
-            const fromTransfer = prevTransfers.find(t => t.transferNumber === fromTransferNumber);
+            const fromTransfer = prevTransfers.find(
+                (t) => t.transferNumber === fromTransferNumber
+            );
             if (!fromTransfer) return prevTransfers;
 
-            const nextTransferIndex = prevTransfers.findIndex(t => t.transferNumber === fromTransferNumber + 1);
+            const nextTransferIndex = prevTransfers.findIndex(
+                (t) => t.transferNumber === fromTransferNumber + 1
+            );
+
+            // 🚀 If next transfer doesn't exist, just stop (don’t add new)
+            if (nextTransferIndex === -1) return prevTransfers;
+
             const nextTransfer = prevTransfers[nextTransferIndex];
 
             const updatedTransfer = {
-                ...(nextTransfer || { ...initialTransferState }),
-                transferNumber: fromTransferNumber + 1,
+                ...nextTransfer,
                 ownerCount: fromTransfer.newOwnerCount,
                 ownersData: Object.values(fromTransfer.newOwnerData || {}),
                 ownerAddress: {
                     residential: { ...fromTransfer.newOwnerAddress },
                     mailing: { ...fromTransfer.newOwnerMailingAddress },
-                    isMailingDifferent: !!Object.keys(fromTransfer.newOwnerMailingAddress || {}).length
+                    isMailingDifferent: fromTransfer.selectedRadio?.includes("if-mailing-address-is-different"),
                 },
                 vehicleInfoState: {
-                    ...(nextTransfer?.vehicleInfoState || {}),
-                    // Sync only specific fields
-                    ["Vehicle/Hull Identification Number"]: fromTransfer.vehicleInfoState?.["Vehicle/Hull Identification Number"] || "",
-                    ["Vehicle License Plate or Vessel CF Number"]: fromTransfer.vehicleInfoState?.["Vehicle License Plate or Vessel CF Number"] || "",
-                    ["Year of Vehicle"]: fromTransfer.vehicleInfoState?.["Year of Vehicle"] || "",
-                    ["Make of Vehicle OR Vessel Builder"]: fromTransfer.vehicleInfoState?.["Make of Vehicle OR Vessel Builder"] || ""
-                }
+                    ...(nextTransfer.vehicleInfoState || {}),
+                    ["Vehicle/Hull Identification Number"]:
+                        fromTransfer.vehicleInfoState?.["Vehicle/Hull Identification Number"] ||
+                        "",
+                    ["Vehicle License Plate or Vessel CF Number"]:
+                        fromTransfer.vehicleInfoState?.[
+                        "Vehicle License Plate or Vessel CF Number"
+                        ] || "",
+                    ["Year of Vehicle"]:
+                        fromTransfer.vehicleInfoState?.["Year of Vehicle"] || "",
+                    ["Make of Vehicle OR Vessel Builder"]:
+                        fromTransfer.vehicleInfoState?.[
+                        "Make of Vehicle OR Vessel Builder"
+                        ] || "",
+                },
             };
 
-            if (nextTransferIndex !== -1) {
-                return prevTransfers.map((t, i) =>
-                    i === nextTransferIndex ? updatedTransfer : t
-                );
-            } else {
-                return [...prevTransfers, updatedTransfer];
-            }
+            return prevTransfers.map((t, i) =>
+                i === nextTransferIndex ? updatedTransfer : t
+            );
         });
     };
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            multipleTransfer.forEach((_, i) => {
-                if (i + 1 < multipleTransfer.length) {
-                    syncToNextTransfer(i + 1);
-                }
-            });
-        }, 300);
+    // useEffect(() => {
+    //     const timeout = setTimeout(() => {
+    //         multipleTransfer.forEach((_, i) => {
+    //             if (i + 1 < multipleTransfer.length) {
+    //                 syncToNextTransfer(i + 1);
+    //             }
+    //         });
+    //     }, 300);
 
-        return () => clearTimeout(timeout);
-    }, [JSON.stringify(multipleTransfer)]);
-
-
-
+    //     return () => clearTimeout(timeout);
+    // }, [JSON.stringify(multipleTransfer)]);
 
     const handleTransferChange = (val: string, label: string) => {
         const newCount = parseInt(val);
@@ -269,31 +340,70 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
 
             return updatedTransfers;
         });
-
-        // Sync after transfers are set
-        // Delay to next tick to ensure state is updated
-        // setTimeout(() => syncToNextTransfer(activeTab), 0);
     };
+    const syncedTransactions = [
+        "Transaction with Vehicle Title",
+        "Is the Vehicle a Motorcycle",
+        "Out of State Title"
+    ];
 
-    // ===> Handler for transaction selections
     const handleTransactionChange = (label: string, checked: boolean) => {
         const current = getCurrentTransfer();
+
         const updatedSelections = checked
             ? [...current.transactionSelections, label]
             : current.transactionSelections.filter(item => item !== label);
 
+        // 🚀 Update current transfer
         updateCurrentTransfer({
             transactionSelections: updatedSelections,
             ...(label === "Is the Vehicle a Motorcycle" && {
                 typeOfVehicleSelection: checked ? "MOTORCYCLE" : "",
-                vehicleInfoState: checked ? current.vehicleInfoState :
-                    Object.fromEntries(
+                vehicleInfoState: checked
+                    ? current.vehicleInfoState
+                    : Object.fromEntries(
                         Object.entries(current.vehicleInfoState)
                             .filter(([key]) => key !== "Motorcycle Engine Number")
-                    )
-            })
+                    ),
+            }),
         });
+
+        // 🧠 If this label is in the synced list, update ALL transfers
+        if (syncedTransactions.includes(label)) {
+            setMultipleTransfer(prevTransfers =>
+                prevTransfers.map(transfer => {
+                    const hasLabel = checked;
+                    const updatedSelections = hasLabel
+                        ? Array.from(new Set([...transfer.transactionSelections, label]))
+                        : transfer.transactionSelections.filter(item => item !== label);
+
+                    // Optional: Apply Motorcycle logic globally too
+                    let updatedVehicleInfoState = transfer.vehicleInfoState;
+                    let updatedTypeOfVehicleSelection = transfer.typeOfVehicleSelection;
+
+                    if (label === "Is the Vehicle a Motorcycle") {
+                        if (checked) {
+                            updatedTypeOfVehicleSelection = "MOTORCYCLE";
+                        } else {
+                            updatedTypeOfVehicleSelection = "";
+                            updatedVehicleInfoState = Object.fromEntries(
+                                Object.entries(transfer.vehicleInfoState)
+                                    .filter(([key]) => key !== "Motorcycle Engine Number")
+                            );
+                        }
+                    }
+
+                    return {
+                        ...transfer,
+                        transactionSelections: updatedSelections,
+                        typeOfVehicleSelection: updatedTypeOfVehicleSelection,
+                        vehicleInfoState: updatedVehicleInfoState,
+                    };
+                })
+            );
+        }
     };
+
 
     //===>  Handler for vehicle type selection
     const handleTypeOfVehicleChange = (label: string, checked: boolean) => {
@@ -313,17 +423,103 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             })
         });
     };
-
-    //===>  Handler for vehicle information fields
-    const handleVehicleFieldChange = (label: string, value: string | boolean) => {
-        const current = getCurrentTransfer();
+    const handleSalvageCertificateChange = (label: string, value: string) => {
         updateCurrentTransfer({
-            vehicleInfoState: {
-                ...current.vehicleInfoState,
-                [label]: value
+            salvageCertificateState: {
+                ...currentTransfer.salvageCertificateState,
+                [label]: value,
+            },
+        });
+    };
+    const handleCommercialChange = (label: string, value: any) => {
+        updateCurrentTransfer({
+            commercialInfo: {
+                ...currentTransfer.commercialInfo,
+                [label]: value,
+            },
+        });
+    };
+    const handleVehicleBodyChange = (label: string, value: any) => {
+        updateCurrentTransfer({
+            vehicleBodyState: {
+                ...currentTransfer.vehicleBodyState,
+                [label]: value,
             }
         });
     };
+    const handleVehicleDeclarationEntryFieldChange = (
+        index: number,
+        label: string,
+        value: string
+    ) => {
+        const updated = [...(currentTransfer.vehicleDeclarationEntryData || [])];
+        if (!updated[index]) updated[index] = {};
+        updated[index][label] = value;
+
+        updateCurrentTransfer({
+            vehicleDeclarationEntryData: updated,
+        });
+    };
+
+    const handleTrimEntries = (trimmed: Record<string, string>[]) => {
+        updateCurrentTransfer({
+            vehicleDeclarationEntryData: trimmed,
+        });
+    };
+    //===>  Handler for vehicle information fields
+    const handleVehicleFieldChange = (label: string, value: string | boolean) => {
+    const current = getCurrentTransfer();
+
+    // Update current transfer first
+    updateCurrentTransfer({
+        vehicleInfoState: {
+            ...current.vehicleInfoState,
+            [label]: value,
+        },
+    });
+
+    // Define fields that should sync across ALL transfers
+    const syncAllFields = [
+        "Vehicle/Hull Identification Number",
+        "Vehicle License Plate or Vessel CF Number",
+        "Year of Vehicle",
+        "Make of Vehicle OR Vessel Builder",
+    ];
+
+    setMultipleTransfer((prev) =>
+        prev.map((transfer, i) => {
+            const isActive = transfer.transferNumber === activeTab;
+
+            // Case 1️⃣: Sync to all transfers if label is in syncAllFields
+            if (syncAllFields.includes(label)) {
+                return {
+                    ...transfer,
+                    vehicleInfoState: {
+                        ...transfer.vehicleInfoState,
+                        [label]: value,
+                    },
+                };
+            }
+
+            // Case 2️⃣: Sync “Motorcycle Engine Number” only to next transfers
+            if (
+                label === "Motorcycle Engine Number" &&
+                i > prev.findIndex((t) => t.transferNumber === activeTab)
+            ) {
+                return {
+                    ...transfer,
+                    vehicleInfoState: {
+                        ...transfer.vehicleInfoState,
+                        [label]: value,
+                    },
+                };
+            }
+
+            // Default: no change
+            return transfer;
+        })
+    );
+};
 
     //===>  Handler for owner count change
     const handleOwnerCountChange = (count: number) => {
@@ -427,6 +623,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                 updateCurrentTransfer({ newOwnerKeptAddress: { ...current.newOwnerKeptAddress, [label]: value } });
                 break;
         }
+        syncToNextTransfer(activeTab);
     };
 
     // ===> Handler for date fields
@@ -677,11 +874,13 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
     const handleToggleOption = (value: string) => {
         const current = getCurrentTransfer();
         const isMutuallyExclusive = mutuallyExclusive.includes(value);
-        const alreadySelected = current.selectedOptions.includes(value);
-
+        const alreadySelected = current.selectedRadio.includes(value);
+        if (value === "if-mailing-address-is-different") {
+            updateCurrentTransfer({ newOwnerMailingAddress: {} });
+        }
         let newSelection = alreadySelected
-            ? current.selectedOptions.filter((v) => v !== value)
-            : [...current.selectedOptions, value];
+            ? current.selectedRadio.filter((v) => v !== value)
+            : [...current.selectedRadio, value];
 
         if (isMutuallyExclusive && !alreadySelected) {
             const other = mutuallyExclusive.find((opt) => opt !== value);
@@ -689,7 +888,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
         }
 
         updateCurrentTransfer({
-            selectedOptions: newSelection,
+            selectedRadio: newSelection,
             ...(value === "if-lessee-address-is-different" && alreadySelected && {
                 newOwnerLesseeAddress: {}
             }),
@@ -731,6 +930,38 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
         });
     };
 
+    // ===> Plate selection change
+    const handlePlateChange = (label: string) => {
+        const current = getCurrentTransfer();
+        updateCurrentTransfer({
+            platesSelectionState: {
+                ...current.platesSelectionState,
+                selectedPlate: label,
+                veteranCode:
+                    label === "Veterans' Organization"
+                        ? current.platesSelectionState.veteranCode
+                        : "",
+                duplicatePlate:
+                    label === "Duplicate Decal"
+                        ? current.platesSelectionState.duplicatePlate
+                        : "",
+            },
+        });
+    };
+
+    // ===> Plate input field change
+    const handleInputChange = (
+        field: "veteranCode" | "duplicatePlate",
+        value: string
+    ) => {
+        const current = getCurrentTransfer();
+        updateCurrentTransfer({
+            platesSelectionState: {
+                ...current.platesSelectionState,
+                [field]: value,
+            },
+        });
+    };
     // ===>  Handler for vehicle storage location fields
     const handleVehicleStorageLocation = (label: string, value: string | boolean) => {
         const current = getCurrentTransfer();
@@ -777,6 +1008,24 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
     const LicensePlateBlock = findBlock("License Plate");
     const plannedNonOperationCertificateBlock = findBlock("PLANNED NON-OPERATION CERTIFICATE");
     const vehicleStorageLocationBlock = findBlock("Vehicle Storage Location");
+    const statementForVehicleBodyChangeBlock = findBlock("Statement for Vehicle Body Change");
+    const forCommercialVehicleOnlyBlock = findBlock("For Commercial Vehicle Only");
+    const CertificateOfLicensePlateDispositionBlock = findBlock("Certification of License Plate Disposition");
+    const SalvageCertificateBlock = findBlock("Salvage Certificate");
+    const VehicleDeclarationEntryBlock = findBlock("Vehicle Declaration Entry");
+    const PersonalOrBusinessInformationBlock = findBlock("PERSONAL OR BUSINESS INFORMATION");
+    const PreviousResidenceOrBusinessAddressBlock = findBlock("PREVIOUS RESIDENCE OR BUSINESS ADDRESS");
+    const NewOrCorrectResidenceOrBusinessAddressBlock = findBlock("NEW OR CORRECT RESIDENSE OR BUSINESS ADDRESS");
+    const NameChangeBlock = findBlock("Name Statement (Ownership Certificate Required)");
+    const VehiclesOwnedByYouBlock = findBlock("Vehicles, Vessels, or Placards Owned By You");
+    const disablePersonTypeBlock = findBlock("Type of Disabled Person Parking Placard(S) or License Plates");
+    const disablePersonVehicleInfoBlock = findBlock("DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION");
+    const platesSelectionBlock = findBlock("Plates Selection");
+    const selectConfigurationBlock = findBlock("Select Configuration");
+    const forReplacementOnlyBlock = findBlock("FOR REPLACEMENT ONLY");
+    const reassignInterestBlock = findBlock("REASSIGN, RETAIN INTEREST, OR RELEASE INTEREST");
+    const platePurchaseBlock = findBlock("PLATE PURCHASER");
+    const documentsReceivedBlock = findBlock("Documents Received");
 
     // ===>  Update power of attorney data when owners change
     useEffect(() => {
@@ -843,6 +1092,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
     const isVehickeIsAGift = currentTransfer.transactionSelections.includes("Vehicle is a Gift");
     const isSmogExemption = currentTransfer.transactionSelections.includes("Smog Exemption");
     const requestPNOCardFlag = currentTransfer.transactionSelections.includes("Request PNO card");
+    const isCommercialVehicle = currentTransfer.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)");
 
     const dropdownOptions = numberOfTransfers
         ? Array.from({ length: numberOfTransfers }, (_, i) => i + 1).map((num) => ({
@@ -852,6 +1102,50 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             abbreviation: num.toString(),
         }))
         : [];
+    // Add setPersonalizePlatesState to update personalizePlatesState in the current transfer
+    const setPersonalizePlatesState = (value: string) => {
+        updateCurrentTransfer({ personalizePlatesState: value });
+    };
+    const setSelectConfigState = (value: string) => {
+        updateCurrentTransfer({ selectConfigState: value });
+    };
+    const setPlatePurchaseState = (updater: any) => {
+        const current = getCurrentTransfer();
+
+        // If updater is a function, call it with current state
+        const newValue =
+            typeof updater === "function"
+                ? updater(current.platePurchaseState)
+                : updater;
+
+        updateCurrentTransfer({ platePurchaseState: newValue });
+    };
+    const handleCertificateOfLicensePlateDispositionChange = (
+        label: string,
+        value: string | boolean
+    ) => {
+        const current = getCurrentTransfer();
+        updateCurrentTransfer({
+            certificateOfLicensePlateDispositionState: {
+                ...current.certificateOfLicensePlateDispositionState,
+                [label]: String(value)
+            }
+        });
+    };
+    const setDpState = (value: any) => {
+        updateCurrentTransfer({ dpState: value });
+    };
+    const setDpVehicleInfoState = (updater: any) => {
+        const current = getCurrentTransfer();
+
+        const newValue =
+            typeof updater === "function"
+                ? updater(current.dpVehicleInfoState)
+                : updater;
+
+        updateCurrentTransfer({ dpVehicleInfoState: newValue });
+    };
+
     return (
         <div>
             <div className="flex items-center gap-4 mb-4">
@@ -885,14 +1179,27 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                 {transactionBlock && (
                     <TransactionDetails
                         title="Transaction Details"
-                        block={transactionBlock}
+                        block={{
+                            ...transactionBlock,
+                            fields: transactionBlock.fields?.filter(field => {
+                                const restrictedLabels = [
+                                    "Smog Exemption",
+                                    "Vehicle is a Gift",
+                                    "Family Transfer",
+                                    "There is a Current Lienholder"
+                                ];
+                                return activeTab === 1
+                                    ? true
+                                    : !restrictedLabels.includes(field.label);
+                            }),
+                        }}
                         senerio={senerio}
                         selectedItems={currentTransfer.transactionSelections}
                         onChange={handleTransactionChange}
                     />
                 )}
 
-                {typeOfVehicleBlock && isOutofStateTitle && (
+                {typeOfVehicleBlock && isOutofStateTitle && (transferCount == activeTab) && (
                     <TypeOfVehicle
                         title="Type of Vehicle"
                         block={typeOfVehicleBlock}
@@ -900,7 +1207,67 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         onChange={handleTypeOfVehicleChange}
                     />
                 )}
-
+                {SalvageCertificateBlock && (
+                    <SalvageCertificate
+                        title={SalvageCertificateBlock.blockName}
+                        block={SalvageCertificateBlock} // ✅ pass metadata
+                        values={currentTransfer.salvageCertificateState} // ✅ pass current field values
+                        onFieldChange={handleSalvageCertificateChange}
+                    />
+                )}
+                {forCommercialVehicleOnlyBlock && (
+                    <CommercialVehicleInfo
+                        title={forCommercialVehicleOnlyBlock.blockName}
+                        block={{}}
+                        isCommercialVehicle={isCommercialVehicle} // optional
+                        values={currentTransfer.commercialInfo}
+                        onChange={handleCommercialChange}
+                    />
+                )}
+                {VehicleDeclarationEntryBlock && (
+                    <VehicleDeclarationEntry
+                        title={VehicleDeclarationEntryBlock.blockName}
+                        block={VehicleDeclarationEntryBlock}
+                        values={currentTransfer.vehicleDeclarationEntryData}
+                        onFieldChange={handleVehicleDeclarationEntryFieldChange}
+                        onTrimEntries={handleTrimEntries}
+                    />
+                )}
+                {platesSelectionBlock && (transferCount == activeTab) && (
+                    <PlatesSelection
+                        block={platesSelectionBlock}
+                        plateInfo={currentTransfer.platesSelectionState}
+                        onPlateChange={handlePlateChange}
+                        onInputChange={handleInputChange}
+                        personalizePlatesState={currentTransfer.personalizePlatesState}
+                        setPersonalizePlatesState={setPersonalizePlatesState}
+                    />
+                )}
+                {selectConfigurationBlock && (currentTransfer.personalizePlatesState === "Order" || currentTransfer.personalizePlatesState === "Exchange") && (transferCount == activeTab) && (
+                    <SelectConfiguration
+                        block={selectConfigurationBlock}
+                        value={currentTransfer.selectConfigState}
+                        onChange={setSelectConfigState}
+                    />
+                )}
+                {platePurchaseBlock && (transferCount == activeTab) && (
+                    <PlatePurchaserAndOwner
+                        block={platePurchaseBlock}
+                        values={currentTransfer.platePurchaseState}
+                        onChange={setPlatePurchaseState}
+                    />
+                )}
+                {CertificateOfLicensePlateDispositionBlock && (
+                    <CertificateOfLicensePlateDisposition
+                        title={CertificateOfLicensePlateDispositionBlock.blockName}
+                        block={{
+                            ...CertificateOfLicensePlateDispositionBlock,
+                            reference: CertificateOfLicensePlateDispositionBlock.reference || "CertificateReference",
+                        }}
+                        values={currentTransfer.certificateOfLicensePlateDispositionState}
+                        onChange={handleCertificateOfLicensePlateDispositionChange}
+                    />
+                )}
                 {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (transferCount == activeTab) && (
                     <MissingTitleReason
                         title="Missing Title Reason"
@@ -941,7 +1308,17 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                 {registeredOwnerBlock && (
                     <RegisteredOwnerDetails
                         title="Registered Owner(s)"
-                        block={registeredOwnerBlock}
+                        block={{
+                            ...registeredOwnerBlock,
+                            fields: registeredOwnerBlock.fields
+                                ?.filter(field => !(!(transferCount == activeTab) && field.label === "Date of Sale"))
+                                .map(field => ({
+                                    ...field,
+                                    value:
+                                        currentTransfer?.ownersData?.[0]?.[field.label] ??
+                                        (field.type === "checkbox" ? false : ""),
+                                })),
+                        }}
                         ownerCount={currentTransfer.ownerCount}
                         onOwnerCountChange={handleOwnerCountChange}
                         ownersData={currentTransfer.ownersData}
@@ -1001,13 +1378,13 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         newOwnerMailingAddress={currentTransfer.newOwnerMailingAddress}
                         newOwnerLesseeAddress={currentTransfer.newOwnerLesseeAddress}
                         newOwnerKeptAddress={currentTransfer.newOwnerKeptAddress}
-                        selectedRadio={currentTransfer.selectedOptions}
+                        selectedRadio={currentTransfer.selectedRadio}
                         onToggleOption={handleToggleOption}
                         onAddressChange={handleNewOwnerAddressChange}
                     />
                 )}
 
-                {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (
+                {dateInformationBlock && dateInformationBlock.reference && isOutofStateTitle && (transferCount == activeTab) && (
                     <DateInformation
                         title="DATE INFORMATION"
                         block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
@@ -1015,8 +1392,22 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         onDateChange={handleDateChange}
                     />
                 )}
-
-                {vehicleStatusBlock && isOutofStateTitle && (
+                {disablePersonTypeBlock && (transferCount == activeTab) && (
+                    <DpPlacardSection
+                        title={disablePersonTypeBlock.blockName}
+                        values={currentTransfer.dpState}
+                        onChange={setDpState}
+                    />
+                )}
+                {disablePersonVehicleInfoBlock && (
+                    <DisablePersonVehicleInfo
+                        title={disablePersonVehicleInfoBlock.blockName}
+                        values={currentTransfer.dpVehicleInfoState}
+                        onChange={setDpVehicleInfoState}
+                        fields={disablePersonVehicleInfoBlock.fields}
+                    />
+                )}
+                {vehicleStatusBlock && isOutofStateTitle && (transferCount == activeTab) && (
                     <VehicleStatusInformation
                         title="Vehicle Status Information"
                         block={vehicleStatusBlock}
@@ -1025,7 +1416,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {vehicleAcquisitionBlock && isOutofStateTitle && (
+                {vehicleAcquisitionBlock && isOutofStateTitle && (transferCount == activeTab) && (
                     <VehicleAcquisitionDetails
                         title={vehicleAcquisitionBlock.blockName}
                         block={vehicleAcquisitionBlock}
@@ -1034,14 +1425,20 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {OutOfStateBlock && isOutofStateTitle && (
+                {OutOfStateBlock && isOutofStateTitle && (transferCount == activeTab) && (
                     <OutOfStateVehicleSection
                         values={currentTransfer.outOfStateVehicle}
                         onFieldChange={handleOutOfStateVehcileFieldChange}
                         onPlateSelect={handleOutOfStateVehcilePlateSelect}
                     />
                 )}
-
+                {statementForVehicleBodyChangeBlock && (
+                    <VehicleBodyChange
+                        title={statementForVehicleBodyChangeBlock.blockName}
+                        values={currentTransfer.vehicleBodyState}
+                        onChange={handleVehicleBodyChange}
+                    />
+                )}
                 {powerOfAttorneyBlock && (
                     <PowerOfAttorneyDetails
                         title="Power of Attorney"
@@ -1052,7 +1449,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {itemRequestedWasBlock && (
+                {itemRequestedWasBlock && transferCount === activeTab && (
                     <TheItemRequestedWasBlock
                         title="The Item Requested Was"
                         block={itemRequestedWasBlock}
@@ -1065,7 +1462,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {LicensePlateBlock && (
+                {LicensePlateBlock && transferCount === activeTab && (
                     <LicensePlateMissingBlock
                         title={LicensePlateBlock.blockName}
                         block={LicensePlateBlock}
@@ -1074,7 +1471,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {LienReleaseBlock && (
+                {LienReleaseBlock && activeTab === 1 && (
                     <LeinRealease
                         title="Lien Release"
                         block={LienReleaseBlock}
@@ -1084,7 +1481,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {plannedNonOperationCertificateBlock && (
+                {plannedNonOperationCertificateBlock && transferCount === activeTab && (
                     <PlannedNonOperation
                         title="Planned Non-Operation Certificate"
                         vehicles={currentTransfer.plannedNonOperationState}
@@ -1095,7 +1492,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {newLienHolderBlock && (
+                {newLienHolderBlock && transferCount === activeTab && (
                     <NewLienHolder
                         block={newLienHolderBlock}
                         formState={currentTransfer.newLienholder.address}
@@ -1131,7 +1528,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     //onPrint={() =>  console.log('Print clicked in MultipleTransfer')}
                     onPrint={async () => {
                         setIsLoading(true);
-                        await headHandlerForPDf("Multiple Transfer");
+                        await headHandlerForPDf("Multiple Transfer", confirm);
                         setIsLoading(false);
                     }}
                     onInvoice={() => console.log('Generate Invoice clicked')}

@@ -31,7 +31,7 @@ export const TransactionDetails = ({
   const isGiftSelected = selectedItems.includes("Vehicle is a Gift");
   const isFamilyTransferSelected = selectedItems.includes("Family Transfer");
   const shouldHideWithTitle =
-    senerio.includes("Simple Transfer") && (senerio.includes("Add Lienholder") || senerio.includes("Remove Lienholder"));
+    senerio.includes("Simple Transfer") || senerio.includes("Multiple Transfer") && (senerio.includes("Add Lienholder") || senerio.includes("Remove Lienholder"));
   const filteredFields = shouldHideWithTitle
     ? block.fields.filter((field) => field.label !== "With Title")
     : block.fields;

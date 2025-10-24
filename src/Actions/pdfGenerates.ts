@@ -4,7 +4,7 @@ import {
     PDFCheckBox,
     PDFField,
 } from 'pdf-lib';
-import { stripContentButKeepFields } from './pdftest2';
+import toast from 'react-hot-toast';
 
 type OwnerData = {
     [key: string]: string | undefined;
@@ -225,7 +225,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     const rawDate = formData.ownersData?.[0]?.['Date of Sale'] || '';
     const { month, day, year } = extractDateParts(rawDate);
     const isTitleAvailable = formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title")
-    // console.log(isTitleAvailable);
+    console.log(formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'], "form");
 
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
@@ -335,14 +335,14 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'CheckBox': "CheckBox",
         'CheckBox_1': "CheckBox",
         'CheckBox_2': "CheckBox",
-        'text_60czib': formData.newOwnerMailingAddress?.Street ? `${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || ''}   ${formData.newOwnerMailingAddress?.Street || ''}` : `${formData.newOwnerAddress?.["APT./SPACE/STE.#"] || ''}   ${formData.newOwnerAddress?.Street || ''}`,
+        'text_60czib': formData.newOwnerMailingAddress?.Street ? `${formData.newOwnerMailingAddress?.Street || ''}   ${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || ''}` : `${formData.newOwnerAddress?.Street || ''}   ${formData.newOwnerAddress?.["APT./SPACE/STE.#"] || ''}   `,
         'text_61pxrx': formData.newOwnerMailingAddress?.City ? formData.newOwnerMailingAddress?.City || '' : formData.newOwnerAddress?.City || '',
         'text_62cqaf': formData.newOwnerMailingAddress?.State ? formData.newOwnerMailingAddress?.State || '' : formData.newOwnerAddress?.State || '',
         'text_63psgg': formData.newOwnerMailingAddress?.["ZIP Code"] ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : formData.newOwnerAddress?.["ZIP Code"] || '',
         'text_64xthv': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.["ZIP Code"] || '' : formData.ownerAddress?.residential?.["ZIP Code"] || '',
         'text_65bzof': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.["State"] || '' : formData.ownerAddress?.residential?.["State"] || '',
         'text_66evl': formData.ownerAddress?.isMailingDifferent === true ? formData.ownerAddress?.mailing?.City || '' : formData.ownerAddress?.residential?.City || '',
-        'text_67vkky': formData.ownerAddress?.isMailingDifferent === true ? `${formData.ownerAddress?.mailing?.["Street"] || ''} ${formData.ownerAddress?.mailing?.["APT./SPACE/STE.#"] || ''}` : `${formData.ownerAddress?.residential?.["Street"] || ''} ${formData.ownerAddress?.residential?.["APT./SPACE/STE.#"] || ''}`,
+        'text_67vkky': formData.ownerAddress?.isMailingDifferent === true ? `${formData.ownerAddress?.mailing?.["Street"] || ''}   ${formData.ownerAddress?.mailing?.["APT./SPACE/STE.#"] || ''}` : `${formData.ownerAddress?.residential?.["Street"] || ''}   ${formData.ownerAddress?.residential?.["APT./SPACE/STE.#"] || ''}`,
         'License Plate/CF Number1': formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "",
         'Vehicle/Vessel ID/Number1': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'Year/Make': `${formData.vehicleInfoState?.['Year of Vehicle'] || ""} ${formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder'] || ""}`,
@@ -470,8 +470,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "date 3": (formData.newOwnerCount ?? 0) > 2 ? rawDate || '' : '',
         '6 States 2.0': formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.State || '' : '',
         '6 Zip Code-2.0': formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.["ZIP Code"] || '' : '',
-        'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerLesseeAddress?.Street || ''}    ${formData.newOwnerLesseeAddress?.City || ''}    ${formData.newOwnerLesseeAddress?.State || ''} `,
-        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerKeptAddress?.Street || ''}    ${formData.newOwnerKeptAddress?.City || ''}    ${formData.newOwnerKeptAddress?.State || ''} `,
+        'Lessee address, if different from address above': `${formData.newOwnerLesseeAddress?.Street || ''}    ${formData.newOwnerLesseeAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerLesseeAddress?.City || ''}    ${formData.newOwnerLesseeAddress?.State || ''} `,
+        'Vessel or trailer coach principally kept at, address or location if different from physical/business address above': `${formData.newOwnerKeptAddress?.Street || ''}    ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}    ${formData.newOwnerKeptAddress?.City || ''}    ${formData.newOwnerKeptAddress?.State || ''} `,
         'county.0.0': formData.newOwnerKeptAddress?.County || '',
         '6 area code 1': (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
         'daytime telephone number': (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : '',
@@ -574,7 +574,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text110": formData.newOwnerLesseeAddress?.City || '',
         "Text111": formData.newOwnerLesseeAddress?.State || '',
         "Text112": formData.newOwnerLesseeAddress?.["ZIP Code"] || '',
-        "Text113": `${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}   ${formData.newOwnerKeptAddress?.Street || ''}`,
+        "Text113": `${formData.newOwnerKeptAddress?.Street || ''}    ${formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || ''}`,
         "Text114": formData.newOwnerKeptAddress?.["APT./SPACE/STE.#"] || '',
         "Text115": formData.newOwnerKeptAddress?.City || '',
         "Text116": formData.newOwnerKeptAddress?.State || '',
@@ -1943,6 +1943,140 @@ const mergeFilledPDFs = async (
 
     return await mergedPdf.save();
 };
+export async function generateMultiple262AndOne227(
+    multipleFormDataList: FormData[],
+    openInNewTab = true
+): Promise<Uint8Array | null> {
+    if (!Array.isArray(multipleFormDataList) || multipleFormDataList.length === 0) {
+        console.warn("No transfer data provided.");
+        return null;
+    }
+
+    try {
+        // 1️⃣ Build DMVREG262new for each transfer (print-only mode)
+        const allFormBytes: Uint8Array[] = [];
+        for (const transferData of multipleFormDataList) {
+            const bytes = await mergeFilledPDFs(
+                ["DMVREG262new"],
+                transferData,
+                "Simple Transfer",
+                true // print-only for 262
+            );
+            if (bytes) allFormBytes.push(bytes);
+        }
+
+        // 2️⃣ Prepare Reg227 / Reg343 / Title using first seller + last buyer
+        const first = multipleFormDataList[0];
+        const last = multipleFormDataList[multipleFormDataList.length - 1];
+
+        const wantsTitle =
+            first.transactionSelections?.includes("Transaction with Vehicle Title") ||
+            first.transactionSelections?.includes("With Title");
+
+        const combinedTransferData: FormData = {
+            ...first,
+            newOwnerCount: last.newOwnerCount,
+            newOwnerData: last.newOwnerData,
+            newOwnerAddress: last.newOwnerAddress,
+            newOwnerMailingAddress: last.newOwnerMailingAddress,
+            newOwnerLesseeAddress: last.newOwnerLesseeAddress,
+            newOwnerKeptAddress: last.newOwnerKeptAddress,
+            newOwnershipTypes: last.newOwnershipTypes,
+            missingReason: last.missingReason,
+            typeOfVehicleSelection: last.typeOfVehicleSelection,
+            dateValues: last.dateValues,
+            vehicleStatusInfoData: last.vehicleStatusInfoData,
+            vehiclePurchaseInfo: last.vehiclePurchaseInfo,
+            outOfStateVehicle: last.outOfStateVehicle
+        };
+
+        // 3️⃣ Add Reg227 and/or Reg343 if required
+        if (!wantsTitle) {
+            const reg227Bytes = await mergeFilledPDFs(
+                ["Reg227"],
+                combinedTransferData,
+                "Simple Transfer",
+                false
+            );
+            if (reg227Bytes) allFormBytes.push(reg227Bytes);
+        }
+
+        if (first.transactionSelections?.includes("Out of State Title")) {
+            const reg343Bytes = await mergeFilledPDFs(
+                ["Reg343"],
+                combinedTransferData,
+                "Simple Transfer",
+                false
+            );
+            if (reg343Bytes) allFormBytes.push(reg343Bytes);
+        }
+        if (first.transactionSelections?.includes("There is a Current Lienholder")) {
+            const reg227Bytes = await mergeFilledPDFs(
+                ["Reg227"],
+                combinedTransferData,
+                "Simple Transfer",
+                false
+            );
+            if (reg227Bytes) allFormBytes.push(reg227Bytes);
+        }
+
+        //==> Vehicle is a Gift OR Family Transfer OR Smog Exemption: REG 256
+        if (
+            first.transactionSelections?.includes("Family Transfer") ||
+            first.transactionSelections?.includes("Vehicle is a Gift") ||
+            first.transactionSelections?.includes("Smog Exemption")
+        ) {
+            const Reg256Bytes = await mergeFilledPDFs(
+                ["Reg256"],
+                combinedTransferData,
+                "Simple Transfer",
+                false
+            );
+            if (Reg256Bytes) allFormBytes.push(Reg256Bytes);
+        }
+        // 4️⃣ Merge all PDFs together
+        const finalMergedPdf = await PDFDocument.create();
+        for (const bytes of allFormBytes) {
+            const doc = await PDFDocument.load(bytes);
+            const pages = await finalMergedPdf.copyPages(doc, doc.getPageIndices());
+            pages.forEach((p) => finalMergedPdf.addPage(p));
+        }
+
+        const finalBytes = await finalMergedPdf.save();
+
+        // 5️⃣ Open merged PDF
+        if (openInNewTab) {
+            const blob = new Blob([finalBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            window.open(url);
+        }
+
+        // 6️⃣ If title form required, open separately (print-only)
+        if (wantsTitle) {
+            try {
+                const titleBytes = await mergeFilledPDFs(
+                    ["title"],
+                    combinedTransferData,
+                    "Simple Transfer",
+                    true // print-only mode
+                );
+
+                const blob = new Blob([titleBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");
+            } catch (e) {
+                console.warn("Could not open title.pdf in a new tab:", e);
+            }
+        }
+
+        return finalBytes;
+    } catch (err) {
+        console.error("Error generating merged transfer PDFs:", err);
+        return null;
+    }
+}
+
+
 async function handleOnPDF(form: any, senerio: any) {
     try {
         let formTypes: string[] = [];
@@ -2030,36 +2164,47 @@ async function handleOnPDF(form: any, senerio: any) {
         console.error("error in genrating pdf : ", e)
     }
 }
-export async function headHandlerForPDf(sourceOfClick: string) {
+export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
+
+    const message = (() => {
+        if (sourceOfClick === "Multiple Transfer") {
+            const saved = localStorage.getItem("multipleTransferStates") || "{}";
+            try {
+                const parsed = JSON.parse(saved);
+                const list = parsed?.multipleTransfer ?? [];
+                const count = Array.isArray(list) ? list.length : 0;
+                return `“Please load the printer with (${count}) DMV 262 forms before continuing.”`;
+            } catch {
+                return `“Please load the printer with (0) DMV 262 forms before continuing.”`;
+            }
+        } else {
+            return "“Please load the printer with one DMV 262 form before continuing.”";
+        }
+    })();
+
+    const obj = {
+        message,
+        confirm: "Proceed",
+        cancel: "Cancel",
+    };
+
+    const result = await confirm(obj);
+
+    if (!result) {
+        // toast("Action cancelled.", { icon: "⚠️" });
+        return;
+    }
     const finalMergedPdf = await PDFDocument.create();
     if (sourceOfClick === "Multiple Transfer") {
-
         const savedForm = localStorage.getItem("multipleTransferStates");
-        const savedSenerio = localStorage.getItem("senerio");
+        const parsed = JSON.parse(savedForm || "{}");
+        const multipleFormDataList: FormData[] = parsed?.multipleTransfer || [];
 
-        const parsed = JSON.parse(savedForm || "[]");
-        const multipleFormDataList = parsed?.multipleTransfer || [];
-        const senerio: string = JSON.parse(savedSenerio || "[]");
-
-        if (!multipleFormDataList.length) {
-            console.warn("No transfer data found.");
-            return;
-        }
-
-        for (const data of multipleFormDataList) {
-            const filledBytes = await handleOnPDF(data, ["Simple Transfer"]);
-            if (!filledBytes) continue;
-
-            try {
-                const filledDoc = await PDFDocument.load(filledBytes);
-                const pages = await finalMergedPdf.copyPages(filledDoc, filledDoc.getPageIndices());
-                pages.forEach((page) => finalMergedPdf.addPage(page));
-            } catch (e) {
-                console.error(`Error processing filled PDF for ${data.transferNumber}`, e);
-            }
-        }
-
-    } else {
+        // Use the first transfer to build Reg227 by default (you can pass other index)
+        await generateMultiple262AndOne227(multipleFormDataList, true);
+        return;
+    }
+    else {
         try {
             const savedForm = localStorage.getItem("formStates");
             const savedSenerio = localStorage.getItem("senerio");

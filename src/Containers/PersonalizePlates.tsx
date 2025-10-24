@@ -54,8 +54,7 @@ export const PlatesSelection = ({
                             label={f}
                             checked={personalizePlatesState === f}
                             onChange={() =>
-                                setPersonalizePlatesState((prev: string) => (prev === f ? "" : f))
-                            }
+                                setPersonalizePlatesState(personalizePlatesState === f ? "" : f)}
                         />
 
                     ))}
