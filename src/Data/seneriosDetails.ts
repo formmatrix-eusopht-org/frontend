@@ -159,36 +159,36 @@ export const seneriosDetails = [
         }, {
             reference: "Legal Owner of Record",
             blockName: "Legal Owner of Record",
-            subOptions: [
-                {
-                    label: "If mailing address is different",
-                    fieldName: "Mailing Address",
-                    type: "radiocheckbox",
-                    subFields: [
-                        {
-                            label: 'Street',
-                            type: "input field",
-                            placeholder: 'Street'
-                        }, {
-                            label: 'APT./SPACE/STE.#',
-                            type: "address",
-                            placeholder: 'APT./SPACE/STE.#'
-                        }, {
-                            label: 'City',
-                            type: "input field",
-                            placeholder: 'City'
-                        }, {
-                            label: 'State',
-                            type: "dropdown",
-                            placeholder: 'State'
-                        }, {
-                            label: 'ZIP Code',
-                            type: "input field",
-                            placeholder: 'ZIP Code'
-                        },
-                    ]
-                },
-            ],
+            // subOptions: [
+            //     {
+            //         label: "If mailing address is different",
+            //         fieldName: "Mailing Address",
+            //         type: "radiocheckbox",
+            //         subFields: [
+            //             {
+            //                 label: 'Street',
+            //                 type: "input field",
+            //                 placeholder: 'Street'
+            //             }, {
+            //                 label: 'APT./SPACE/STE.#',
+            //                 type: "address",
+            //                 placeholder: 'APT./SPACE/STE.#'
+            //             }, {
+            //                 label: 'City',
+            //                 type: "input field",
+            //                 placeholder: 'City'
+            //             }, {
+            //                 label: 'State',
+            //                 type: "dropdown",
+            //                 placeholder: 'State'
+            //             }, {
+            //                 label: 'ZIP Code',
+            //                 type: "input field",
+            //                 placeholder: 'ZIP Code'
+            //             },
+            //         ]
+            //     },
+            // ],
             fields: [
                 {
                     label: 'Name of Bank, Finance Company, or Individual having a Lien on this Vehicle',

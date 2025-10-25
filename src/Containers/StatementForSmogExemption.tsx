@@ -32,11 +32,9 @@ const StatementForSmogExemption = ({
 }: VehicleStatusProps) => {
     const checkboxFields = block.fields.filter((f) => f.type === "checkbox");
 
-    // Auto-uncheck subOptions if parent is unchecked
     useEffect(() => {
         checkboxFields.forEach((field) => {
             const isChecked = Boolean(values?.[field?.label]);
-
             if (!isChecked && field.subOptions?.length) {
                 field.subOptions.forEach((sub) => {
                     if (values?.[sub?.label]) {
@@ -46,62 +44,73 @@ const StatementForSmogExemption = ({
             }
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [values]); // Re-run if values change
+    }, [values]);
 
     return (
-        <div className="pb-2">
+        <div className="pb-3">
             <Section title={title}>
-                <p>The vehicle does not require a smog certification for transfer of ownership because:</p>
-                <div className="grid gap-4">
+                <p className="text-[14px] font-medium mb-2">
+                    The vehicle does not require a smog certification for transfer of ownership because:
+                </p>
+
+                <div className="flex flex-col gap-2">
                     {checkboxFields.map((field, index) => {
                         const isChecked = Boolean(values?.[field?.label]);
 
                         return (
-                            <div key={index}>
+                            <div key={index} className="flex flex-col">
                                 {/* Parent Checkbox */}
-                                <Checkbox
-                                    label={field.label}
-                                    className="mb-1"
-                                    checked={isChecked}
-                                    onChange={() =>
-                                        onFieldChange(field.label, !isChecked)
-                                    }
-                                />
+                                <div className="flex items-start gap-2">
+                                    <Checkbox
+                                        label=""
+                                        checked={isChecked}
+                                        onChange={() => onFieldChange(field.label, !isChecked)}
+                                    />
 
-                                {/* Sub-options */}
-                                <div key={`${index}-subOptions`} className="flex items-center gap-4 flex-wrap ml-4">
-                                    {field.subOptions?.map((subOption, subIdx) => {
-                                        const subValue = Boolean(values?.[subOption?.label]);
+                                    {/* Inline layout */}
+                                    <div className="flex flex-wrap items-center gap-3 leading-tight">
+                                        <span className="text-[14px] whitespace-nowrap">{field.label}</span>
 
-                                        return (
-                                            <div key={`${index}-${subIdx}`} className="flex items-center gap-2">
-                                                <Checkbox
-                                                    label={subOption.label}
-                                                    checked={subValue}
-                                                    className=""
-                                                    onChange={() => onFieldChange(subOption.label, !subValue)}
-                                                    disabled={!isChecked}
-                                                />
-
-                                                {/* 👇 Inline input if "Other" is selected */}
-                                                {subOption.label === "Other" && subValue && (
-                                                    <Input
+                                        {field.subOptions?.map((subOption, subIdx) => {
+                                            const subValue = Boolean(values?.[subOption?.label]);
+                                            return (
+                                                <div
+                                                    key={`${index}-${subIdx}`}
+                                                    className="flex items-center gap-1 translate-y-[1px]"
+                                                >
+                                                    <Checkbox
                                                         label=""
-                                                        placeholder="Specify other"
-                                                        type="text"
-                                                        className="w-[10rem] h-6"
-                                                        value={typeof values?.["Other"] === "string" ? values["Other"] : ""}
-                                                        onChange={(val) => onFieldChange("Other", val)}
+                                                        checked={subValue}
+                                                        onChange={() => onFieldChange(subOption.label, !subValue)}
+                                                        disabled={!isChecked}
                                                     />
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                                    <span className="text-[13px] whitespace-nowrap">
+                                                        {subOption.label}
+                                                    </span>
+
+                                                    {/* Inline input for “Other” */}
+                                                    {subOption.label === "Other" && subValue && (
+                                                        <input
+                                                            placeholder="_________________________"
+                                                            type="text"
+                                                            className="w-[8rem] h-5 ml-1 border-b border-black rounded-none focus:ring-0 focus:outline-none text-[13px] align-middle translate-y-[-1px]"
+                                                            value={
+                                                                typeof values?.["Other"] === "string"
+                                                                    ? values["Other"]
+                                                                    : ""
+                                                            }
+                                                            onChange={(e) => onFieldChange("Other", e.target.value)}
+                                                        />
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                        {field.subText && (
+                                            <p className="ml-4 text-[12px] text-gray-600">{field.subText}</p>
+                                        )}
+                                    </div>
                                 </div>
-                                {/* Subtext */}
-                                {field.subText && (
-                                    <p className="ml-4 text-[12px] text-gray-600">{field.subText}</p>
-                                )}
+
                             </div>
                         );
                     })}

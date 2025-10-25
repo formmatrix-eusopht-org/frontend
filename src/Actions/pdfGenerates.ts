@@ -225,7 +225,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     const rawDate = formData.ownersData?.[0]?.['Date of Sale'] || '';
     const { month, day, year } = extractDateParts(rawDate);
     const isTitleAvailable = formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title")
-    console.log(formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'], "form");
+    // console.log(formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'], "form");
+    const newOwnerAddressCombine = `${formData.newOwnerMailingAddress?.Street} ${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"]}`
+    const newLienholderAddressCombine = `${formData.newLienholder?.["address"]?.["Street"]} ${formData.newLienholder?.["address"]?.["APT./SPACE/STE.#"]}`
 
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
@@ -613,7 +615,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text132.5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
         //Reg343
         "Text12": `${formData.statementForSomgExemptionData?.diesel ? 'Diesel' : formData.statementForSomgExemptionData?.electricity ? 'Electricity' : formData.statementForSomgExemptionData?.Other || ''}`,
-        "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
+        "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : "",
         "Text18": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Veterans' Organization" ? formData?.platesSelectionState?.veteranCode : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
         "Text29": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[0] : '' : '' : formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Length (IN)'] || '' : '',
         "Text30": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[1] : '' : '' : '',
@@ -1700,33 +1702,33 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "county_26": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[25] : formData.newOwnerAddress?.County?.[25] || '' : "",
         "county_27": isTitleAvailable ? formData.selectedRadio?.includes("trailer/vessel-location") ? formData.newOwnerKeptAddress?.County?.[26] : formData.newOwnerAddress?.County?.[26] || '' : "",
 
-        "mailing_1": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[0] || "" : '' : "",
-        "mailing_2": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[1] || "" : '' : "",
-        "mailing_3": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[2] || "" : '' : "",
-        "mailing_4": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[3] || "" : '' : "",
-        "mailing_5": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[4] || "" : '' : "",
-        "mailing_6": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[5] || "" : '' : "",
-        "mailing_7": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[6] || "" : '' : "",
-        "mailing_8": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[7] || "" : '' : "",
-        "mailing_9": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[8] || "" : '' : "",
-        "mailing_10": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[9] || "" : '' : "",
-        "mailing_11": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[10] || "" : '' : "",
-        "mailing_12": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[11] || "" : '' : "",
-        "mailing_13": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[12] || "" : '' : "",
-        "mailing_14": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[13] || "" : '' : "",
-        "mailing_15": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[14] || "" : '' : "",
-        "mailing_16": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[15] || "" : '' : "",
-        "mailing_17": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[16] || "" : '' : "",
-        "mailing_18": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[17] || "" : '' : "",
-        "mailing_19": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[18] || "" : '' : "",
-        "mailing_20": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[19] || "" : '' : "",
-        "mailing_21": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[20] || "" : '' : "",
-        "mailing_22": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[21] || "" : '' : "",
-        "mailing_23": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[22] || "" : '' : "",
-        "mailing_24": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[23] || "" : '' : "",
-        "mailing_25": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[24] || "" : '' : "",
-        "mailing_26": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[25] || "" : '' : "",
-        "mailing_27": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.Street?.[26] || "" : '' : "",
+        "mailing_1": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[0] || "" : '' : "",
+        "mailing_2": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[1] || "" : '' : "",
+        "mailing_3": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[2] || "" : '' : "",
+        "mailing_4": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[3] || "" : '' : "",
+        "mailing_5": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[4] || "" : '' : "",
+        "mailing_6": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[5] || "" : '' : "",
+        "mailing_7": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[6] || "" : '' : "",
+        "mailing_8": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[7] || "" : '' : "",
+        "mailing_9": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[8] || "" : '' : "",
+        "mailing_10": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[9] || "" : '' : "",
+        "mailing_11": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[10] || "" : '' : "",
+        "mailing_12": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[11] || "" : '' : "",
+        "mailing_13": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[12] || "" : '' : "",
+        "mailing_14": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[13] || "" : '' : "",
+        "mailing_15": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[14] || "" : '' : "",
+        "mailing_16": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[15] || "" : '' : "",
+        "mailing_17": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[16] || "" : '' : "",
+        "mailing_18": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[17] || "" : '' : "",
+        "mailing_19": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[18] || "" : '' : "",
+        "mailing_20": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[19] || "" : '' : "",
+        "mailing_21": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[20] || "" : '' : "",
+        "mailing_22": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[21] || "" : '' : "",
+        "mailing_23": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[22] || "" : '' : "",
+        "mailing_24": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[23] || "" : '' : "",
+        "mailing_25": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[24] || "" : '' : "",
+        "mailing_26": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[25] || "" : '' : "",
+        "mailing_27": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? newOwnerAddressCombine?.[26] || "" : '' : "",
 
         "city_21": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[0] || "" : '' : "",
         "city_22": isTitleAvailable ? formData.selectedRadio?.includes("if-mailing-address-is-different") ? formData.newOwnerMailingAddress?.City?.[1] || "" : '' : "",
@@ -1810,33 +1812,33 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "elt#_title_2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ELT Number (3 digits)"]?.[1] : '' : "",
         "elt#_title_3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ELT Number (3 digits)"]?.[2] : '' : "",
 
-        "lien_add_1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[0] : '' : "",
-        "lien_add_2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[1] : '' : "",
-        "lien_add_3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[2] : '' : "",
-        "lien_add_4": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[3] : '' : "",
-        "lien_add_5": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[4] : '' : "",
-        "lien_add_6": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[5] : '' : "",
-        "lien_add_7": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[6] : '' : "",
-        "lien_add_8": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[7] : '' : "",
-        "lien_add_9": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[8] : '' : "",
-        "lien_add_10": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[9] : '' : "",
-        "lien_add_11": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[10] : '' : "",
-        "lien_add_12": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[11] : '' : "",
-        "lien_add_13": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[12] : '' : "",
-        "lien_add_14": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[13] : '' : "",
-        "lien_add_15": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[14] : '' : "",
-        "lien_add_16": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[15] : '' : "",
-        "lien_add_17": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[16] : '' : "",
-        "lien_add_18": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[17] : '' : "",
-        "lien_add_19": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[18] : '' : "",
-        "lien_add_20": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[19] : '' : "",
-        "lien_add_21": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[20] : '' : "",
-        "lien_add_22": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[21] : '' : "",
-        "lien_add_23": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[22] : '' : "",
-        "lien_add_24": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[23] : '' : "",
-        "lien_add_25": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[24] : '' : "",
-        "lien_add_26": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[25] : '' : "",
-        "lien_add_27": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["Street"]?.[26] : '' : "",
+        "lien_add_1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[0] : '' : "",
+        "lien_add_2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[1] : '' : "",
+        "lien_add_3": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[2] : '' : "",
+        "lien_add_4": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[3] : '' : "",
+        "lien_add_5": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[4] : '' : "",
+        "lien_add_6": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[5] : '' : "",
+        "lien_add_7": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[6] : '' : "",
+        "lien_add_8": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[7] : '' : "",
+        "lien_add_9": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[8] : '' : "",
+        "lien_add_10": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[9] : '' : "",
+        "lien_add_11": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[10] : '' : "",
+        "lien_add_12": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[11] : '' : "",
+        "lien_add_13": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[12] : '' : "",
+        "lien_add_14": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[13] : '' : "",
+        "lien_add_15": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[14] : '' : "",
+        "lien_add_16": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[15] : '' : "",
+        "lien_add_17": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[16] : '' : "",
+        "lien_add_18": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[17] : '' : "",
+        "lien_add_19": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[18] : '' : "",
+        "lien_add_20": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[19] : '' : "",
+        "lien_add_21": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[20] : '' : "",
+        "lien_add_22": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[21] : '' : "",
+        "lien_add_23": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[22] : '' : "",
+        "lien_add_24": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[23] : '' : "",
+        "lien_add_25": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[24] : '' : "",
+        "lien_add_26": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[25] : '' : "",
+        "lien_add_27": isTitleAvailable ? senerio?.includes("Add Lienholder") ? newLienholderAddressCombine?.[26] : '' : "",
 
         "city_41": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[0] : '' : "",
         "city_42": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["City"]?.[1] : '' : "",
@@ -1883,6 +1885,8 @@ const mergeFilledPDFs = async (
     for (const type of formTypes) {
         const pdfUrl = `/${plainPdf ? "plain pdf" : 'pdfs'}/${type}.pdf`;
         const res = await fetch(pdfUrl);
+        console.log(plainPdf);
+
 
         if (!res.ok) {
             console.error(`❌ Failed to fetch PDF: ${pdfUrl}`);
@@ -1916,7 +1920,7 @@ const mergeFilledPDFs = async (
                         }
                     }
                 } catch (e: any) {
-                    console.warn(`Could not fill field ${name}:`, e.message);
+                    // console.warn(`Could not fill field ${name}:`, e.message);
                 }
             });
 
@@ -1960,7 +1964,7 @@ export async function generateMultiple262AndOne227(
                 ["DMVREG262new"],
                 transferData,
                 "Simple Transfer",
-                true // print-only for 262
+                false // print-only for 262
             );
             if (bytes) allFormBytes.push(bytes);
         }
@@ -2084,8 +2088,22 @@ async function handleOnPDF(form: any, senerio: any) {
             formTypes.push('DMVREG262new', 'Reg227');
             //==> Without Title: REG 227
             if (form.transactionSelections?.includes("Transaction with Vehicle Title")) {
-                formTypes = formTypes.filter(formType => formType !== "Reg227");
-                formTypes.push("title")
+                // formTypes = formTypes.filter(formType => formType !== "Reg227");
+                // formTypes.push("title")
+                try {
+                    const titleBytes = await mergeFilledPDFs(
+                        ["title"],
+                        form,
+                        "Simple Transfer",
+                        false // print-only mode
+                    );
+
+                    const blob = new Blob([titleBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, "_blank");
+                } catch (e) {
+                    console.warn("Could not open title.pdf in a new tab:", e);
+                }
             }
 
             //==> Out Of State Title: REG 343
@@ -2094,7 +2112,7 @@ async function handleOnPDF(form: any, senerio: any) {
             }
 
             //==> Current Lienholder: REG 227
-            if (form.transactionSelections?.includes("There is a Current Lienholder")) {
+            if (!formTypes.includes("Reg227") && form.transactionSelections?.includes("There is a Current Lienholder")) {
                 formTypes.push("Reg227");
             }
 
