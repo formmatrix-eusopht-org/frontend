@@ -19,7 +19,7 @@
     "dotenv": "^16.5.0",
     "firebase": "^11.9.1",
     "lucide-react": "^0.515.0",
-    "next": "15.3.2",
+    "next": "^15.3.8",
     "pdf-lib": "^1.17.1",
     "react": "^19.0.0",
     "react-datepicker": "^8.4.0",
