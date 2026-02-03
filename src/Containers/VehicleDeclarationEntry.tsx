@@ -34,7 +34,7 @@ const VehicleDeclarationEntry = ({
     onFieldChange,
     onTrimEntries
 }: VehicleDeclarationProps) => {
-    const [entryCount, setEntryCount] = React.useState(block.numberOfEntry || 1);
+    const [entryCount, setEntryCount] = React.useState(1);
     useEffect(() => {
         if (entryCount === 1 && values.length > 1) {
             onTrimEntries?.(values.slice(0, 1));
