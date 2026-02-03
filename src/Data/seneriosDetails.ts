@@ -2101,6 +2101,7 @@ export const seneriosDetails = [
                 }
             ]
         }, {
+            //--- New Lien Holder --- change here
             reference: "New Lien Holder",
             blockName: "New Lien Holder",
             subOption: [
@@ -2111,11 +2112,13 @@ export const seneriosDetails = [
                             label: 'Street',
                             type: "input field",
                             placeholder: 'Street'
-                        }, {
-                            label: 'APT./SPACE/STE.#',
-                            type: "address",
-                            placeholder: 'APT./SPACE/STE.#'
-                        }, {
+                        },
+                        // {
+                        //     label: 'APT./SPACE/STE.#',
+                        //     type: "address",
+                        //     placeholder: 'APT./SPACE/STE.#'
+                        // },
+                        {
                             label: 'City',
                             type: "input field",
                             placeholder: 'City'
@@ -2145,11 +2148,13 @@ export const seneriosDetails = [
                     label: 'Street',
                     type: "input field",
                     placeholder: 'Street'
-                }, {
-                    label: 'APT./SPACE/STE.#',
-                    type: "address",
-                    placeholder: 'APT./SPACE/STE.#'
-                }, {
+                },
+                // {
+                //     label: 'APT./SPACE/STE.#',
+                //     type: "address",
+                //     placeholder: 'APT./SPACE/STE.#'
+                // },
+                {
                     label: 'City',
                     type: "input field",
                     placeholder: 'City'
