@@ -2477,29 +2477,45 @@ export const seneriosDetails = [
                 placeholder: 'Make of Vehicle OR Vessel Builder'
             }
             ]
-        }, {
-            reference: "New Registered Owner(s)",
-            blockName: "New Registered Owner(s)",
+        },
+        {
+            reference: "Registered Owner(s)",
+            blockName: "Registered Owner(s)",
+            ownersNumber: 3,
             fields: [
-                {
-                    label: 'First Name',
-                    type: "input field",
-                    placeholder: 'First Name'
-                }, {
-                    label: 'Middle Name',
-                    type: "input field",
-                    placeholder: 'Middle Name'
-                }, {
-                    label: 'Last Name',
-                    type: "input field",
-                    placeholder: 'Last Name'
-                }, {
-                    label: 'Phone Number',
-                    type: "phone",
-                    placeholder: 'Phone Number'
-                }
+                { label: 'First Name', type: 'input field', placeholder: 'First Name' },
+                { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
+                { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
+                { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
+                { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
-        }, {
+        },
+        //  {
+        //     reference: "New Registered Owner(s)",
+        //     blockName: "New Registered Owner(s)",
+        //     fields: [
+        //         {
+        //             label: 'First Name',
+        //             type: "input field",
+        //             placeholder: 'First Name'
+        //         }, {
+        //             label: 'Middle Name',
+        //             type: "input field",
+        //             placeholder: 'Middle Name'
+        //         }, {
+        //             label: 'Last Name',
+        //             type: "input field",
+        //             placeholder: 'Last Name'
+        //         }, {
+        //             label: 'Phone Number',
+        //             type: "phone",
+        //             placeholder: 'Phone Number'
+        //         }
+        //     ]
+        // }, 
+        {
             reference: "Documents Received",
             blockName: "Documents Received",
             fields: [
