@@ -1056,7 +1056,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     return (
         <>
-            <div>{isEditAndId ? "Editing Transaction" : "Creating Transaction"}</div>
+            {/* <div>{isEditAndId ? "Editing Transaction" : "Creating Transaction"}</div> */}
             {senerio?.includes("Multiple Transfer") ?
                 <MultipleTransfer
                     title="Multiple Transfer"
