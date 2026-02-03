@@ -1,3 +1,4 @@
+//right side part of form to show relevant sections
 export const sidebarSections = [
   {
     title: "Transfer",
