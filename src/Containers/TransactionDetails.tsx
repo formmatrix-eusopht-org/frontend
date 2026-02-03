@@ -57,10 +57,18 @@ export const TransactionDetails = ({
                 checked={selectedItems.includes(field.label)}
                 onChange={() => {
                   // If trying to select a disabled option, do nothing
-                  if (shouldDisableFamilyTransfer || shouldDisableGift) return;
+                  if (shouldDisableFamilyTransfer || shouldDisableGift || (senerio.includes("Multiple Transfer") && (
+                    (field.label === "Smog Exemption" && isFamilyTransferSelected) ||
+                    (field.label === "Family Transfer" && selectedItems.includes("Smog Exemption"))
+                  ))) return;
                   onChange(field.label, !selectedItems.includes(field.label));
                 }}
-                disabled={shouldDisableFamilyTransfer || shouldDisableGift}
+                disabled={shouldDisableFamilyTransfer || shouldDisableGift ||
+                  (senerio.includes("Multiple Transfer") && (
+                    (field.label === "Smog Exemption" && isFamilyTransferSelected) ||
+                    (field.label === "Family Transfer" && selectedItems.includes("Smog Exemption"))
+                  ))
+                }
               />
             );
           })}
