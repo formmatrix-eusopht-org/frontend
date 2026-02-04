@@ -88,7 +88,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     const confirm = useConfirm();
     const [open, setOpen] = useState(false);
-    const [isEditAndId, setIsEditAndId] = useState("");
     const isInitialMount = useRef(true);
     const schemaForMultipletransfer = {
         "transferNumber": 1,
@@ -117,9 +116,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         }
     });
     const { user } = UserAuth();
-    const { senerio } = useSenerioContext();
-
-    const [isLoading, setIsLoading] = useState(false);
+    const { senerio, isLoading, setIsLoading, isEditAndId, setIsEditAndId, handleClear } = useSenerioContext();
 
     const LOCAL_STORAGE_KEY_form = "formStates";
     const LOCAL_STORAGE_KEY_senerio = "senerio";
@@ -1455,22 +1452,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             setIsLoading(false);
                         }}
                         onInvoice={() => console.log('Generate Invoice clicked')}
-                        onClear={() => {
-                            if (isEditAndId) {
-                                localStorage.removeItem(LOCAL_STORAGE_KEY_form);
-                                localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
-                                // localStorage.removeItem("senerio");
-                                localStorage.setItem("isEditAndId", "");
-                                window.location.reload();
-                            } else {
-                                localStorage.removeItem(LOCAL_STORAGE_KEY_form);
-                                localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
-                                localStorage.setItem("isEditAndId", "");
-                                window.location.reload();
-
-                            }
-
-                        }}
+                        onClear={handleClear}
                         isEdit={isEditAndId}
                     />
                     <Dialog

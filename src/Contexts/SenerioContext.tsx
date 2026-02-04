@@ -37,6 +37,11 @@ type SenerioContextType = {
   senerio: string[];
   setSenerio: (senerio: string[] | ((prev: string[]) => string[])) => void;
   formData: Block[];
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
+  isEditAndId: string;
+  setIsEditAndId: (id: string) => void;
+  handleClear: () => void;
 };
 
 const LOCAL_STORAGE_KEY = "senerio";
@@ -93,6 +98,9 @@ const buildCombinedForm = (
 const SenerioContext = createContext<SenerioContextType | undefined>(undefined);
 
 export const SenerioProvider = ({ children }: { children: ReactNode }) => {
+  const LOCAL_STORAGE_KEY_form = "formStates";
+  const LOCAL_STORAGE_KEY_senerio = "senerio";
+
   // ✅ Load from localStorage right away
   const [senerio, setSenerio] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
@@ -108,6 +116,13 @@ export const SenerioProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const [formData, setFormData] = useState<Block[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditAndId, setIsEditAndId] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("isEditAndId") || "";
+    }
+    return "";
+  });
 
   // Rebuild formData whenever senerio changes
   useEffect(() => {
@@ -116,7 +131,30 @@ export const SenerioProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(senerio));
   }, [senerio]);
 
-  const senerioValues = { senerio, setSenerio, formData };
+  const handleClear = () => {
+    if (isEditAndId) {
+      localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+      localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
+      localStorage.setItem("isEditAndId", "");
+      window.location.reload();
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+      localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
+      localStorage.setItem("isEditAndId", "");
+      window.location.reload();
+    }
+  };
+
+  const senerioValues = {
+    senerio,
+    setSenerio,
+    formData,
+    isLoading,
+    setIsLoading,
+    isEditAndId,
+    setIsEditAndId,
+    handleClear
+  };
 
   return (
     <SenerioContext.Provider value={senerioValues}>

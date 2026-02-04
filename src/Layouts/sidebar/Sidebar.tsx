@@ -6,7 +6,7 @@ import { useSenerioContext } from "@/Contexts/SenerioContext";
 import { sidebarSections } from "@/Data/sidebarCheckboxData";
 
 export default function Sidebar() {
-  const { senerio, setSenerio } = useSenerioContext();
+  const { senerio, setSenerio, isLoading, isEditAndId, handleClear } = useSenerioContext();
 
   const handleCheckboxChange = (label: string) => {
     const selectedOption = sidebarSections
@@ -43,12 +43,25 @@ export default function Sidebar() {
   };
 
 
+
+
   return (
     <div className="w-[400px] fixed right-0 top-[112px] bottom-[30px] rounded-xl shadow-lg z-40 bg-white flex flex-col">
       <aside className="flex flex-col h-full">
-        <div className="p-6">
+
+        <div className="flex flex-row justify-between items-center p-6">
+          {/* --tRANSACTIONS --*/}
           <h2 className="text-2xl font-bold">Transactions</h2>
-          <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
+
+          {/* --CLEAR FORM --*/}
+          <button
+            disabled={isLoading}
+            className="border border-black text-black px-4 py-2 rounded-md hover:bg-black hover:text-white transition"
+            onClick={handleClear}
+          >
+            {isEditAndId ? "Cancel Editing" : "Clear Form"}
+          </button>
+
         </div>
 
         {/* Scrollable section */}
