@@ -3,8 +3,10 @@ import {
     PDFTextField,
     PDFCheckBox,
     PDFField,
+    rgb
 } from 'pdf-lib';
 import toast from 'react-hot-toast';
+import { seneriosDetails } from '../Data/seneriosDetails';
 
 type OwnerData = {
     [key: string]: string | undefined;
@@ -169,6 +171,7 @@ type FormData = {
         issuedPreviously?: "yes" | "no";
         plate?: string;
     };
+    optionsForValidation?: string[];
 };
 
 function formatSingleOwner(owner?: OwnerData): string {
@@ -1954,7 +1957,8 @@ const mergeFilledPDFs = async (
 };
 export async function generateMultiple262AndOne227(
     multipleFormDataList: FormData[],
-    openInNewTab = true
+    openInNewTab = true,
+    senerio = "Simple Transfer"
 ): Promise<Uint8Array | null> {
     if (!Array.isArray(multipleFormDataList) || multipleFormDataList.length === 0) {
         console.warn("No transfer data provided.");
@@ -2049,6 +2053,19 @@ export async function generateMultiple262AndOne227(
             const doc = await PDFDocument.load(bytes);
             const pages = await finalMergedPdf.copyPages(doc, doc.getPageIndices());
             pages.forEach((p) => finalMergedPdf.addPage(p));
+        }
+
+        // Add Collections PDF if there are any collections (from the last transfer)
+        const collections = last.optionsForValidation || [];
+        const allOptions = getCollectionOptions(senerio);
+
+        if (collections.length > 0 || allOptions.length > 0) {
+            const collectionsPdfBytes = await generateCollectionsPDF(collections, allOptions);
+            if (collectionsPdfBytes) {
+                const collectionsDoc = await PDFDocument.load(collectionsPdfBytes);
+                const collectionsPages = await finalMergedPdf.copyPages(collectionsDoc, collectionsDoc.getPageIndices());
+                collectionsPages.forEach((p) => finalMergedPdf.addPage(p));
+            }
         }
 
         const finalBytes = await finalMergedPdf.save();
@@ -2187,6 +2204,123 @@ async function handleOnPDF(form: any, senerio: any) {
         console.error("error in genrating pdf : ", e)
     }
 }
+
+async function generateCollectionsPDF(selectedItems: string[], allItems: string[]): Promise<Uint8Array | null> {
+    try {
+        const pdfDoc = await PDFDocument.create();
+        let currentPage = pdfDoc.addPage([612, 792]); // Standard letter size
+        const { width, height } = currentPage.getSize();
+
+        // Title
+        currentPage.drawText('COLLECTIONS', {
+            x: 50,
+            y: height - 50,
+            size: 20,
+        });
+
+        // Add a line under the title
+        currentPage.drawLine({
+            start: { x: 50, y: height - 60 },
+            end: { x: width - 50, y: height - 60 },
+            thickness: 2,
+        });
+
+        // List collection items
+        let yPosition = height - 100;
+        const lineHeight = 25;
+        const boxSize = 12;
+        const textMargin = 70; // Position for text
+
+        // If no allItems provided, fallback to selectedItems
+        const itemsToRender = allItems.length > 0 ? allItems : selectedItems;
+
+        itemsToRender.forEach((item, index) => {
+            // Check if we need a new page
+            if (yPosition < 50) {
+                currentPage = pdfDoc.addPage([612, 792]);
+                yPosition = height - 50;
+            }
+
+            const isSelected = selectedItems.includes(item);
+
+            // Draw Checkbox Square
+            currentPage.drawRectangle({
+                x: 50,
+                y: yPosition,
+                width: boxSize,
+                height: boxSize,
+                borderColor: rgb(0, 0, 0),
+                borderWidth: 1,
+            });
+
+            // Draw Checkmark if selected
+            if (isSelected) {
+                currentPage.drawLine({
+                    start: { x: 50, y: yPosition },
+                    end: { x: 50 + boxSize, y: yPosition + boxSize },
+                    color: rgb(0, 0, 0),
+                    thickness: 1.5,
+                });
+                currentPage.drawLine({
+                    start: { x: 50, y: yPosition + boxSize },
+                    end: { x: 50 + boxSize, y: yPosition },
+                    color: rgb(0, 0, 0),
+                    thickness: 1.5,
+                });
+            }
+
+            // Draw collection item text
+            currentPage.drawText(item, {
+                x: textMargin,
+                y: yPosition, // Adjust for baseline? drawText y is usually baseline. Rectangle y is bottom-left. 
+                // However, pdf-lib drawText y is baseline. Rectangle y is bottom-left.
+                // It's safer to align them visually.
+                // If yPosition is bottom of the line:
+                size: 12,
+                maxWidth: width - textMargin - 50,
+            });
+
+            yPosition -= lineHeight;
+        });
+
+        const pdfBytes = await pdfDoc.save();
+        return pdfBytes;
+    } catch (error) {
+        console.error('Error generating Collections PDF:', error);
+        return null;
+    }
+}
+
+function getCollectionOptions(senerioName: string): string[] {
+    try {
+        const allOptions: string[] = [];
+        seneriosDetails.forEach((scenario: any) => {
+            // Check if this scenario form name is present in the input senerioName string
+            // We use includes() which works for both comma-separated strings "FormA, FormB"
+            // and JSON arrays "['FormA', 'FormB']".
+            if (senerioName && senerioName.includes(scenario.form)) {
+
+                const docBlock = scenario.blocks.find((b: any) =>
+                    b.blockName === "Documents Received" || b.reference === "Documents Received"
+                );
+
+                if (docBlock && docBlock.fields) {
+                    docBlock.fields.forEach((f: any) => {
+                        if (f.label) {
+                            allOptions.push(f.label);
+                        }
+                    });
+                }
+            }
+        });
+
+        // Deduplicate
+        return Array.from(new Set(allOptions));
+    } catch (e) {
+        console.error("Error getting collection options:", e);
+        return [];
+    }
+}
 export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
 
     const message = (() => {
@@ -2218,19 +2352,20 @@ export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
         return;
     }
     const finalMergedPdf = await PDFDocument.create();
+    const savedSenerio = localStorage.getItem("senerio") || "Simple Transfer";
     if (sourceOfClick === "Multiple Transfer") {
         const savedForm = localStorage.getItem("multipleTransferStates");
         const parsed = JSON.parse(savedForm || "{}");
         const multipleFormDataList: FormData[] = parsed?.multipleTransfer || [];
 
         // Use the first transfer to build Reg227 by default (you can pass other index)
-        await generateMultiple262AndOne227(multipleFormDataList, true);
+        await generateMultiple262AndOne227(multipleFormDataList, true, savedSenerio);
         return;
     }
     else {
         try {
             const savedForm = localStorage.getItem("formStates");
-            const savedSenerio = localStorage.getItem("senerio");
+            // const savedSenerio = localStorage.getItem("senerio"); // Removed to use outer declaration
             const parsed = JSON.parse(savedForm || "{}");
             const filledBytes = await handleOnPDF(parsed, savedSenerio);
 
@@ -2238,6 +2373,20 @@ export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
                 const filledDoc = await PDFDocument.load(filledBytes);
                 const pages = await finalMergedPdf.copyPages(filledDoc, filledDoc.getPageIndices());
                 pages.forEach((page) => finalMergedPdf.addPage(page));
+            }
+
+            // Add Collections PDF if there are any collections
+            // Also need senerio here
+            const collections = parsed.optionsForValidation || [];
+            const allOptions = getCollectionOptions(savedSenerio);
+
+            if (collections.length > 0 || allOptions.length > 0) {
+                const collectionsPdfBytes = await generateCollectionsPDF(collections, allOptions);
+                if (collectionsPdfBytes) {
+                    const collectionsDoc = await PDFDocument.load(collectionsPdfBytes);
+                    const collectionsPages = await finalMergedPdf.copyPages(collectionsDoc, collectionsDoc.getPageIndices());
+                    collectionsPages.forEach((page) => finalMergedPdf.addPage(page));
+                }
             }
         } catch (e) {
             console.error(`Error processing filled PDF:`, e);
