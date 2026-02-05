@@ -9,14 +9,18 @@ interface User {
   email: string;
   role: string | number;
   status: number;
+  activeStatus?: boolean;
   planExpiration: string;
 }
 
 interface UserTableProps {
   users: User[];
+  onRefresh: () => void;
 }
 
-export default function UserTable({ users }: UserTableProps) {
+import toast from "react-hot-toast";
+
+export default function UserTable({ users, onRefresh }: UserTableProps) {
   const router = useRouter();
 
   const formatDate = (dateString: string) => {
@@ -26,6 +30,45 @@ export default function UserTable({ users }: UserTableProps) {
       day: "2-digit",
       year: "numeric",
     });
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const handleStatusChange = async (id: number, currentStatus: boolean | undefined) => {
+    try {
+      // If currentStatus is explicitly false, we want to activate (true). 
+      // If it's true or undefined, we want to deactivate (false).
+      const newStatus = currentStatus === false ? true : false;
+      const confirmMsg = newStatus ? "Are you sure you want to activate this user?" : "Are you sure you want to deactivate this user?";
+
+      if (!window.confirm(confirmMsg)) return;
+
+      const url = newStatus
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/activate/${id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/deactivate/${id}`;
+
+      const body = newStatus ? {} : { activeStatus: false };
+
+      const res = await fetch(url, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message);
+        onRefresh();
+      } else {
+        toast.error(data.message || "Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -72,13 +115,25 @@ export default function UserTable({ users }: UserTableProps) {
                       {formatDate(user.planExpiration)}
                     </td>
                     <td className="px-4 py-2 text-right space-x-3 whitespace-nowrap">
-                      <button className="text-blue-600 hover:underline">Edit</button>
-                      {user.status === 1 ? (
-                        <button className="text-yellow-600 hover:underline">Deactivate</button>
+                      {/* edit delete button commented in admin */}
+                      {/* <button className="text-blue-600 hover:underline">Edit</button> */}
+                      {user.activeStatus !== false ? (
+                        <button
+                          className="text-yellow-600 hover:underline"
+                          onClick={() => handleStatusChange(user._id, user.activeStatus)}
+                        >
+                          Deactivate
+                        </button>
                       ) : (
-                        <button className="text-gray-600 hover:underline">Activate</button>
+                        //--button to activate deactivate user status activestatus
+                        <button
+                          className="text-gray-600 hover:underline"
+                          onClick={() => handleStatusChange(user._id, user.activeStatus)}
+                        >
+                          Activate
+                        </button>
                       )}
-                      <button className="text-red-600 hover:underline">Delete</button>
+                      {/* <button className="text-red-600 hover:underline">Delete</button> */}
                     </td>
                   </tr>
                 ))
@@ -100,11 +155,22 @@ export default function UserTable({ users }: UserTableProps) {
                   <div className="flex justify-between items-start mb-2">
                     <div className="font-medium text-sm">{user.name}</div>
                     <div className="flex space-x-3">
+
                       <button className="text-blue-600 hover:underline text-sm">Edit</button>
-                      {user.status === 1 ? (
-                        <button className="text-yellow-600 hover:underline text-sm">Deactivate</button>
+                      {user.activeStatus !== false ? (
+                        <button
+                          className="text-yellow-600 hover:underline text-sm"
+                          onClick={() => handleStatusChange(user._id, user.activeStatus)}
+                        >
+                          Deactivate
+                        </button>
                       ) : (
-                        <button className="text-gray-600 hover:underline text-sm">Activate</button>
+                        <button
+                          className="text-gray-600 hover:underline text-sm"
+                          onClick={() => handleStatusChange(user._id, user.activeStatus)}
+                        >
+                          Activate
+                        </button>
                       )}
                       <button className="text-red-600 hover:underline text-sm">Delete</button>
                     </div>

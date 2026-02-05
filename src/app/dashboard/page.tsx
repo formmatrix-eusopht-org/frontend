@@ -31,6 +31,10 @@ export default function User() {
         <>
             <UserTable
                 users={users}
+                onRefresh={() => {
+                    const uid = localStorage.getItem("uid");
+                    fetchUsers(uid);
+                }}
             />
         </>
     )
