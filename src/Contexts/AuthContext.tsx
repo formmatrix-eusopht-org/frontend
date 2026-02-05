@@ -7,6 +7,7 @@ import { auth, initFirebase } from '../../firebase-config';
 import axios from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { getCookie } from '../Actions/cookie';
+import toast from 'react-hot-toast';
 
 initFirebase(); // Ensure Firebase is initialized once
 
@@ -128,8 +129,14 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
           router.push('/dashboard')
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
+      if (error && (error.code === 'auth/user-disabled' || (error.response && error.response.status === 403))) {
+        toast.error("Account Deactivated. Contact Admin for Help");
+      }
+      else {
+        toast.error("Login Failed " + (error.message || ""));
+      }
       throw error;
     } finally {
       setLoading(false);
