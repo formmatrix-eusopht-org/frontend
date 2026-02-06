@@ -9,17 +9,16 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
-  const [showForgotModal, setShowForgotModal] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
   const { emailSignIn, isLoggingIn, resetPassword } = UserAuth();
 
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!resetEmail) return;
+  const handleResetPassword = async () => {
+    if (!email) {
+      alert("Please enter your email address in the field above first.");
+      return;
+    }
+
     try {
-      await resetPassword(resetEmail);
-      setShowForgotModal(false);
-      setResetEmail('');
+      await resetPassword(email);
     } catch (err) {
       // Error is handled in context
     }
@@ -91,41 +90,12 @@ const LoginPage = () => {
 
           <p
             className="text-sm text-gray-600 hover:underline cursor-pointer"
-            onClick={() => setShowForgotModal(true)}
+            onClick={handleResetPassword}
+            title="Enter email above and click here to reset"
           >
             Forgot Password?
           </p>
         </form>
-
-        {/* Forgot Password Modal */}
-        {showForgotModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm relative text-left">
-              <button
-                onClick={() => setShowForgotModal(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-black"
-                type="button"
-              >
-                <X size={20} />
-              </button>
-              <h3 className="text-xl font-bold mb-4 text-black">Reset Password</h3>
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <p className="text-sm text-gray-600">Enter your email address to receive a password reset link.</p>
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter your email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-black text-black"
-                />
-                <button type="submit" className="w-full bg-black text-white py-2 rounded hover:opacity-90">
-                  Send Reset Link
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
