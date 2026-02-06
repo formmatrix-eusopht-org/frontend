@@ -1874,7 +1874,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "zip_15": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["ZIP Code"]?.[4] : '' : "",
 
         //dmv 14
-        "S8b Yes": true,
+        "S8b No": true,
         //not a us citizen
         "S8a Yes": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Not a United State Citizen") ? false : true : false,
         "S8a No": senerio?.includes("Change of Address") ? formData.transactionSelections?.includes("Not a United State Citizen") ? true : false : false,
