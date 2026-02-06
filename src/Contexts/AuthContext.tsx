@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAuth } from 'firebase/auth';
+import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAuth, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, onSnapshot, getFirestore, deleteDoc } from 'firebase/firestore';
 import { auth, initFirebase } from '../../firebase-config';
 import axios from 'axios';
@@ -19,6 +19,7 @@ interface AuthContextType {
   loading: boolean;
   isLoggingIn: boolean;
   checkSession: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -221,13 +222,27 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     return () => unsubscribe();
   }, [user, sessionChecked, router]);
 
+  // ✅ Password Reset
+  const resetPassword = async (email: string) => {
+    console.log("Attempting to send reset email to:", email);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      console.log("Firebase reported success for reset email.");
+      toast.success('Password reset email sent! Check your inbox (and spam).');
+    } catch (error: any) {
+      console.error('Reset password failed:', error);
+      toast.error('Failed to send reset email: ' + (error.message || ''));
+      throw error;
+    }
+  };
+
   if (!sessionChecked) {
     return <div>Loading...</div>;
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn, checkSession }}
+      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn, checkSession, resetPassword }}
     >
       {children}
     </AuthContext.Provider>
