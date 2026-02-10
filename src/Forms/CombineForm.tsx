@@ -1166,6 +1166,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                                     ? ["if-mailing-address-is-different"]
                                     : []
                             }
+                            senerio={senerio}
                             onToggleOption={legalOwnerToggleMailingAddress}
                             onAddressChange={handleLegalOwnerFieldChange}
                             isOutofStateTitle={isOutofStateTitle}

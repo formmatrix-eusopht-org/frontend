@@ -27,6 +27,7 @@ interface Props {
   isOutofStateTitle: Boolean;
   legalOwnerMailingAddress: Record<string, string>;
   selectedRadio: string[];
+  senerio: string[];
   onToggleOption: (val: string) => void;
   onAddressChange: (
     section: "residential" | "mailing",
@@ -45,7 +46,8 @@ export const LegalOwnerOfRecord = ({
   selectedRadio,
   onToggleOption,
   onAddressChange,
-  isOutofStateTitle
+  isOutofStateTitle,
+  senerio
 }: Props) => {
   const fields = block?.fields || [];
 
@@ -63,7 +65,7 @@ export const LegalOwnerOfRecord = ({
       data: legalOwnerMailingAddress,
     },
   };
-
+  const isCommercialVehicle = senerio?.includes("Commercial Vehicle")
   return (
     <div className="pb-4">
       <Section
@@ -96,7 +98,7 @@ export const LegalOwnerOfRecord = ({
 
         {/* Remaining fields - Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {fields?.filter(field => isOutofStateTitle || field.label !== "ELT Number (3 digits)")?.slice(1).map((field) => (
+          {fields?.filter(field => isCommercialVehicle ? true : (isOutofStateTitle || field.label !== "ELT Number (3 digits)"))?.slice(1).map((field) => (
             <Input
               key={field?.label}
               label={field?.label}

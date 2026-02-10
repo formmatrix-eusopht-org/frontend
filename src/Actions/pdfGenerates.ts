@@ -585,7 +585,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text116": formData.newOwnerKeptAddress?.State || '',
         "Text117": formData.newOwnerKeptAddress?.["ZIP Code"] || '',
         "Text118": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || '' : 'NONE',
-        "Text119": formData.transactionSelections?.includes('There is a Current Lienholder') && formData.transactionSelections?.includes('Out of State Title') ? formData.LegalOwnerOfRecordData?.residential?.["ELT Number (3 digits)"] || '' : '',
+        "Text119": formData.transactionSelections?.includes('There is a Current Lienholder') && (formData.transactionSelections?.includes('Out of State Title') || senerio?.includes('Commercial Vehicle')) ? formData.LegalOwnerOfRecordData?.residential?.["ELT Number (3 digits)"] || '' : '',
         "Text120": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.Street || '' : '',
         "Text121": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.["APT./SPACE/STE.#"] || '' : '',
         "Text122": formData.transactionSelections?.includes('There is a Current Lienholder') ? formData.LegalOwnerOfRecordData?.residential?.City || '' : '',
@@ -686,7 +686,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Check Box21": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedTo === "Trailer" ? true : false : false : false,
         "Check Box22": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedTo === "Motorcycle" ? true : false : false : false,
         "Check Box23": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedFor === "Sequential" ? true : false : false : false,
-        "Check Box24": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedFor !== "" ? formData?.selectConfigState.deliveryType === "Auto Club" ? true : false : false : false : formData.typeOfVehicleSelection === "Commercial" ? true : false,
+        "Check Box24": senerio?.includes("Commercial Vehicle") ? true : senerio?.includes("Personalized Plates") ?
+            (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ?
+                formData?.selectConfigState.assignedFor !== "" ? formData?.selectConfigState.deliveryType === "Auto Club" ? true : false : false : false : formData.typeOfVehicleSelection === "Commercial" ? true : false,
         "Check Box25": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === "California 1960s Legacy" ? true : false : formData.typeOfVehicleSelection === "MOTORCYCLE" ? true : false,
         "Check Box26": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'California Museums (Snoopy)' ? true : false : formData.typeOfVehicleSelection === "OFF HIGHWAY" ? true : false,
         "Check Box27": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? true : false : false : formData.typeOfVehicleSelection === "TRAILER COACH" ? true : false,
@@ -723,7 +725,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         'Check Box77': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnershipTypes?.[2] === 'and' ? true : false : false,
         'Check Box80': (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnershipTypes?.[2] === 'or' ? true : false : false,
         "Check Box181": true,
-        "Check Box183": true,
+        "Check Box183": false,
         "Text184": (formData.newOwnerCount ?? 0) > 0 ? formatSingleOwner(formData.newOwnerData?.[0]) : '',
         "Text185": (formData.newOwnerCount ?? 0) > 0 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
         "Text186": (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
@@ -810,8 +812,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "license year": senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : false,
         "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false,
 
-        "Check Box51": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Weight Actual"] || '' : '',
-        "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Weight Estimated"] || '' : '',
+        "Check Box51": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Actual" ? true : false : false,
+        "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Estimated" ? true : false : false,
 
         //reg 4008
 
