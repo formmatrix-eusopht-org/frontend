@@ -2136,13 +2136,13 @@ async function handleOnPDF(form: any, senerio: any) {
             }
         }
         if (senerio?.includes("Filing for Planned Non-Operation (PNO)")) {
-            formTypes.push("Reg102");
+            formTypes.push("REG102");
             if (form.transactionSelections?.includes('60 days before registration expires or 90 days after')) {
                 formTypes.push("Reg156");
             }
         }
         if (senerio?.includes("Certificate of Non-Operation")) {
-            formTypes.push("Reg102");
+            formTypes.push("REG102");
         }
         if (senerio?.includes("Commercial Vehicle")) {
             formTypes.push("Reg343");
