@@ -468,58 +468,58 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
     };
     //===>  Handler for vehicle information fields
     const handleVehicleFieldChange = (label: string, value: string | boolean) => {
-    const current = getCurrentTransfer();
+        const current = getCurrentTransfer();
 
-    // Update current transfer first
-    updateCurrentTransfer({
-        vehicleInfoState: {
-            ...current.vehicleInfoState,
-            [label]: value,
-        },
-    });
+        // Update current transfer first
+        updateCurrentTransfer({
+            vehicleInfoState: {
+                ...current.vehicleInfoState,
+                [label]: value,
+            },
+        });
 
-    // Define fields that should sync across ALL transfers
-    const syncAllFields = [
-        "Vehicle/Hull Identification Number",
-        "Vehicle License Plate or Vessel CF Number",
-        "Year of Vehicle",
-        "Make of Vehicle OR Vessel Builder",
-    ];
+        // Define fields that should sync across ALL transfers
+        const syncAllFields = [
+            "Vehicle/Hull Identification Number",
+            "Vehicle License Plate or Vessel CF Number",
+            "Year of Vehicle",
+            "Make of Vehicle OR Vessel Builder",
+        ];
 
-    setMultipleTransfer((prev) =>
-        prev.map((transfer, i) => {
-            const isActive = transfer.transferNumber === activeTab;
+        setMultipleTransfer((prev) =>
+            prev.map((transfer, i) => {
+                const isActive = transfer.transferNumber === activeTab;
 
-            // Case 1️⃣: Sync to all transfers if label is in syncAllFields
-            if (syncAllFields.includes(label)) {
-                return {
-                    ...transfer,
-                    vehicleInfoState: {
-                        ...transfer.vehicleInfoState,
-                        [label]: value,
-                    },
-                };
-            }
+                // Case 1️⃣: Sync to all transfers if label is in syncAllFields
+                if (syncAllFields.includes(label)) {
+                    return {
+                        ...transfer,
+                        vehicleInfoState: {
+                            ...transfer.vehicleInfoState,
+                            [label]: value,
+                        },
+                    };
+                }
 
-            // Case 2️⃣: Sync “Motorcycle Engine Number” only to next transfers
-            if (
-                label === "Motorcycle Engine Number" &&
-                i > prev.findIndex((t) => t.transferNumber === activeTab)
-            ) {
-                return {
-                    ...transfer,
-                    vehicleInfoState: {
-                        ...transfer.vehicleInfoState,
-                        [label]: value,
-                    },
-                };
-            }
+                // Case 2️⃣: Sync “Motorcycle Engine Number” only to next transfers
+                if (
+                    label === "Motorcycle Engine Number" &&
+                    i > prev.findIndex((t) => t.transferNumber === activeTab)
+                ) {
+                    return {
+                        ...transfer,
+                        vehicleInfoState: {
+                            ...transfer.vehicleInfoState,
+                            [label]: value,
+                        },
+                    };
+                }
 
-            // Default: no change
-            return transfer;
-        })
-    );
-};
+                // Default: no change
+                return transfer;
+            })
+        );
+    };
 
     //===>  Handler for owner count change
     const handleOwnerCountChange = (count: number) => {
@@ -1348,6 +1348,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                                 ? ["if-mailing-address-is-different"]
                                 : []
                         }
+                        senerio={senerio}
                         onToggleOption={legalOwnerToggleMailingAddress}
                         onAddressChange={handleLegalOwnerFieldChange}
                         isOutofStateTitle={isOutofStateTitle}
