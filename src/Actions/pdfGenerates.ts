@@ -651,7 +651,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text55": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[2]?.meaning : '' : '' : '',
 
         //check boxes
-        "App for2": true,
+        "App for": true,
+        "App for2": false,
         "Check Box1": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Order' ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Lost' ? true : false,
         "Check Box2": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Replace' ? true : false : formData.transactionSelections?.includes("Transaction with Vehicle Title") || formData.transactionSelections?.includes("With Title") ? false : formData.missingReason === 'Stolen' ? true : false,
         "Check Box3": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState === 'Reassign/Retain' ? true : false : false,
