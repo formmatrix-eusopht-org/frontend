@@ -1207,11 +1207,12 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         onChange={handleTypeOfVehicleChange}
                     />
                 )}
-                {SalvageCertificateBlock && (
+                {SalvageCertificateBlock && (activeTab === transferCount) && (
                     <SalvageCertificate
+                        key={`salvage-cert-${activeTab}`}
                         title={SalvageCertificateBlock.blockName}
-                        block={SalvageCertificateBlock} // ✅ pass metadata
-                        values={currentTransfer.salvageCertificateState} // ✅ pass current field values
+                        block={SalvageCertificateBlock}
+                        values={currentTransfer.salvageCertificateState}
                         onFieldChange={handleSalvageCertificateChange}
                     />
                 )}
@@ -1259,6 +1260,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                 )}
                 {CertificateOfLicensePlateDispositionBlock && (
                     <CertificateOfLicensePlateDisposition
+                        key={`cert-license-plate-${activeTab}`}
                         title={CertificateOfLicensePlateDispositionBlock.blockName}
                         block={{
                             ...CertificateOfLicensePlateDispositionBlock,
