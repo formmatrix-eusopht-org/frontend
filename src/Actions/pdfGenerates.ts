@@ -536,8 +536,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text72": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.ifPlateOwnerIsDifferent ? formData?.platePurchaseState?.plateOwner?.["State"] || '' : '' : '',
 
         "Text74": senerio?.includes("Personalized Plates") ? getCurrentDate() : (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.['State'] || '' : '',
-        "Text75": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"]?.slice(1, 4) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
-        "Text76": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.plateOwner?.["Phone Number"]?.slice(5) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
+        "Text75": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.["Phone Number"]?.slice(1, 4) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
+        "Text76": senerio?.includes("Personalized Plates") ? formData?.platePurchaseState?.platePurchase?.["Phone Number"]?.slice(5) || '' : (formData.newOwnerCount ?? 0) > 2 ? formData.newOwnerData?.[2]?.['State'] || '' : '',
         'Owner DL no': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '',
         'owner second digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '',
         'owner third digit': formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '',
