@@ -3,17 +3,33 @@
 import React from "react";
 
 interface Subscription {
-    _id: string;
+    subscriptionId: string;
+    status: string;
+    currentPeriodStart: string | null;
+    currentPeriodEnd: string | null;
+    priceId: string;
+    Price: string;
     planType: string;
-    Price: number;
-    currentPeriodStart: string;
-    currentPeriodEnd: string;
-    status: "active" | "expired" | "canceled" | "pending";
-    invoiceUrl?: string;
+    cancelAtPeriodEnd: boolean;
+}
+
+interface Payment {
+    invoiceId: string;
+    amountPaid: number;
+    currency: string;
+    status: string;
+    hosted_invoice_url: string;
+    invoice_pdf: string;
+    date: string;
+    periodStart: string;
+    periodEnd: string;
 }
 
 interface SubscriptionTableProps {
-    subscriptions: any;
+    subscriptions: {
+        subscriptions?: Subscription[];
+        payments?: Payment[];
+    };
     onCancel: () => void;
     loading?: boolean;
 }
@@ -23,151 +39,224 @@ export default function SubscriptionTable({
     onCancel,
     loading,
 }: SubscriptionTableProps) {
-    const subData = subscriptions?.subscriptions || {};
+    const subList = subscriptions?.subscriptions || [];
+    const paymentList = subscriptions?.payments || [];
+
+    // Find if there's any active subscription to enable/disable the cancel button
+    const activeSubscription = subList.find(sub => sub.status === "active");
+    const isCancelDisabled = loading || !activeSubscription;
+
+    const formatDate = (dateStr: string | null) => {
+        if (!dateStr) return "N/A";
+        return new Date(dateStr).toLocaleDateString("en-US", {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
 
     return (
-        <div className="p-4 mt-4 w-full">
-            <div className="flex justify-between items-center my-2 flex-wrap gap-2">
-                <h2 className="text-xl font-semibold">Subscriptions</h2>
-                <button
-                    className={`px-4 py-2 rounded-sm text-sm bg-black text-white ${loading || subData.status !== "active" ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
-                    onClick={() => {
-                        if (!loading && subData.status === "active") {
-                            onCancel();
-                        }
-                    }}
-                    disabled={loading || subData.status !== "active"}
-                >
-                    {loading ? "Processing..." : subData.status === "active" ? "Cancel Subscription" : "Subscription Canceled"}
-                </button>
-            </div>
+        <div className="p-4 md:p-8 mt-4 w-full max-w-7xl mx-auto space-y-10">
+            {/* Subscriptions Section */}
+            <section>
+                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                    <div>
+                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Subscriptions</h2>
+                        <p className="text-gray-500 mt-1">Manage your active plans and billing cycles.</p>
+                    </div>
+                    <button
+                        className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform active:scale-95 shadow-sm ${isCancelDisabled
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-white text-red-600 border-2 border-red-100 hover:border-red-600 hover:bg-red-50"
+                            }`}
+                        onClick={() => {
+                            if (!isCancelDisabled) onCancel();
+                        }}
+                        disabled={isCancelDisabled}
+                    >
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                <svg className="animate-spin h-4 w-4 text-red-600" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                </svg>
+                                Processing...
+                            </span>
+                        ) : activeSubscription ? (
+                            "Cancel Subscription"
+                        ) : (
+                            "No Active Plans"
+                        )}
+                    </button>
+                </div>
 
-            <div className="rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                <div className="max-h-[61vh] overflow-y-auto">
-                    {/* Desktop Table */}
-                    <table className="hidden md:table min-w-full divide-y divide-gray-200 text-sm">
-                        <thead className="bg-gray-50 sticky top-0 z-10">
-                            <tr>
-                                <th className="px-4 py-2 text-left font-medium text-gray-700">
-                                    Plan
-                                </th>
-                                <th className="px-4 py-2 text-left font-medium text-gray-700">
-                                    Price
-                                </th>
-                                <th className="px-4 py-2 text-left font-medium text-gray-700">
-                                    Start Date
-                                </th>
-                                <th className="px-4 py-2 text-left font-medium text-gray-700">
-                                    End Date
-                                </th>
-                                <th className="px-4 py-2 text-left font-medium text-gray-700">
-                                    Status
-                                </th>
-                                <th className="px-4 py-2 text-right font-medium text-gray-700">
-                                    Invoice
-                                </th>
-                            </tr>
-                        </thead>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+                    {/* Desktop View */}
+                    <div className="hidden md:block overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-100 text-sm">
+                            <thead className="bg-gray-50/50">
+                                <tr>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Plan Name</th>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Billing Period</th>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {subList.length > 0 ? (
+                                    subList.map((sub) => (
+                                        <tr key={sub.subscriptionId} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-6 py-6">
+                                                <div className="font-bold text-gray-900 text-base">{sub.planType}</div>
+                                                <div className="text-gray-400 text-xs mt-1 font-mono">{sub.subscriptionId}</div>
+                                            </td>
+                                            <td className="px-6 py-6 text-gray-700 font-semibold text-base">
+                                                ${sub.Price}.00
+                                                <span className="text-gray-400 text-xs font-normal ml-1">/ mo</span>
+                                            </td>
+                                            <td className="px-6 py-6 text-gray-600">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">Next Billing</span>
+                                                    <span className="mt-0.5">{formatDate(sub.currentPeriodStart)} — {formatDate(sub.currentPeriodEnd)}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-6">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${sub.status === "active"
+                                                    ? "bg-green-50 text-green-700 ring-green-600/20"
+                                                    : sub.status === "canceled"
+                                                        ? "bg-red-50 text-red-700 ring-red-600/20"
+                                                        : "bg-amber-50 text-amber-700 ring-amber-600/20"
+                                                    }`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full mr-2 ${sub.status === "active" ? "bg-green-600" : sub.status === "canceled" ? "bg-red-600" : "bg-amber-600"
+                                                        }`} />
+                                                    {sub.status.toUpperCase()}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-12 text-center text-gray-400 italic">
+                                            No subscription record found.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                        <tbody className="divide-y divide-gray-100">
-                            <tr key={subData._id} className="hover:bg-gray-50">
-                                <td className="px-4 py-2 font-medium max-w-xs truncate" title={subData.planType}>
-                                    {subData.planType}
-                                </td>
-                                <td className="px-4 py-2">${subData.Price}.00</td>
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                    {subData.currentPeriodStart ? new Date(subData.currentPeriodStart).toLocaleDateString("en-US") : "N/A"}
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap">
-                                    {subData.currentPeriodEnd ? new Date(subData.currentPeriodEnd).toLocaleDateString("en-US") : "N/A"}
-                                </td>
-                                <td className="px-4 py-2">
-                                    <span
-                                        className={`px-2 py-1 rounded-full text-xs font-medium ${subData.status === "active"
-                                            ? "bg-green-100 text-green-700" 
-                                            : subData.status === "pending"
-                                            ? "bg-blue-100 text-blue-700"
-                                            : "bg-yellow-100 text-yellow-600"
-                                            }`}
-                                    >
-                                        {subData.status ? subData.status.charAt(0).toUpperCase() + subData.status.slice(1) : "N/A"}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-2 text-right">
-                                    {subData?.invoiceUrl ? (
-                                        <a
-                                            href={subData.invoiceUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline whitespace-nowrap"
-                                        >
-                                            View Invoice
-                                        </a>
-                                    ) : (
-                                        <span className="text-gray-400">No Invoice</span>
-                                    )}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    {/* Mobile Cards */}
-                    <div className="md:hidden">
-                        <div className="p-4 border-b border-gray-200">
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="font-medium text-sm truncate max-w-[60%]" title={subData.planType}>
-                                    {subData.planType || "No plan"}
-                                </h3>
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${subData.status === "active"
-                                        ? "bg-green-100 text-green-700" 
-                                        : subData.status === "pending"
-                                        ? "bg-blue-100 text-blue-700"
-                                        : "bg-yellow-100 text-yellow-600"
-                                        }`}
-                                >
-                                    {subData.status ? subData.status.charAt(0).toUpperCase() + subData.status.slice(1) : "N/A"}
-                                </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-3 text-sm">
-                                <div>
-                                    <p className="text-gray-500 text-xs">Price</p>
-                                    <p>${subData.Price || "0"}.00</p>
+                    {/* Mobile View */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {subList.length > 0 ? (
+                            subList.map((sub) => (
+                                <div key={sub.subscriptionId} className="p-6 space-y-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-bold text-gray-900">{sub.planType}</h3>
+                                            <p className="text-gray-400 text-[10px] font-mono mt-1">{sub.subscriptionId}</p>
+                                        </div>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ring-1 ring-inset ${sub.status === "active" ? "bg-green-50 text-green-700 ring-green-600/20" : "bg-red-50 text-red-700 ring-red-600/20"
+                                            }`}>
+                                            {sub.status.toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Price</p>
+                                            <p className="text-gray-900 font-semibold">${sub.Price}.00</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">End Date</p>
+                                            <p className="text-gray-700 font-medium">{formatDate(sub.currentPeriodEnd)}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-gray-500 text-xs">Start Date</p>
-                                    <p className="whitespace-nowrap">
-                                        {subData.currentPeriodStart ? new Date(subData.currentPeriodStart).toLocaleDateString("en-US") : "N/A"}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-500 text-xs">End Date</p>
-                                    <p className="whitespace-nowrap">
-                                        {subData.currentPeriodEnd ? new Date(subData.currentPeriodEnd).toLocaleDateString("en-US") : "N/A"}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-500 text-xs">Invoice</p>
-                                    {subData?.invoiceUrl ? (
-                                        <a
-                                            href={subData.invoiceUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline text-sm whitespace-nowrap"
-                                        >
-                                            View Invoice
-                                        </a>
-                                    ) : (
-                                        <span className="text-gray-400 text-sm">No Invoice</span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                            ))
+                        ) : (
+                            <div className="p-12 text-center text-gray-400 italic">No subscriptions.</div>
+                        )}
                     </div>
                 </div>
-            </div>
+            </section>
+
+            {/* Billing History Section */}
+            <section>
+                <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900">Billing History</h2>
+                    <p className="text-gray-500 mt-1">Access your previous invoices and receipts.</p>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-100 text-sm">
+                            <thead className="bg-gray-50/50">
+                                <tr>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Amount Paid</th>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Billing Period</th>
+                                    <th className="px-6 py-5 text-right font-bold text-gray-500 uppercase tracking-wider">Download</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {paymentList.length > 0 ? (
+                                    paymentList.map((payment) => (
+                                        <tr key={payment.invoiceId} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-6 py-6">
+                                                <div className="font-bold text-gray-900">{formatDate(payment.date)}</div>
+                                            </td>
+                                            <td className="px-6 py-6 font-bold text-gray-900">
+                                                ${payment.amountPaid.toFixed(2)}
+                                                <span className="text-gray-400 text-[10px] font-normal ml-1 tracking-widest">{payment.currency}</span>
+                                            </td>
+                                            <td className="px-6 py-6">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 text-gray-600 uppercase tracking-tight">
+                                                    {payment.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-6 text-gray-500 text-xs">
+                                                {formatDate(payment.periodStart)} - {formatDate(payment.periodEnd)}
+                                            </td>
+                                            <td className="px-6 py-6 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <a
+                                                        href={payment.invoice_pdf}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-colors group"
+                                                        title="Download PDF"
+                                                    >
+                                                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                    </a>
+                                                    <a
+                                                        href={payment.hosted_invoice_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-2 hover:bg-gray-50 text-gray-600 rounded-lg transition-colors group"
+                                                        title="View Invoice"
+                                                    >
+                                                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-12 text-center text-gray-400 italic">
+                                            No billing history found.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

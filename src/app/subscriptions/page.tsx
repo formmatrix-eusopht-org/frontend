@@ -24,11 +24,10 @@ export default function Subscriptions() {
 
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get_user_subscriptions`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get_user_subscriptions/${user?.subscriptionID}`,
                 {
-                    method: "POST",
+                    method: "GET",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ subscriptionID: user?.subscriptionID }),
                 }
             );
 
