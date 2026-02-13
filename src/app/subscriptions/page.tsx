@@ -1,5 +1,5 @@
 'use client'
-import SubscriptionTable from '@/ui/SubscribtionTable';
+import SubscriptionTable, { Payment, Subscription } from '@/ui/SubscribtionTable';
 import '../globals.css';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -11,7 +11,10 @@ interface AuthUser {
     [key: string]: any;
 }
 export default function Subscriptions() {
-    const [subscriptions, setSubscriptions] = useState([]);
+    const [subscriptions, setSubscriptions] = useState<{
+        subscriptions?: Subscription[];
+        payments?: Payment[];
+    }>({});
     const [loading, setLoading] = useState(false);
     const router = useRouter()
     const { user }: { user: AuthUser | null; } = UserAuth()

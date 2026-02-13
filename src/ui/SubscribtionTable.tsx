@@ -2,7 +2,7 @@
 
 import React from "react";
 
-interface Subscription {
+export interface Subscription {
     subscriptionId: string;
     status: string;
     currentPeriodStart: string | null;
@@ -13,7 +13,7 @@ interface Subscription {
     cancelAtPeriodEnd: boolean;
 }
 
-interface Payment {
+export interface Payment {
     invoiceId: string;
     amountPaid: number;
     currency: string;
@@ -43,7 +43,7 @@ export default function SubscriptionTable({
     const paymentList = subscriptions?.payments || [];
 
     // Find if there's any active subscription to enable/disable the cancel button
-    const activeSubscription = subList.find(sub => sub.status === "active");
+    const activeSubscription = subList.find(sub => sub.status === "active" && sub.cancelAtPeriodEnd === false);
     const isCancelDisabled = loading || !activeSubscription;
 
     const formatDate = (dateStr: string | null) => {
