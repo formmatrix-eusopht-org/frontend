@@ -89,7 +89,7 @@ const VehiclesSection: React.FC<VehiclesSectionProps> = ({
                                 onChange={(val) => handleVehicleChange(idx, "vinNumber", val)}
                             />
                         </div>
-                        <div className="flex items-center gap-6 mt-3">
+                        <div className="flex flex-wrap items-start gap-4 mt-3">
                             <label className="flex items-center gap-2">
                                 <input
                                     type="checkbox"

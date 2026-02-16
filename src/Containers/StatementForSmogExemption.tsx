@@ -68,8 +68,8 @@ const StatementForSmogExemption = ({
                                     />
 
                                     {/* Inline layout */}
-                                    <div className="flex flex-wrap items-center gap-3 leading-tight">
-                                        <span className="text-[14px] whitespace-nowrap">{field.label}</span>
+                                    <div className="flex flex-wrap items-start gap-3 leading-tight">
+                                        <span className="text-[14px]">{field.label}</span>
 
                                         {field.subOptions?.map((subOption, subIdx) => {
                                             const subValue = Boolean(values?.[subOption?.label]);
@@ -84,7 +84,7 @@ const StatementForSmogExemption = ({
                                                         onChange={() => onFieldChange(subOption.label, !subValue)}
                                                         disabled={!isChecked}
                                                     />
-                                                    <span className="text-[13px] whitespace-nowrap">
+                                                    <span className="text-[13px]">
                                                         {subOption.label}
                                                     </span>
 

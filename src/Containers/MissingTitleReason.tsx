@@ -18,7 +18,7 @@ export const MissingTitleReason = ({
   return (
     <div className="pb-4">
       <Section title={title}>
-        <div className="flex items-center gap-2 mb-4 w-[28rem]">
+        <div className="flex items-center gap-2 mb-4 w-[90%]">
           <CustomDropdown
             value={selectedReason}
             onChange={onReasonChange}

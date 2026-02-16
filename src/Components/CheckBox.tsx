@@ -12,13 +12,13 @@ export default function Checkbox({
   className?: string;
 }) {
   return (
-    <label className={`flex items-center gap-2 text-[12px] ${className} ${disabled ? "opacity-50" : ""}`}>
+    <label className={`flex items-start gap-2 text-[12px] ${className} ${disabled ? "opacity-50" : ""}`}>
       <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
         disabled={disabled}
-        className="accent-blue-600"
+        className="accent-blue-600 mt-[2px]"
       />
       {label}
     </label>

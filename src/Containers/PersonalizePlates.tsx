@@ -46,18 +46,20 @@ export const PlatesSelection = ({
 
     return (
         <div className="pb-4">
-            <Section title="Plates Options">
-                <div className="flex justify-between">
-                    {checkboxOptions?.map((f: string) => (
-                        <Checkbox
-                            key={f}
-                            label={f}
-                            checked={personalizePlatesState === f}
-                            onChange={() =>
-                                setPersonalizePlatesState(personalizePlatesState === f ? "" : f)}
-                        />
+            <Section title="Plates Optionss">
+                <div className="overflow-x-auto">
+                    <div className="flex justify-start gap-4">
+                        {checkboxOptions?.map((f: string) => (
+                            <Checkbox
+                                key={f}
+                                label={f}
+                                checked={personalizePlatesState === f}
+                                onChange={() =>
+                                    setPersonalizePlatesState(personalizePlatesState === f ? "" : f)}
+                            />
 
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </Section>
 
