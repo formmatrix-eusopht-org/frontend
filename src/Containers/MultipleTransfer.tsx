@@ -1148,8 +1148,12 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
 
     return (
         <div>
+            {/* --Number of Transfers-- y div uthega overflow ki waja */}
             <div className="flex items-center gap-4 mb-4">
                 <h2 className="text-2xl font-bold"> {title}</h2>
+            </div>
+
+            <div className="flex items-center gap-4 mb-4">
                 <label className="text-lg font-semibold"> Number of Transfers:</label>
                 <div className="w-[4rem]">
                     <CustomDropdown

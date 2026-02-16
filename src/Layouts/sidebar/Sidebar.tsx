@@ -46,21 +46,24 @@ export default function Sidebar() {
 
 
   return (
-    <div className="w-[400px] fixed right-0 top-[112px] bottom-[30px] rounded-xl shadow-lg z-40 bg-white flex flex-col">
+    <div className="w-[40%] fixed right-0 top-[112px] bottom-[30px] rounded-xl shadow-lg z-40 bg-white flex flex-col">
       <aside className="flex flex-col h-full">
+
+        {/* --CLEAR FORM --*/}
+        <button
+          disabled={isLoading}
+          className="border border-black text-black px-4 py-2 rounded-md hover:bg-black hover:text-white transition"
+          onClick={handleClear}
+        >
+          {isEditAndId ? "Cancel Editing" : "Clear Form"}
+        </button>
+
 
         <div className="flex flex-row justify-between items-center p-6">
           {/* --tRANSACTIONS --*/}
           <h2 className="text-2xl font-bold">Transactions</h2>
 
-          {/* --CLEAR FORM --*/}
-          <button
-            disabled={isLoading}
-            className="border border-black text-black px-4 py-2 rounded-md hover:bg-black hover:text-white transition"
-            onClick={handleClear}
-          >
-            {isEditAndId ? "Cancel Editing" : "Clear Form"}
-          </button>
+
 
         </div>
 
