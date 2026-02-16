@@ -3653,7 +3653,7 @@ export const seneriosDetails = [
             },
             {
                 reference: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
-                blockName: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
+                blockName: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATIONsss",
                 fields: [
                     { label: "License Plate", key: "plate", placeholder: "License plate" },
                     { label: "VEHICLE IDENTIFICATION NUMBER", key: "vin", placeholder: "VEHICLE IDENTIFICATION NUMBER" },

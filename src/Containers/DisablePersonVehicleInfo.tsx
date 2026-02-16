@@ -35,7 +35,7 @@ export default function DisablePersonVehicleInfo({
 
     return (
         <div className={`space-y-4 ${className}`}>
-            <h3 className="text-black px-2 py-1 font-semibold text-sm w-max uppercase">{title}</h3>
+            <h3 className="text-black px-2 py-1 font-semibold text-sm  uppercase">{title}</h3>
 
             <div className="overflow-x-auto">
                 <table className="w-full border border-gray-300 text-sm text-left">

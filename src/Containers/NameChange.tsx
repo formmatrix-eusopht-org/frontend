@@ -13,13 +13,13 @@ export const NameChange = ({ title, values, onchange, name }: any) => {
         <div className="pb-4">
             <Section title={title}>
                 {name === "Correction" && (
-                    <div className="my-4 text-gray-700 flex items-center gap-2">
-                        <p className="text-lg pt-4">My name is misspelled. Please correct it to:</p>
+                    <div className="my-4 text-gray-700 flex items-center gap-1">
+                        <p className="text-base">My name is misspelled. Please correct it to:</p>
                         <Input
                             label=""
                             placeholder=""
                             type="text"
-                            className="border-0 border-b border-gray-500 rounded-none focus:ring-0 focus:border-black w-[18rem]"
+                            className="border-0 border-b border-gray-500 rounded-none focus:ring-0 focus:border-black w-[48%]"
                             value={values.correction || ""}
                             onChange={(e) => handleChange("correction", e)}
                         />
