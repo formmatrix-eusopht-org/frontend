@@ -2068,7 +2068,9 @@ export const seneriosDetails = [
                     label: 'Street',
                     type: "input field",
                     placeholder: 'Street'
-                }, {
+                },
+                //111oooffff
+                {
                     label: 'APT./SPACE/STE.#',
                     type: "address",
                     placeholder: 'APT./SPACE/STE.#'
@@ -2113,11 +2115,11 @@ export const seneriosDetails = [
                             type: "input field",
                             placeholder: 'Street'
                         },
-                        // {
-                        //     label: 'APT./SPACE/STE.#',
-                        //     type: "address",
-                        //     placeholder: 'APT./SPACE/STE.#'
-                        // },
+                        {
+                            label: 'APT./SPACE/STE.#',
+                            type: "address",
+                            placeholder: 'APT./SPACE/STE.#'
+                        },
                         {
                             label: 'City',
                             type: "input field",
@@ -2149,11 +2151,12 @@ export const seneriosDetails = [
                     type: "input field",
                     placeholder: 'Street'
                 },
-                // {
-                //     label: 'APT./SPACE/STE.#',
-                //     type: "address",
-                //     placeholder: 'APT./SPACE/STE.#'
-                // },
+                //1111offf
+                {
+                    label: 'APT./SPACE/STE.#',
+                    type: "input field",
+                    placeholder: 'APT./SPACE/STE.#'
+                },
                 {
                     label: 'City',
                     type: "input field",
@@ -3653,7 +3656,7 @@ export const seneriosDetails = [
             },
             {
                 reference: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
-                blockName: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATIONsss",
+                blockName: "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
                 fields: [
                     { label: "License Plate", key: "plate", placeholder: "License plate" },
                     { label: "VEHICLE IDENTIFICATION NUMBER", key: "vin", placeholder: "VEHICLE IDENTIFICATION NUMBER" },
