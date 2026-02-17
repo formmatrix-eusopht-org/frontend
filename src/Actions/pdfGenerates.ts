@@ -2342,7 +2342,7 @@ async function generateCollectionsPDF(
 
 
 
-
+//--old collections design
 // async function generateCollectionsPDF(selectedItems: string[], allItems: string[]): Promise<Uint8Array | null> {
 //     try {
 //         const pdfDoc = await PDFDocument.create();
@@ -2450,6 +2450,10 @@ async function generateCollectionsPDF(
 //     }
 // }
 
+
+
+
+
 function getCollectionOptions(senerioName: string): string[] {
     try {
         const allOptions: string[] = [];
@@ -2480,6 +2484,9 @@ function getCollectionOptions(senerioName: string): string[] {
         return [];
     }
 }
+
+
+
 export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
 
     const message = (() => {

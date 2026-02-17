@@ -2117,7 +2117,7 @@ export const seneriosDetails = [
                         },
                         {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         },
                         {
