@@ -24,7 +24,7 @@ const Options: React.FC<OptionsProps> = ({ selected, onChange, block }) => {
 
     return (
         <div className="grid">
-            <Section title="Collections">
+            {/* <Section title="Collections">
                 {options.map((option: any) => (
                     <Checkbox
                         key={option.label}
@@ -34,7 +34,7 @@ const Options: React.FC<OptionsProps> = ({ selected, onChange, block }) => {
                         className='mt-4'
                     />
                 ))}
-            </Section>
+            </Section> */}
         </div>
     );
 };
