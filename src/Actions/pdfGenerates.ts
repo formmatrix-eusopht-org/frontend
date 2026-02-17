@@ -3,7 +3,8 @@ import {
     PDFTextField,
     PDFCheckBox,
     PDFField,
-    rgb
+    rgb,
+    StandardFonts
 } from 'pdf-lib';
 import toast from 'react-hot-toast';
 import { seneriosDetails } from '../Data/seneriosDetails';
@@ -2173,91 +2174,281 @@ async function handleOnPDF(form: any, senerio: any) {
     }
 }
 
-async function generateCollectionsPDF(selectedItems: string[], allItems: string[]): Promise<Uint8Array | null> {
+
+//--new collections designeddd
+async function generateCollectionsPDF(
+    selectedItems: string[],
+    allItems: string[]
+): Promise<Uint8Array | null> {
     try {
         const pdfDoc = await PDFDocument.create();
-        let currentPage = pdfDoc.addPage([612, 792]); // Standard letter size
-        const { width, height } = currentPage.getSize();
+        const page = pdfDoc.addPage([612, 792]);
+        const { width, height } = page.getSize();
+
+        const font = await pdfDoc.embedFont(StandardFonts.Courier);
+        const boldFont = await pdfDoc.embedFont(StandardFonts.CourierBold);
+
+        const centerX = width / 2;
+
+        const drawCenteredText = (
+            text: string,
+            y: number,
+            size: number,
+            fontType = font,
+            color = rgb(0, 0, 0)
+        ) => {
+            const textWidth = fontType.widthOfTextAtSize(text, size);
+            page.drawText(text, {
+                x: centerX - textWidth / 2,
+                y,
+                size,
+                font: fontType,
+                color,
+            });
+        };
+
+        const drawDashedLine = (y: number) => {
+            page.drawLine({
+                start: { x: 60, y },
+                end: { x: width - 60, y },
+                thickness: 1,
+                dashArray: [4, 4],
+                color: rgb(0.3, 0.3, 0.3),
+            });
+        };
+
+        let y = height - 50;
+
+        // Top line
+        drawDashedLine(y);
+        y -= 25;
 
         // Title
-        currentPage.drawText('COLLECTIONS', {
-            x: 50,
-            y: height - 50,
-            size: 20,
+        const redTo = "TO";
+        const rest = " COMPLETE THE TRANSACTION";
+
+        const toWidth = boldFont.widthOfTextAtSize(redTo, 16);
+        const restWidth = font.widthOfTextAtSize(rest, 16);
+        const totalWidth = toWidth + restWidth;
+
+        const titleStartX = centerX - totalWidth / 2;
+
+        page.drawText(redTo, {
+            x: titleStartX,
+            y,
+            size: 16,
+            font: boldFont,
+            color: rgb(0.8, 0.1, 0.1),
         });
 
-        // Add a line under the title
-        currentPage.drawLine({
-            start: { x: 50, y: height - 60 },
-            end: { x: width - 50, y: height - 60 },
-            thickness: 2,
+        page.drawText(rest, {
+            x: titleStartX + toWidth,
+            y,
+            size: 16,
+            font,
         });
 
-        // List collection items
-        let yPosition = height - 100;
-        const lineHeight = 25;
+        y -= 25;
+
+        drawCenteredText(
+            "Checklist for DMV Paperwork & Requirements",
+            y,
+            14
+        );
+
+        y -= 35;
+
+        drawDashedLine(y);
+        y -= 70;
+
+        // ===============================
+        // CHECKLIST (CENTERED BLOCK)
+        // ===============================
+
+        const items = allItems.length > 0 ? allItems : selectedItems;
+
         const boxSize = 12;
-        const textMargin = 70; // Position for text
+        const gap = 12;
+        const lineHeight = 28;
 
-        // If no allItems provided, fallback to selectedItems
-        const itemsToRender = allItems.length > 0 ? allItems : selectedItems;
+        // 🔹 Find widest text
+        let maxTextWidth = 0;
+        items.forEach((item) => {
+            const w = font.widthOfTextAtSize(item, 12);
+            if (w > maxTextWidth) maxTextWidth = w;
+        });
 
-        itemsToRender.forEach((item, index) => {
-            // Check if we need a new page
-            if (yPosition < 50) {
-                currentPage = pdfDoc.addPage([612, 792]);
-                yPosition = height - 50;
-            }
+        const totalBlockWidth = boxSize + gap + maxTextWidth;
 
-            const isSelected = selectedItems.includes(item);
+        // 🔹 Shared start position (centered block)
+        const sharedStartX = centerX - totalBlockWidth / 2;
 
-            // Draw Checkbox Square
-            currentPage.drawRectangle({
-                x: 50,
-                y: yPosition,
+        items.forEach((item) => {
+            // Checkbox (border only — no fill)
+            page.drawRectangle({
+                x: sharedStartX,
+                y: y - 2,
                 width: boxSize,
                 height: boxSize,
-                borderColor: rgb(0, 0, 0),
                 borderWidth: 1,
+                borderColor: rgb(0, 0, 0),
             });
 
-            // Draw Checkmark if selected
-            if (isSelected) {
-                currentPage.drawLine({
-                    start: { x: 50, y: yPosition },
-                    end: { x: 50 + boxSize, y: yPosition + boxSize },
-                    color: rgb(0, 0, 0),
-                    thickness: 1.5,
-                });
-                currentPage.drawLine({
-                    start: { x: 50, y: yPosition + boxSize },
-                    end: { x: 50 + boxSize, y: yPosition },
-                    color: rgb(0, 0, 0),
-                    thickness: 1.5,
-                });
-            }
+            //   // Real checkmark ✓
+            //   if (selectedItems.includes(item)) {
+            //     page.drawText("✓", {
+            //       x: sharedStartX + 2,
+            //       y: y - 1,
+            //       size: 12,
+            //       font: boldFont,
+            //     });
+            //   }
 
-            // Draw collection item text
-            currentPage.drawText(item, {
-                x: textMargin,
-                y: yPosition, // Adjust for baseline? drawText y is usually baseline. Rectangle y is bottom-left. 
-                // However, pdf-lib drawText y is baseline. Rectangle y is bottom-left.
-                // It's safer to align them visually.
-                // If yPosition is bottom of the line:
-                size: 12,
-                maxWidth: width - textMargin - 50,
+            // Text (all aligned same left)
+            page.drawText(item, {
+                x: sharedStartX + boxSize + gap,
+                y,
+                size: 10,
+                font,
             });
 
-            yPosition -= lineHeight;
+            y -= lineHeight;
         });
+
+        // ===============================
+        // FOOTER (ALWAYS PAGE BOTTOM)
+        // ===============================
+
+        const footerY = 20;
+
+        drawDashedLine(footerY + 25);
+
+        drawCenteredText(
+            "© Formatic – Your DMV paperwork simplified",
+            footerY,
+            12
+        );
+
+        drawDashedLine(footerY - 10);
 
         const pdfBytes = await pdfDoc.save();
         return pdfBytes;
+
     } catch (error) {
-        console.error('Error generating Collections PDF:', error);
+        console.error("Error generating Collections PDF:", error);
         return null;
     }
 }
+
+
+
+
+// async function generateCollectionsPDF(selectedItems: string[], allItems: string[]): Promise<Uint8Array | null> {
+//     try {
+//         const pdfDoc = await PDFDocument.create();
+//         let currentPage = pdfDoc.addPage([612, 792]); // Standard letter size
+//         const { width, height } = currentPage.getSize();
+
+//         // Title
+//         currentPage.drawText('To Complete The Transactions', {
+//             x: 50,
+//             y: height - 50,
+//             size: 20,
+//         });
+
+//         // Title
+//         currentPage.drawText('Checklist for DMV Paperwork & Requirements', {
+//             x: 50,
+//             y: height - 70,
+//             size: 20,
+//         });
+
+//         // Add a line under the title
+//         currentPage.drawLine({
+//             start: { x: 50, y: height - 90 },
+//             end: { x: width - 50, y: height - 60 },
+//             thickness: 1,
+//         });
+
+//         // List collection items
+//         let yPosition = height - 100;
+//         const lineHeight = 25;
+//         const boxSize = 12;
+//         const textMargin = 70; // Position for text
+
+//         // If no allItems provided, fallback to selectedItems
+//         const itemsToRender = allItems.length > 0 ? allItems : selectedItems;
+
+//         itemsToRender.forEach((item, index) => {
+//             // Check if we need a new page
+//             if (yPosition < 50) {
+//                 currentPage = pdfDoc.addPage([612, 792]);
+//                 yPosition = height - 50;
+//             }
+
+//             const isSelected = selectedItems.includes(item);
+
+//             // Draw Checkbox Square
+//             currentPage.drawRectangle({
+//                 x: 50,
+//                 y: yPosition,
+//                 width: boxSize,
+//                 height: boxSize,
+//                 borderColor: rgb(0, 0, 0),
+//                 borderWidth: 1,
+//             });
+
+//             // Draw Checkmark if selected
+//             if (isSelected) {
+//                 currentPage.drawLine({
+//                     start: { x: 50, y: yPosition },
+//                     end: { x: 50 + boxSize, y: yPosition + boxSize },
+//                     color: rgb(0, 0, 0),
+//                     thickness: 1.5,
+//                 });
+//                 currentPage.drawLine({
+//                     start: { x: 50, y: yPosition + boxSize },
+//                     end: { x: 50 + boxSize, y: yPosition },
+//                     color: rgb(0, 0, 0),
+//                     thickness: 1.5,
+//                 });
+//             }
+
+//             // Draw collection item text
+//             currentPage.drawText(item, {
+//                 x: textMargin,
+//                 y: yPosition, // Adjust for baseline? drawText y is usually baseline. Rectangle y is bottom-left. 
+//                 // However, pdf-lib drawText y is baseline. Rectangle y is bottom-left.
+//                 // It's safer to align them visually.
+//                 // If yPosition is bottom of the line:
+//                 size: 12,
+//                 maxWidth: width - textMargin - 50,
+//             });
+
+//             // Title
+//             currentPage.drawText('Formatic your DMV paperwork simplified', {
+//                 x: 50,
+//                 y: height - 170,
+//                 size: 20,
+//             });
+
+//             // Add a line under the title
+//             currentPage.drawLine({
+//                 start: { x: 50, y: height - 290 },
+//                 end: { x: width - 50, y: height - 60 },
+//                 thickness: 1,
+//             });
+
+//             yPosition -= lineHeight;
+//         });
+
+//         const pdfBytes = await pdfDoc.save();
+//         return pdfBytes;
+//     } catch (error) {
+//         console.error('Error generating Collections PDF:', error);
+//         return null;
+//     }
+// }
 
 function getCollectionOptions(senerioName: string): string[] {
     try {
