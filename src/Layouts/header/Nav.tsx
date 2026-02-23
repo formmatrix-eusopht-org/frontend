@@ -37,13 +37,13 @@ export default function Nav() {
   }, []);
 
   const Plans = [
-    {
-      name: "Daily Plan",
-      price: 5,
-      color: "bg-blue-500",
-      description: "Access all features for one day.",
-      features: []
-    },
+    // {
+    //   name: "Daily Plan",
+    //   price: 5,
+    //   color: "bg-blue-500",
+    //   description: "Access all features for one day.",
+    //   features: []
+    // },
     {
       name: "Monthly Plan",
       price: 50,

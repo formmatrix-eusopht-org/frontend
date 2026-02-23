@@ -98,7 +98,7 @@ export default function SubscriptionTable({
                                 <tr>
                                     <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Plan Name</th>
                                     <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Amount</th>
-                                    <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Billing Period</th>
+                                    {/* <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Billing Period</th> */}
                                     <th className="px-6 py-5 text-left font-bold text-gray-500 uppercase tracking-wider">Status</th>
                                 </tr>
                             </thead>
@@ -114,12 +114,12 @@ export default function SubscriptionTable({
                                                 ${sub.Price}.00
                                                 <span className="text-gray-400 text-xs font-normal ml-1">/ mo</span>
                                             </td>
-                                            <td className="px-6 py-6 text-gray-600">
+                                            {/* <td className="px-6 py-6 text-gray-600">
                                                 <div className="flex flex-col">
                                                     <span className="text-xs text-gray-400 font-medium uppercase tracking-wide">Next Billing</span>
                                                     <span className="mt-0.5">{formatDate(sub.currentPeriodStart)} — {formatDate(sub.currentPeriodEnd)}</span>
                                                 </div>
-                                            </td>
+                                            </td> */}
                                             <td className="px-6 py-6">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${sub.status === "active"
                                                     ? "bg-green-50 text-green-700 ring-green-600/20"
