@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, onAuthStateChanged, User, deleteUser, getAuth, sendPasswordResetEmail, updatePassword } from 'firebase/auth';
 import { doc, onSnapshot, getFirestore, deleteDoc } from 'firebase/firestore';
 import { auth, initFirebase } from '../../firebase-config';
 import axios from 'axios';
@@ -20,6 +20,7 @@ interface AuthContextType {
   isLoggingIn: boolean;
   checkSession: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  changePassword: (email: string, oldPass: string, newPass: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -47,8 +48,11 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       });
 
       // Now Firebase is ready
+      const publicRoutes = ['/', '/change-password'];
       if (!auth.currentUser) {
-        await logout();
+        if (!publicRoutes.includes(window.location.pathname)) {
+          await logout();
+        }
         return;
       }
 
@@ -85,8 +89,8 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     const role = localStorage.getItem("userRole") || "";
 
     if (role === "2") {
-      // role 0 can only see dashboard and adduser
-      if (pathname !== "/dashboard" && pathname !== "/add_user") {
+      // role 2 can only see dashboard, add_user, and change-password
+      if (pathname !== "/dashboard" && pathname !== "/add_user" && pathname !== "/change-password") {
         router.replace("/dashboard");
       }
     } else if (role === "1") {
@@ -94,9 +98,10 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       if (pathname === "/dashboard" || pathname === "/add_user") {
         router.replace("/home");
       }
-    } else if (role === "0") {
-      // if not logged in, only allow landing page
-      if (pathname !== "/") {
+    } else if (role === "0" || !role) {
+      // if not logged in, only allow landing page and change-password
+      const publicRoutes = ['/', '/change-password'];
+      if (!publicRoutes.includes(pathname)) {
         router.replace("/");
       }
     }
@@ -211,7 +216,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
           const currentUser = getAuth().currentUser;
           if (currentUser) await deleteUser(currentUser);
           await logout();
-        } else if (!isSubscribed) {
+        } else if (!isSubscribed && pathname !== "/change-password") {
           router.push('/');
         }
       } catch (err) {
@@ -236,13 +241,32 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     }
   };
 
+  // ✅ Password Change
+  const changePassword = async (email: string, oldPass: string, newPass: string) => {
+    try {
+      setLoading(true);
+      const userCredential = await signInWithEmailAndPassword(auth, email, oldPass);
+      await updatePassword(userCredential.user, newPass);
+      await auth.signOut();
+      setUser(null);
+      localStorage.clear();
+      toast.success('Password changed successfully! Please login with your new password.');
+    } catch (error: any) {
+      console.error('Change password failed:', error);
+      toast.error('Failed to change password: ' + (error.message || ''));
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!sessionChecked) {
     return <div>Loading...</div>;
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn, checkSession, resetPassword }}
+      value={{ user, emailSignIn, logout, isSubscribed, loading, isLoggingIn, checkSession, resetPassword, changePassword }}
     >
       {children}
     </AuthContext.Provider>

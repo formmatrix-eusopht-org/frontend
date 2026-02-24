@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, X } from 'lucide-react';
 import { UserAuth } from '../Contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const LoginPage = () => {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
   const { emailSignIn, isLoggingIn, resetPassword } = UserAuth();
+  const router = useRouter();
 
   const handleResetPassword = async () => {
     if (!email) {
@@ -91,10 +93,25 @@ const LoginPage = () => {
           <p
             className="text-sm text-gray-600 hover:underline cursor-pointer"
             onClick={handleResetPassword}
-            title="Enter email above and click here to reset"
+            title="Click to reset password"
           >
             Forgot Password?
           </p>
+
+          <p
+            className="text-sm text-gray-600 hover:underline cursor-pointer"
+            onClick={() => {
+              if (email) {
+                router.push(`/change-password?email=${encodeURIComponent(email)}`);
+              } else {
+                router.push('/change-password');
+              }
+            }}
+            title="Click to change password"
+          >
+            Change Password
+          </p>
+
         </form>
       </div>
     </div>
