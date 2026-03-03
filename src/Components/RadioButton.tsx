@@ -23,9 +23,9 @@ export default function RadioButton({
         value={value}
         checked={checked}
         onChange={() => onChange(value)}
-        className="form-radio text-blue-600 "
+        className="form-radio text-blue-600 flex-shrink-0"
       />
-      <span className=" text-gray-700">{label}</span>
+      <span className="text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis" title={label}>{label}</span>
     </label>
   );
 }

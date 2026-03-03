@@ -86,7 +86,7 @@ export const DateInputField = ({
 
     return (
         <div className={`flex flex-col ${className}`}>
-            <label className="text-[12px] text-gray-500 font-medium mb-1">
+            <label className="text-[12px] text-gray-500 font-medium mb-1 whitespace-nowrap overflow-hidden text-ellipsis" title={label}>
                 {label}
                 {required && <span className="text-red-500">*</span>}
             </label>
@@ -97,7 +97,7 @@ export const DateInputField = ({
                 onBlur={handleBlur}
                 placeholder={placeholder}
                 className={`border rounded px-3 w-20 h-6 py-2 ${error ? 'border-red-500' : 'border-gray-300'
-                    } focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs bg-gray-100`} 
+                    } focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs bg-gray-100`}
             />
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
         </div>
