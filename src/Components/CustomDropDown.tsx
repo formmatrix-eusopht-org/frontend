@@ -106,9 +106,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         onKeyDown={handleKeyDown}
         className={`w-full bg-white border border-gray-300 flex items-center justify-between px-2 text-left
           ${!selectedOption ? "text-gray-400" : "text-gray-800"}
-          ${className}`}
+          ${className} overflow-hidden`}
       >
-        <span>{selectedOption?.label || placeholder}</span>
+        <span className="truncate overflow-hidden whitespace-nowrap min-w-0 flex-1">{selectedOption?.label || placeholder}</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
@@ -140,7 +140,8 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   : value === opt.value
                     ? "bg-gray-100 text-black font-medium"
                     : "text-gray-600 hover:bg-black hover:text-white"
-                }`}
+                } whitespace-nowrap overflow-hidden text-ellipsis`}
+              title={opt.label}
             >
               {opt.label}
             </li>
