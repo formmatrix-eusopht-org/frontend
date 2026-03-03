@@ -137,7 +137,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -205,7 +205,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -283,7 +283,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -310,7 +310,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -337,7 +337,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -366,7 +366,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -745,7 +745,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -780,7 +780,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -813,7 +813,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -931,7 +931,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -1167,7 +1167,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -1202,7 +1202,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -1235,7 +1235,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -1313,7 +1313,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -1340,7 +1340,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -1367,7 +1367,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -1396,7 +1396,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -1775,7 +1775,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -1915,7 +1915,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -2073,7 +2073,7 @@ export const seneriosDetails = [
                 //111oooffff
                 {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -2272,7 +2272,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -2311,7 +2311,7 @@ export const seneriosDetails = [
                     type: "radiocheckbox",
                     subFields: [
                         { label: 'Street', type: "input field", placeholder: 'Street' },
-                        { label: 'APT./SPACE/STE.#', type: "address", placeholder: 'APT./SPACE/STE.#' },
+                        { label: 'APT./SPACE/STE.#', type: "input field", placeholder: 'APT./SPACE/STE.#' },
                         { label: 'City', type: "input field", placeholder: 'City' },
                         { label: 'State', type: "dropdown", placeholder: 'Select' },
                         { label: 'ZIP Code', type: "input field", placeholder: 'ZIP Code' },]
@@ -2320,7 +2320,7 @@ export const seneriosDetails = [
             fields: [
                 { label: 'Name of bank, finance company, or individual(s) having a lien on this vehicle', type: "input field", placeholder: 'Name of bank, finance company, or individual(s) having a lien on this vehicle' },
                 { label: 'Street', type: "input field", placeholder: 'Street' },
-                { label: 'APT./SPACE/STE.#', type: "address", placeholder: 'APT./SPACE/STE.#' },
+                { label: 'APT./SPACE/STE.#', type: "input field", placeholder: 'APT./SPACE/STE.#' },
                 { label: 'City', type: "input field", placeholder: 'City' },
                 { label: 'State', type: "dropdown", placeholder: 'Select' },
                 { label: 'ZIP Code', type: "input field", placeholder: 'ZIP Code' },
@@ -2413,7 +2413,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -3002,7 +3002,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -3084,7 +3084,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -3111,7 +3111,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -3138,7 +3138,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -3167,7 +3167,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -3206,7 +3206,7 @@ export const seneriosDetails = [
                             placeholder: 'Street'
                         }, {
                             label: 'APT./SPACE/STE.#',
-                            type: "address",
+                            type: "input field",
                             placeholder: 'APT./SPACE/STE.#'
                         }, {
                             label: 'City',
@@ -3239,7 +3239,7 @@ export const seneriosDetails = [
                     placeholder: 'Street'
                 }, {
                     label: 'APT./SPACE/STE.#',
-                    type: "address",
+                    type: "input field",
                     placeholder: 'APT./SPACE/STE.#'
                 }, {
                     label: 'City',
@@ -3505,7 +3505,7 @@ export const seneriosDetails = [
                         placeholder: 'Street'
                     }, {
                         label: 'APT./SPACE/STE.#',
-                        type: "address",
+                        type: "input field",
                         placeholder: 'APT./SPACE/STE.#'
                     }, {
                         label: 'City',
@@ -3580,7 +3580,7 @@ export const seneriosDetails = [
                                 placeholder: 'Street'
                             }, {
                                 label: 'APT./SPACE/STE.#',
-                                type: "address",
+                                type: "input field",
                                 placeholder: 'APT./SPACE/STE.#'
                             }, {
                                 label: 'City',
@@ -3604,7 +3604,7 @@ export const seneriosDetails = [
                         placeholder: 'Street'
                     }, {
                         label: 'APT./SPACE/STE.#',
-                        type: "address",
+                        type: "input field",
                         placeholder: 'APT./SPACE/STE.#'
                     }, {
                         label: 'City',
@@ -3634,7 +3634,7 @@ export const seneriosDetails = [
                         placeholder: 'Street'
                     }, {
                         label: 'APT./SPACE/STE.#',
-                        type: "address",
+                        type: "input field",
                         placeholder: 'APT./SPACE/STE.#'
                     }, {
                         label: 'City',
