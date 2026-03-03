@@ -44,7 +44,7 @@ export default function Sidebar() {
 
 
   return (
-    <div className="w-[40%] fixed right-0 top-[112px] bottom-[30px] z-40 flex flex-col">
+    <div className="w-[40%] fixed right-2 top-[112px] bottom-[30px] z-40 flex flex-col overflow-hidden">
 
       {/* BUTTON OUTSIDE CARD */}
       <button
@@ -56,14 +56,14 @@ export default function Sidebar() {
       </button>
 
       {/* CARD START */}
-      <div className="rounded-xl shadow-lg bg-white flex flex-col flex-1">
-        <aside className="flex flex-col h-full">
+      <div className="rounded-xl shadow-lg bg-white flex flex-col flex-1 min-h-0">
+        <aside className="flex flex-col flex-1 min-h-0">
 
           <div className="flex flex-row justify-between items-center p-6">
             <h2 className="text-2xl font-bold">Transactions</h2>
           </div>
 
-          <div className="overflow-y-auto px-6 pb-6 flex-1">
+          <div className="overflow-y-auto px-6 pb-6 flex-1 min-h-0">
             <div className="flex flex-col gap-1">
               {sidebarSections.map((section) => (
                 <Section key={section.title} title={section.title}>
