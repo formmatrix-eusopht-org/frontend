@@ -1,3 +1,4 @@
+// This is only data showing the structure of the form.
 export const seneriosDetails = [
     {
         form: "Simple Transfer",
@@ -115,8 +116,8 @@ export const seneriosDetails = [
                 { label: 'First Name', type: 'input field', placeholder: 'First Name' },
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
-                { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'Driver License Numberss', type: 'input field', placeholder: 'Driver License Number' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
@@ -149,7 +150,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -180,7 +181,7 @@ export const seneriosDetails = [
             //             }, {
             //                 label: 'State',
             //                 type: "dropdown",
-            //                 placeholder: 'State'
+            //                 placeholder: 'Select'
             //             }, {
             //                 label: 'ZIP Code',
             //                 type: "input field",
@@ -213,7 +214,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -244,7 +245,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -291,7 +292,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -318,7 +319,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -349,7 +350,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -378,7 +379,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -618,7 +619,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -724,7 +725,7 @@ export const seneriosDetails = [
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
@@ -757,7 +758,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -788,7 +789,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -821,7 +822,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -911,7 +912,7 @@ export const seneriosDetails = [
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
             ]
         }, {
@@ -943,7 +944,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -999,7 +1000,7 @@ export const seneriosDetails = [
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                     { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                     { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                    { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                    { label: 'State', type: 'dropdown', placeholder: 'Select' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 ]
             }, {
@@ -1146,7 +1147,7 @@ export const seneriosDetails = [
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
@@ -1179,7 +1180,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -1210,7 +1211,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -1243,7 +1244,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -1274,7 +1275,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -1321,7 +1322,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -1348,7 +1349,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -1379,7 +1380,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -1408,7 +1409,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -1648,7 +1649,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -1751,7 +1752,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -1787,7 +1788,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -1895,7 +1896,7 @@ export const seneriosDetails = [
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
             ]
         }, {
@@ -1923,7 +1924,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2047,7 +2048,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -2085,7 +2086,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2127,7 +2128,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -2164,7 +2165,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2248,7 +2249,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -2284,7 +2285,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2312,7 +2313,7 @@ export const seneriosDetails = [
                         { label: 'Street', type: "input field", placeholder: 'Street' },
                         { label: 'APT./SPACE/STE.#', type: "address", placeholder: 'APT./SPACE/STE.#' },
                         { label: 'City', type: "input field", placeholder: 'City' },
-                        { label: 'State', type: "dropdown", placeholder: 'State' },
+                        { label: 'State', type: "dropdown", placeholder: 'Select' },
                         { label: 'ZIP Code', type: "input field", placeholder: 'ZIP Code' },]
                 }
             ],
@@ -2321,7 +2322,7 @@ export const seneriosDetails = [
                 { label: 'Street', type: "input field", placeholder: 'Street' },
                 { label: 'APT./SPACE/STE.#', type: "address", placeholder: 'APT./SPACE/STE.#' },
                 { label: 'City', type: "input field", placeholder: 'City' },
-                { label: 'State', type: "dropdown", placeholder: 'State' },
+                { label: 'State', type: "dropdown", placeholder: 'Select' },
                 { label: 'ZIP Code', type: "input field", placeholder: 'ZIP Code' },
                 { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
                 { label: 'Phone number', type: 'phone', placeholder: 'Phone number' },
@@ -2389,7 +2390,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -2425,7 +2426,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2490,7 +2491,7 @@ export const seneriosDetails = [
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
@@ -2558,7 +2559,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2752,7 +2753,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -2781,7 +2782,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -2982,7 +2983,7 @@ export const seneriosDetails = [
                 { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                 { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' }
             ]
         }, {
@@ -3014,7 +3015,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -3045,7 +3046,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'Phone Number',
                     type: "phone",
@@ -3092,7 +3093,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -3119,7 +3120,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -3150,7 +3151,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -3175,7 +3176,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -3214,7 +3215,7 @@ export const seneriosDetails = [
                         }, {
                             label: 'State',
                             type: "dropdown",
-                            placeholder: 'State'
+                            placeholder: 'Select'
                         }, {
                             label: 'ZIP Code',
                             type: "input field",
@@ -3247,7 +3248,7 @@ export const seneriosDetails = [
                 }, {
                     label: 'State',
                     type: "dropdown",
-                    placeholder: 'State'
+                    placeholder: 'Select'
                 }, {
                     label: 'ZIP Code',
                     type: "input field",
@@ -3490,7 +3491,7 @@ export const seneriosDetails = [
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                     { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                     { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                    { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                    { label: 'State', type: 'dropdown', placeholder: 'Select' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                     { label: 'Agent Name', type: 'input field', placeholder: 'Agent Name' },
                 ]
@@ -3517,7 +3518,7 @@ export const seneriosDetails = [
                     }, {
                         label: 'State',
                         type: "dropdown",
-                        placeholder: 'State'
+                        placeholder: 'Select'
                     }, {
                         label: 'ZIP Code',
                         type: "input field",
@@ -3560,7 +3561,7 @@ export const seneriosDetails = [
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                     { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
                     { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
-                    { label: 'State', type: 'dropdown', placeholder: 'Select State' },
+                    { label: 'State', type: 'dropdown', placeholder: 'Select' },
                     { label: 'Date of Birth', type: 'date', placeholder: 'MM/DD/YYYY' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 ]
@@ -3588,7 +3589,7 @@ export const seneriosDetails = [
                             }, {
                                 label: 'State',
                                 type: "dropdown",
-                                placeholder: 'State'
+                                placeholder: 'Select'
                             }, {
                                 label: 'ZIP Code',
                                 type: "input field",
@@ -3616,7 +3617,7 @@ export const seneriosDetails = [
                     }, {
                         label: 'State',
                         type: "dropdown",
-                        placeholder: 'State'
+                        placeholder: 'Select'
                     }, {
                         label: 'ZIP Code',
                         type: "input field",
@@ -3646,7 +3647,7 @@ export const seneriosDetails = [
                     }, {
                         label: 'State',
                         type: "dropdown",
-                        placeholder: 'State'
+                        placeholder: 'Select'
                     }, {
                         label: 'ZIP Code',
                         type: "input field",
