@@ -176,6 +176,14 @@ export default function Nav() {
                   <p className="text-sm text-gray-500 dark:text-gray-300 truncate">{user?.email}</p>
                 </div>
                 <ul className="py-2">
+                  <li>
+                    <button
+                      onClick={() => router.push('/settings')}
+                      className="w-full text-left block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      Settings
+                    </button>
+                  </li>
                   {user?.role === 1 && user.subscriptionID !== null && (
                     <li>
                       <button

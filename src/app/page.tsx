@@ -98,19 +98,7 @@ const LoginPage = () => {
             Forgot Password?
           </p>
 
-          <p
-            className="text-sm text-gray-600 hover:underline cursor-pointer"
-            onClick={() => {
-              if (email) {
-                router.push(`/change-password?email=${encodeURIComponent(email)}`);
-              } else {
-                router.push('/change-password');
-              }
-            }}
-            title="Click to change password"
-          >
-            Change Password
-          </p>
+
 
         </form>
       </div>
