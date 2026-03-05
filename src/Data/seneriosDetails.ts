@@ -3712,8 +3712,8 @@ export const seneriosDetails = [
             blockName: "PREVIOUS RESIDENCE OR BUSINESS ADDRESS",
             fields: [
                 { label: "STREET NUMBER", type: "input field", placeholder: "STREET NUMBER ONLY" },
+                { label: "STREET NAME (INCLUDE ST., AVE., RD., CT., ETC.)", type: "input field", placeholder: "STREET NAME" },
                 { label: "APT. NO.", type: "input field", placeholder: "APT. NUMBER" },
-                { label: "STREET NAME", type: "input field", placeholder: "STREET NAME (INCLUDE ST., AVE., RD., CT., ETC.)" },
                 { label: "CITY", type: "input field", placeholder: "CITY - DO NOT ABBREVIATE" },
                 { label: "STATE", type: "dropdown", placeholder: "STATE" },
                 { label: "ZIP CODE", type: "numeric", placeholder: "ZIP CODE", maxLength: 5 },
@@ -3727,8 +3727,9 @@ export const seneriosDetails = [
                     fieldName: "Mailing Address",
                     subFields: [
                         { label: "STREET NUMBER", type: "input field", placeholder: "STREET NUMBER ONLY" },
-                        { label: "APT. NO.", type: "input field", placeholder: "APT. NUMBER" },
                         { label: "P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)", type: "input field", placeholder: "STREET/PO BOX" },
+                        { label: "STREET NAME (INCLUDE ST., AVE., RD., CT., ETC.)", type: "input field", placeholder: "STREET NAME" },
+                        { label: "APT. NO.", type: "input field", placeholder: "APT. NUMBER" },
                         { label: "CITY", type: "input field", placeholder: "CITY - DO NOT ABBREVIATE" },
                         { label: "STATE", type: "dropdown", placeholder: "STATE" },
                         { label: "ZIP CODE", type: "numeric", placeholder: "ZIP CODE", maxLength: 5 },
@@ -3746,8 +3747,8 @@ export const seneriosDetails = [
             ],
             fields: [
                 { label: "STREET NUMBER", type: "input field", placeholder: "STREET NUMBER ONLY" },
-                { label: "APT. NO.", type: "input field", placeholder: "APT. NUMBER" },
                 { label: "STREET NAME", type: "input field", placeholder: "STREET NAME (INCLUDE ST., AVE., RD., CT., ETC.)" },
+                { label: "APT. NO.", type: "input field", placeholder: "APT. NUMBER" },
                 { label: "CITY", type: "input field", placeholder: "CITY - DO NOT ABBREVIATE" },
                 { label: "DRIVER LICENSE/ID ", type: "input field", placeholder: "DL/ID NUMBER (FOR DL/ID CHANGE OF ADDRESS ONLY)" },
                 { label: "STATE", type: "dropdown", placeholder: "STATE" },
