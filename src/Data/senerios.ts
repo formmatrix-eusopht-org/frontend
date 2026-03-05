@@ -102,7 +102,7 @@ export const seneriosForForms = [
             "Vehicle Storage Location",
             "Planned Non-Operation (PNO) Certificate",
         ]
-    },, {
+    }, , {
         form: "Personalized Plates",
         fields: [
             "PLATES SECTION",
@@ -118,7 +118,7 @@ export const seneriosForForms = [
             "Type of Disabled Person Parking Placard(S) or License Plates",
             "DISABLED PERSON LICENSE PLATES APPLICANTS ONLY: VEHICLE INFORMATION",
         ]
-    },{
+    }, {
         form: "Commercial Vehicle",
         fields: [
             "Transaction Details",

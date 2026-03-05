@@ -1135,6 +1135,17 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             name={nameChangeSelected}
                         />
                     )}
+
+                    {LienReleaseBlock && (
+                        <LeinRealease
+                            title="Lien Release"
+                            block={LienReleaseBlock}
+                            lienReleaseState={lienReleaseState}
+                            onLienReleaseChange={handleLienAddressChange}
+                            onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
+                        />
+                    )}
+
                     {registeredOwnerBlock && (
                         <RegisteredOwnerDetails
                             title="Registered Owner(s)"
@@ -1217,6 +1228,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onTrimEntries={handleTrimEntries}
                         />
                     )}
+
+
 
                     {newRegisteredOwnerBlock && (
                         <NewRegisteredOwnerDetails
@@ -1314,15 +1327,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             handleSelectedOptionOnChange={handleLicensePlateChange} />
                     }
 
-                    {LienReleaseBlock && (
-                        <LeinRealease
-                            title="Lien Release"
-                            block={LienReleaseBlock}
-                            lienReleaseState={lienReleaseState}
-                            onLienReleaseChange={handleLienAddressChange}
-                            onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
-                        />
-                    )}
                     {plannedNonOperationCertificateBlock &&
                         <PlannedNonOperation
                             title="Planned Non-Operation Certificate"
