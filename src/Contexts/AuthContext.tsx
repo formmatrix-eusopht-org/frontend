@@ -8,6 +8,7 @@ import axios from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { getCookie } from '../Actions/cookie';
 import toast from 'react-hot-toast';
+import LoadingOverlay from '@/Components/LoadingOverlay';
 
 initFirebase(); // Ensure Firebase is initialized once
 
@@ -261,7 +262,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   };
 
   if (!sessionChecked) {
-    return <div>Loading...</div>;
+    return <LoadingOverlay message="Checking session..." show />;
   }
 
   return (

@@ -132,17 +132,11 @@ export const SenerioProvider = ({ children }: { children: ReactNode }) => {
   }, [senerio]);
 
   const handleClear = () => {
-    if (isEditAndId) {
-      localStorage.removeItem(LOCAL_STORAGE_KEY_form);
-      localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
-      localStorage.setItem("isEditAndId", "");
-      window.location.reload();
-    } else {
-      localStorage.removeItem(LOCAL_STORAGE_KEY_form);
-      localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
-      localStorage.setItem("isEditAndId", "");
-      window.location.reload();
-    }
+    setSenerio([]);
+    setIsEditAndId("");
+
+    localStorage.removeItem(LOCAL_STORAGE_KEY_form);
+    localStorage.removeItem(LOCAL_STORAGE_KEY_senerio);
   };
 
   const senerioValues = {
