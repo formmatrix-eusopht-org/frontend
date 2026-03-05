@@ -13,10 +13,11 @@ type InputProps = {
   label: string;
   placeholder?: string;
   value?: string;
-  type?: "text" | "phone" | "date" | "dropdown" | "datepicker" | "address";
+  type?: "text" | "phone" | "date" | "dropdown" | "datepicker" | "address" | "numeric";
   onChange?: (val: string) => void;
   className?: string;
   options?: Option[];
+  maxLength?: number;
 };
 
 export default function Input({
@@ -27,6 +28,7 @@ export default function Input({
   onChange,
   className = '',
   options = [],
+  maxLength,
 }: InputProps) {
   // Formatter for phone
   const formatPhone = (input: string) => {
@@ -40,7 +42,14 @@ export default function Input({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = type === "phone" ? formatPhone(e.target.value) : e.target.value.toUpperCase();
+    let val = e.target.value;
+    if (type === "phone") {
+      val = formatPhone(val);
+    } else if (type === "numeric") {
+      val = val.replace(/\D/g, "");
+    } else {
+      val = val.toUpperCase();
+    }
     onChange?.(val);
   };
 
@@ -102,8 +111,9 @@ export default function Input({
           value={value}
           onChange={handleInputChange}
           placeholder={placeholder}
-          inputMode={type === "phone" ? "numeric" : undefined}
-          maxLength={type === "phone" ? 14 : undefined}
+          inputMode={type === "phone" || type === "numeric" ? "numeric" : undefined}
+          // maxLength={type === "phone" ? 14 : undefined}
+          maxLength={type === "phone" ? 14 : maxLength}
           className={`border border-gray-300 rounded-md px-3 py-2 text-sm w-full ${className}`}
         />
       )}
