@@ -73,7 +73,7 @@ export default function Input({
 
   return (
     <div className="flex flex-col">
-      <label className="text-[13px] font-thin tracking-tight mb-1 mt-3 whitespace-nowrap overflow-hidden text-ellipsis" title={label}>{label}</label>
+      {label && <label className="text-[13px] font-thin tracking-tight mb-1 mt-3 whitespace-nowrap overflow-hidden text-ellipsis" title={label}>{label}</label>}
 
       {type === "date" ? (
         <DateInput
