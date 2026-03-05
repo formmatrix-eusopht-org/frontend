@@ -3702,8 +3702,8 @@ export const seneriosDetails = [
             blockName: "PERSONAL OR BUSINESS INFORMATION",
             fields: [
                 { label: "FIRST", type: "input field", placeholder: "FIRST NAME" },
+                { label: "MIDDLE INITIAL", type: "input field", placeholder: "ENTER MIDDLE INITIAL" },
                 { label: "LAST NAME OR BUSINESS NAME", type: "input field", placeholder: "LAST NAME OR BUSINESS NAME" },
-                { label: "INITIAL", type: "input field", placeholder: "Enter INITIAL" },
                 { label: "BIRTH DATE (FOR DL/ID CHANGE OF ADDRESS ONLY)", type: "date", placeholder: "MM/DD/YYYY" },
                 { label: "DRIVER LICENSE/ID (FOR DL/ID CHANGE OF ADDRESS ONLY)", type: "input field", placeholder: "DL/ID NUMBER" },
             ],
@@ -3716,7 +3716,7 @@ export const seneriosDetails = [
                 { label: "STREET NAME", type: "input field", placeholder: "STREET NAME (INCLUDE ST., AVE., RD., CT., ETC.)" },
                 { label: "CITY", type: "input field", placeholder: "CITY - DO NOT ABBREVIATE" },
                 { label: "STATE", type: "dropdown", placeholder: "STATE" },
-                { label: "ZIP CODE", type: "input field", placeholder: "ZIP CODE" },
+                { label: "ZIP CODE", type: "numeric", placeholder: "ZIP CODE", maxLength: 5 },
             ],
         }, {
             reference: "NEW OR CORRECT RESIDENSE OR BUSINESS ADDRESS",
@@ -3731,7 +3731,7 @@ export const seneriosDetails = [
                         { label: "P.O. BOX OR STREET NAME OR STREET NAME AND PRIVATE MAIL BOX (PMB)", type: "input field", placeholder: "STREET/PO BOX" },
                         { label: "CITY", type: "input field", placeholder: "CITY - DO NOT ABBREVIATE" },
                         { label: "STATE", type: "dropdown", placeholder: "STATE" },
-                        { label: "ZIP CODE", type: "input field", placeholder: "ZIP CODE" },
+                        { label: "ZIP CODE", type: "numeric", placeholder: "ZIP CODE", maxLength: 5 },
                     ]
                 }, {
                     label: "Location of Trailer Coach or Vessel",
@@ -3751,7 +3751,7 @@ export const seneriosDetails = [
                 { label: "CITY", type: "input field", placeholder: "CITY - DO NOT ABBREVIATE" },
                 { label: "DRIVER LICENSE/ID ", type: "input field", placeholder: "DL/ID NUMBER (FOR DL/ID CHANGE OF ADDRESS ONLY)" },
                 { label: "STATE", type: "dropdown", placeholder: "STATE" },
-                { label: "ZIP CODE", type: "input field", placeholder: "ZIP CODE" },
+                { label: "ZIP CODE", type: "numeric", placeholder: "ZIP CODE", maxLength: 5 },
                 { label: "COUNTY", type: "input field", placeholder: "COUNTY - DO NOT ABBREVIATE" },
             ],
         }, {

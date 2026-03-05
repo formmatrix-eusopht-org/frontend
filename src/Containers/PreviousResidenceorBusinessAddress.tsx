@@ -5,8 +5,9 @@ import { states } from "../Data/statesData";
 
 interface Field {
   label: string;
-  type: "text" | "phone" | "date" | "dropdown" | "datepicker";
+  type: "text" | "phone" | "date" | "dropdown" | "datepicker" | "numeric";
   placeholder?: string;
+  maxLength?: number;
   options?: { value: string; label: string }[];
 }
 
@@ -51,6 +52,7 @@ const PreviousResidenceorBusinessAddress: React.FC<PreviousResidenceorBusinessAd
                   key={field.label}
                   label={field.label}
                   type={field.type}
+                  maxLength={field.maxLength}
                   options={field.type === "dropdown" ? states : []}
                   value={fieldValue}
                   placeholder={field.placeholder || ""}

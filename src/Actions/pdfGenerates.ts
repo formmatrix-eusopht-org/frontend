@@ -2129,7 +2129,7 @@ async function handleOnPDF(form: any, senerio: any) {
         }
         if (senerio?.includes("Add Lienholder") ||
             senerio?.includes("Remove Lienholder")) {
-            if (form.transactionSelections?.includes("With Title")) {
+            if (form.transactionSelections?.includes("With Title") || (form.transactionSelections?.includes("Transaction with Vehicle Title"))) {
                 formTypes = formTypes?.filter(formType => formType !== "Reg227");
                 formTypes.push("title");
             } else {

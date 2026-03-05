@@ -46,7 +46,9 @@ export const OwnerAddress = ({
               label={field.label}
               placeholder={field.placeholder}
               type={field.type === "dropdown" ? "dropdown" :
-                field.type === "phone" ? "phone" : "text"}
+                field.type === "phone" ? "phone" :
+                  field.type === "numeric" ? "numeric" : "text"}
+              maxLength={field.maxLength}
               options={field.type === "dropdown" ? states : []}
               value={residentialAddress[field.label] || ""}
               onChange={(val) => onAddressChange("residential", field.label, val)}
@@ -67,8 +69,10 @@ export const OwnerAddress = ({
                   placeholder={field.placeholder}
                   type={
                     field.type === "dropdown" ? "dropdown" :
-                      field.type === "phone" ? "phone" : "text"
+                      field.type === "phone" ? "phone" :
+                        field.type === "numeric" ? "numeric" : "text"
                   }
+                  maxLength={field.maxLength}
                   options={field.type === "dropdown" ? states : []}
                   value={mailingAddress[field.label] || ""}
                   onChange={(val) => onAddressChange("mailing", field.label, val)}
