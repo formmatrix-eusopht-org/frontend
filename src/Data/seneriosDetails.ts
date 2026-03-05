@@ -94,6 +94,10 @@ export const seneriosDetails = [
                     label: 'Mileage of Vehicle',
                     type: "input field",
                     placeholder: 'Mileage of Vehicle'
+                },{
+                    label: 'Explain Odometer Discrepancy',
+                    type: "input field",
+                    placeholder: 'Explain Odometer Discrepancy'
                 }, {
                     label: 'NOT Actual Mileage',
                     type: "checkbox",
