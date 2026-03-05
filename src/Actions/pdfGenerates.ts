@@ -1264,6 +1264,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "apt number.1.1.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["APT. NO."]?.[2] || '' : '' : '',
         "apt number.1.2.1.1": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["APT. NO."]?.[3] || '' : '' : '',
 
+
+        "Sec10 date": senerio?.includes("Change of Address") ? getCurrentDate() : '',
+
         "city.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[0] || '' : '' : '',
         "city 1.0.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[1] || '' : '' : '',
         "city 1.1.1.1.0": senerio?.includes("Change of Address") ? formData?.newOrCorrectResidenceOrBusinessAddressData?.["If mailing address is different"] ? formData?.newOrCorrectResidenceOrBusinessAddressData?.mailingAddress?.["CITY"]?.[2] || '' : '' : '',
