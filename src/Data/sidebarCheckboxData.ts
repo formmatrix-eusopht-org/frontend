@@ -71,10 +71,10 @@ export const sidebarSections = [
         label: "Filing for Planned Non-Operation (PNO)",
         disabledWhen: ["Restoring PNO Vehicle to Operational", "Certificate of Non-Operation", "Duplicate Stickers", "Duplicate Plates & Stickers"],
       },
-      {
-        label: "Restoring PNO Vehicle to Operational",
-        disabledWhen: ["Filing for Planned Non-Operation (PNO)"]
-      },
+      // {
+      //   label: "Restoring PNO Vehicle to Operational",
+      //   disabledWhen: ["Filing for Planned Non-Operation (PNO)"]
+      // },
       {
         label: "Certificate of Non-Operation",
         disabledWhen: ["Filing for Planned Non-Operation (PNO)"]

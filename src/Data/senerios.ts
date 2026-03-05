@@ -90,13 +90,15 @@ export const seneriosForForms = [
             "Transaction Details",
             "Planned Non-Operation (PNO) Certificate",
         ]
-    }, {
+    },
+    {
         form: "Restoring PNO Vehicle to Operational",
         fields: [
             "Vehicle Information",
             "New Registeration Owners"
         ]
-    }, {
+    },
+    {
         form: "Certificate of Non-Operation",
         fields: [
             "Vehicle Storage Location",

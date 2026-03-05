@@ -2462,7 +2462,9 @@ export const seneriosDetails = [
             ]
         }
         ]
-    }, {
+    },
+
+    {
         form: "Restoring PNO Vehicle to Operational",
         blocks: [{
             reference: "Vehicle Information",
@@ -2538,7 +2540,9 @@ export const seneriosDetails = [
                 },
             ]
         }]
-    }, {
+    },
+
+    {
         form: "Certificate of Non-Operation",
         blocks: [{
             reference: "Vehicle Storage Location",
