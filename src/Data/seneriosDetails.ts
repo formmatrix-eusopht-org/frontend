@@ -1998,7 +1998,7 @@ export const seneriosDetails = [
             reference: "Transaction Details",
             blockName: "Transaction Details",
             fields: [{
-                label: 'With Title',
+                label: 'Transaction with Vehicle Title',
                 type: "checkbox",
                 placeholder: 'With Title'
             }
