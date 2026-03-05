@@ -993,8 +993,8 @@ export const seneriosDetails = [
                 blockName: "Name Statement (Ownership Certificate Required)",
                 fields: []
             }, {
-                reference: "New Registered Owner(s)",
-                blockName: "New Registered Owner(s)",
+                reference: "Registered Owner(s)",
+                blockName: "Registered Owner(s)",
                 fields: [
                     { label: 'First Name', type: 'input field', placeholder: 'First Name' },
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
