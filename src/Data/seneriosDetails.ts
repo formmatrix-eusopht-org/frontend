@@ -2198,7 +2198,7 @@ export const seneriosDetails = [
             blockName: "Transaction Details",
             fields: [
                 {
-                    label: 'With Title',
+                    label: 'Transaction with Vehicle Title',
                     type: "checkbox",
                     placeholder: 'With Title'
                 }

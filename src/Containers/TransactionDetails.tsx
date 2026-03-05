@@ -33,7 +33,7 @@ export const TransactionDetails = ({
   const shouldHideWithTitle =
     senerio.includes("Simple Transfer") || senerio.includes("Multiple Transfer") && (senerio.includes("Add Lienholder") || senerio.includes("Remove Lienholder"));
   const filteredFields = shouldHideWithTitle
-    ? block.fields.filter((field) => field.label !== "With Title")
+    ? block.fields.filter((field) => field.label !== "With Title" || "Transaction with Vehicle Title")
     : block.fields;
 
   return (
