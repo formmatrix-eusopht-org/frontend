@@ -58,50 +58,63 @@ const ReplacementOnlySection: React.FC<ReplacementProps> = ({ values, onChange }
       <hr className="my-8 border-gray-300" />
 
       {/* I NEED section */}
-      <div className="flex flex-wrap items-center gap-4 mt-4">
-        <span className="font-semibold">I NEED:</span>
-        <label className="flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={values.need === "onePlate"}
-            onChange={() => handleToggle("need", "onePlate")}
-          />
-          One Plate
-        </label>
-        <label className="flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={values.need === "twoPlates"}
-            onChange={() => handleToggle("need", "twoPlates")}
-          />
-          Two Plates
-        </label>
+      <div className="flex flex-col gap-4 mt-4">
 
-        <span className="font-semibold ml-6">PLATE(S) WERE:</span>
-        <label className="flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={values.plateCondition === "lost"}
-            onChange={() => handleToggle("plateCondition", "lost")}
-          />
-          Lost
-        </label>
-        <label className="flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={values.plateCondition === "mutilated"}
-            onChange={() => handleToggle("plateCondition", "mutilated")}
-          />
-          Mutilated
-        </label>
-        <label className="flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={values.plateCondition === "stolen"}
-            onChange={() => handleToggle("plateCondition", "stolen")}
-          />
-          Stolen
-        </label>
+        {/* I NEED */}
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="font-semibold text-[14px]">I NEED:</span>
+
+          <label className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={values.need === "onePlate"}
+              onChange={() => handleToggle("need", "onePlate")}
+            />
+            One Plate
+          </label>
+
+          <label className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={values.need === "twoPlates"}
+              onChange={() => handleToggle("need", "twoPlates")}
+            />
+            Two Plates
+          </label>
+        </div>
+
+        {/* PLATE(S) WERE */}
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="font-semibold text-[14px]">PLATE(S) WERE:</span>
+
+          <label className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={values.plateCondition === "lost"}
+              onChange={() => handleToggle("plateCondition", "lost")}
+            />
+            Lost
+          </label>
+
+          <label className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={values.plateCondition === "mutilated"}
+              onChange={() => handleToggle("plateCondition", "mutilated")}
+            />
+            Mutilated
+          </label>
+
+          <label className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={values.plateCondition === "stolen"}
+              onChange={() => handleToggle("plateCondition", "stolen")}
+            />
+            Stolen
+          </label>
+        </div>
+
       </div>
     </Section>
   );

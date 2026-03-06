@@ -161,25 +161,45 @@ const SelectConfiguration: React.FC<Props> = ({ block, value, onChange }) => {
 
                 {/* Delivery */}
                 {value.assignedFor !== "" && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center pt-4 border-t">
-                        <Checkbox
-                            label="DMV Office"
-                            checked={value.deliveryType === "DMV Office"}
-                            onChange={() => onChange({ ...value, deliveryType: "DMV Office" })}
-                        />
-                        <Checkbox
-                            label="Auto Club (must be a member)"
-                            checked={value.deliveryType === "Auto Club"}
-                            onChange={() => onChange({ ...value, deliveryType: "Auto Club" })}
-                        />
-                        <Input
-                            type="text"
-                            label="LOCATION (city) :"
-                            placeholder="LOCATION (city)"
-                            value={value.location}
-                            onChange={(val) => onChange({ ...value, location: val })}
-                        />
-                    </div>)}
+                    <div className="flex items-start justify-between gap-6 pt-4 border-t">
+
+                        <div className="min-w-0">
+                            <Checkbox
+                                label="DMV Office"
+                                checked={value.deliveryType === "DMV Office"}
+                                onChange={() => onChange({ ...value, deliveryType: "DMV Office" })}
+                                className="truncate"
+                            />
+                        </div>
+
+                        <div className="min-w-0">
+                            <Checkbox
+                                label="Auto Club (must be a member)"
+                                checked={value.deliveryType === "Auto Club"}
+                                onChange={() => onChange({ ...value, deliveryType: "Auto Club" })}
+                                className="truncate"
+                            />
+                        </div>
+
+                        <div className="flex flex-col min-w-0 w-[220px]">
+                            <label className="text-[12px] font-medium truncate">
+                                LOCATION (city)
+                            </label>
+
+                            <Input
+                                type="text"
+                                label=""
+                                placeholder="LOCATION (city)"
+                                value={value.location}
+                                onChange={(val) => onChange({ ...value, location: val })}
+                                className="h-8"
+                            />
+                        </div>
+
+                    </div>
+
+
+                )}
             </Section>
             <hr className="my-8 border-gray-300" />
         </div>
