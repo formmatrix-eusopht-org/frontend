@@ -1329,7 +1329,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
                     {plannedNonOperationCertificateBlock &&
                         <PlannedNonOperation
-                            title="Planned Non-Operation Certificate"
+                            title="CERTIFICATE OF NON-OPERATION"
                             vehicles={plannedNonOperationState}
                             onChange={handlePlannedNonOperationChange}
                             onAdd={handlePlannedNonOperationAdd}
