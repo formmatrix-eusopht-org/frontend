@@ -1890,7 +1890,12 @@ const mergeFilledPDFs = async (
 
                 try {
                     if (field instanceof PDFTextField) {
-                        field.setText(value);
+                        const strValue = (value !== undefined && value !== null) ? String(value) : '';
+
+                        // Remove the character limit constraint from the PDF field itself
+                        field.setMaxLength(undefined);
+
+                        field.setText(strValue);
                         field.setFontSize(11);
                     } else if (field instanceof PDFCheckBox) {
                         if (value === true || value === 'true') {
@@ -1900,7 +1905,7 @@ const mergeFilledPDFs = async (
                         }
                     }
                 } catch (e: any) {
-                    // console.warn(`Could not fill field ${name}:`, e.message);
+                    console.warn(`Could not fill field ${name} with value "${value}":`, e.message);
                 }
             });
 
