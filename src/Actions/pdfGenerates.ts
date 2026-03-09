@@ -2143,7 +2143,9 @@ async function handleOnPDF(form: any, senerio: any) {
                 formTypes = formTypes?.filter(formType => formType !== "Reg227");
                 formTypes.push("title");
             } else {
-                formTypes.push("Reg227");
+                if (!formTypes.includes("Reg227")) {  // to prevent dual printing of reg 227 when simple transfer + remove lien holder
+                    formTypes.push("Reg227");
+                }
             }
         }
         if (senerio?.includes("Filing for Planned Non-Operation (PNO)")) {
