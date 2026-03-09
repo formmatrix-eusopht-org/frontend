@@ -399,10 +399,10 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "one": formData.itemRequestedWasState?.checked?.includes("SURRENDERED") ? formData.itemRequestedWasState?.plateCount?.[0] === "ONE" : false,
         "Two": formData.itemRequestedWasState?.checked?.includes("SURRENDERED") ? formData.itemRequestedWasState?.plateCount?.[0] === "TWO" : false,
         "Special plates": formData.itemRequestedWasState?.checked?.includes("SPECIAL PLATES"),
-        "REG card with current address": formData.itemRequestedWasState?.checked?.includes("REQUESTING REGISTRATION CARD"),
+        "REG card with current address": (formData.itemRequestedWasState?.checked?.includes("REQUESTING REGISTRATION CARD") || formData.transactionSelections?.some((s: any) => s.toLowerCase().includes("request pno card"))),
         "CVC": formData.itemRequestedWasState?.checked?.includes("PER CVC §4467"),
-        "other": formData.itemRequestedWasState?.checked?.includes("OTHER") ? true : senerio?.includes("Duplicate Registration") ? true : false,
-        "Explanation": formData.itemRequestedWasState?.checked?.includes("OTHER") ? formData.itemRequestedWasState?.otherExplain || '' : senerio?.includes("Duplicate Registration") ? "Requesting a Duplicate Registration Card" : "",
+        "other": formData.itemRequestedWasState?.checked?.includes("OTHER") ? true : senerio?.includes("Duplicate Registration") ? true : formData.transactionSelections?.some((s: any) => s.toLowerCase().includes("request pno card")) ? true : false,
+        "Explanation": formData.itemRequestedWasState?.checked?.includes("OTHER") ? formData.itemRequestedWasState?.otherExplain || '' : senerio?.includes("Duplicate Registration") ? "Requesting a Duplicate Registration Card" : formData.transactionSelections?.some((s: any) => s.toLowerCase().includes("request pno card")) ? "Requesting PNO Card" : "",
         "Name of bank, finance company, or individual having a lien on this vehicle": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["Name of Bank, Finance Company, or Individual having a Lien on this Vehicle"] || 'NONE' : "NONE",
         "2 Address": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["Street"] || '' : "",
         "2 Apt/Space Number": formData.transactionSelections?.includes("There is a Current Lienholder") ? formData.LegalOwnerOfRecordData?.residential?.["APT./SPACE/STE.#"] || '' : "",
@@ -750,7 +750,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "textarea_69crqf": senerio?.includes("Restoring PNO Vehicle to Operational") ? " The vehicle was previously placed on Planned Non Operation (PNO) status I now intend to operate it on public roads and I am submitting payment for registration fees and for any late fees penalities." :
             senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Statement of Facts"] || '' : '',
         //Reg102
-        "PNO": formData?.transactionSelections?.includes('60 days before registration expires or 90 days after') ? true : false,
+        "PNO": (formData?.transactionSelections?.includes('60 days before registration expires or 90 days after') || formData?.transactionSelections?.includes('Request PNO card')) ? true : false,
         "veh lic plate #.0": (senerio?.includes("Filing for Planned Non-Operation (PNO)") || senerio?.includes("Certificate of Non-Operation")) ? formData?.plannedNonOperationState?.[0]?.plate || '' : '',
         "veh id #.0": (senerio?.includes("Filing for Planned Non-Operation (PNO)") || senerio?.includes("Certificate of Non-Operation")) ? formData?.plannedNonOperationState?.[0]?.vin || '' : '',
         "veh make.0": (senerio?.includes("Filing for Planned Non-Operation (PNO)") || senerio?.includes("Certificate of Non-Operation")) ? formData?.plannedNonOperationState?.[0]?.make || '' : '',
@@ -2148,7 +2148,11 @@ async function handleOnPDF(form: any, senerio: any) {
         }
         if (senerio?.includes("Filing for Planned Non-Operation (PNO)")) {
             formTypes.push("REG102");
-            if (form.transactionSelections?.includes('60 days before registration expires or 90 days after')) {
+            const isReg156Needed = form.transactionSelections?.some((selection: string) =>
+                selection.toLowerCase().includes("60 days before registration expires") ||
+                selection.toLowerCase().includes("request pno card")
+            );
+            if (isReg156Needed) {
                 formTypes.push("Reg156");
             }
         }
