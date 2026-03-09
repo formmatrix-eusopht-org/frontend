@@ -28,11 +28,12 @@ export const TypeOfVehicle = ({
   return (
     <div className="pb-4">
       <Section title={title}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           {block.fields.map((field, index) => (
             <Checkbox
               key={index}
               label={field.label}
+              className="whitespace-nowrap"
               checked={selectedItems.includes(field.label)}
               onChange={() => onChange(field.label, !selectedItems.includes(field.label))}
             />

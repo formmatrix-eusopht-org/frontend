@@ -39,7 +39,7 @@ export const TransactionDetails = ({
   return (
     <div className="pb-4">
       <Section title={title}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           {filteredFields.map((field, index) => {
             // Disable Family Transfer if Vehicle is a Gift is selected
             const shouldDisableFamilyTransfer =
@@ -53,7 +53,7 @@ export const TransactionDetails = ({
               <Checkbox
                 key={index}
                 label={field.label}
-                className="tracking-tight"
+                className="tracking-tight whitespace-nowrap"
                 checked={selectedItems.includes(field.label)}
                 onChange={() => {
                   // If trying to select a disabled option, do nothing
