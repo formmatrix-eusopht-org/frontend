@@ -102,10 +102,8 @@ export const LegalOwnerOfRecord = ({
             <Input
               key={field?.label}
               label={field?.label}
-              type={
-                field?.label === "ELT Number (3 digits)" ? "numeric" : field?.type
-              }
-              maxLength={field?.label === "ELT Number (3 digits)" ? 3 : undefined}
+              type={field.type}
+              maxLength={field.label === "ELT Number (3 digits)" ? 3 : undefined}
               placeholder={field?.placeholder ?? ""}
               options={field?.type === "dropdown" ? states : []}
               value={legalOwnerAddress?.[field?.label] || ""}

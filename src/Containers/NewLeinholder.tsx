@@ -72,7 +72,7 @@ export const NewLienHolder = ({
             <Input
               key={field.label}
               label={field.label}
-              type={field.label === "ELT Number (3 digits)" ? "numeric" : field.type}
+              type={field.type}
               maxLength={field.label === "ELT Number (3 digits)" ? 3 : undefined}
               placeholder={field.placeholder ?? ""}
               value={formState[field.label] as string}
