@@ -820,21 +820,21 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Estimated" ? true : false : false,
 
         //reg 4008
-
-        "Name": senerio?.includes("Commercial Vehicle") ? owner1 || '' : '',
-        "text_31jsfn": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.Street || '' : '',
-        "text_32olri": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.["APT./SPACE/STE.#"] || '' : '',
-        "City.0": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.City || '' : '',
-        "States1.0": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.State || '' : '',
-        "Zip Code.0": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.["ZIP Code"] || '' : '',
-        "Address.0.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.residential?.County || '' : '',
+        //-- reg 4008 — use NEW owner data
+        "Name": senerio?.includes("Commercial Vehicle") ? newOwner1 || '' : '',
+        "text_31jsfn": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.Street || '' : '',
+        "text_32olri": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.["APT./SPACE/STE.#"] || '' : '',
+        "City.0": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.City || '' : '',
+        "States1.0": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.State || '' : '',
+        "Zip Code.0": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.["ZIP Code"] || '' : '',
+        "Address.0.1": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.County || '' : '',
         "Check Box 1": senerio?.includes("Commercial Vehicle") ? formData?.newOwnerAddress?.["If no California county and used out-of-state, check this box"] || false : false,
 
-        "text_30xebc": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.Street || '' : '',
-        "text_33mpyh": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.["APT./SPACE/STE.#"] || '' : '',
-        "City.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.City || '' : '',
-        "States1.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.State || '' : '',
-        "Zip Code.1": senerio?.includes("Commercial Vehicle") ? formData?.ownerAddress?.mailing?.["ZIP Code"] || '' : '',
+        "text_30xebc": senerio?.includes("Commercial Vehicle") ? formData?.selectedRadio?.includes("if-mailing-address-is-different") ? formData?.newOwnerMailingAddress?.Street || '' : '' : '',
+        "text_33mpyh": senerio?.includes("Commercial Vehicle") ? formData?.selectedRadio?.includes("if-mailing-address-is-different") ? formData?.newOwnerMailingAddress?.["APT./SPACE/STE.#"] || '' : '' : '',
+        "City.1": senerio?.includes("Commercial Vehicle") ? formData?.selectedRadio?.includes("if-mailing-address-is-different") ? formData?.newOwnerMailingAddress?.City || '' : '' : '',
+        "States1.1": senerio?.includes("Commercial Vehicle") ? formData?.selectedRadio?.includes("if-mailing-address-is-different") ? formData?.newOwnerMailingAddress?.State || '' : '' : '',
+        "Zip Code.1": senerio?.includes("Commercial Vehicle") ? formData?.selectedRadio?.includes("if-mailing-address-is-different") ? formData?.newOwnerMailingAddress?.["ZIP Code"] || '' : '' : '',
 
         "License- 1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle License Number"] || '' : '',
         "VIN- 1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Identification Number"] || '' : '',
@@ -2163,7 +2163,10 @@ async function handleOnPDF(form: any, senerio: any) {
         }
         if (senerio?.includes("Commercial Vehicle")) {
             formTypes.push("Reg343");
-            formTypes.push("Reg4008");
+            // Only push Reg4008 if vehicle is 10,001 lbs or more
+            if (form.commercialInfo?.["GVWR"] === "Yes") {
+                formTypes.push("Reg4008");
+            }
             formTypes.push("Reg256");
             formTypes.push("Reg590");
         }
