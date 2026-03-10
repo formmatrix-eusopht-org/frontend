@@ -291,8 +291,22 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     // Handlers for various form interactions
     const handleTransactionChange = (label: string, checked: boolean) => {
         setTransactionSelections((prev) => {
-            const updated = checked ? [...prev, label] : prev.filter((item) => item !== label);
+            let updated = checked ? [...prev, label] : prev.filter((item) => item !== label);
 
+            // Mutual exclusivity: Motorcycle <-> Commercial Vehicle
+            if (label === "Is the Vehicle a Motorcycle" && checked) {
+                updated = updated.filter((item) => item !== "Commercial Vehicle(BUS/LIMO/TAXI)");
+                setCommercialInfo({});
+            }
+            if (label === "Commercial Vehicle(BUS/LIMO/TAXI)" && checked) {
+                updated = updated.filter((item) => item !== "Is the Vehicle a Motorcycle");
+                setTypeOfVehicleSelection("");
+                setVehicleInfoState(prev => {
+                    const { ["Motorcycle Engine Number"]: _, ...rest } = prev;
+                    return rest;
+                });
+            }
+            //
             // Sync "Is the Vehicle a Motorcycle" with "MOTORCYCLE"
             if (label === "Is the Vehicle a Motorcycle") {
                 setTypeOfVehicleSelection(checked ? "MOTORCYCLE" : "");

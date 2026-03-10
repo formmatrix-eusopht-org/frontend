@@ -18,6 +18,7 @@ type TransactionProps = {
   senerio: Array<any>;
   selectedItems: string[];
   onChange: (label: string, checked: boolean) => void;
+  disabledItems?: string[]; // <-- add this
 };
 
 export const TransactionDetails = ({
@@ -26,10 +27,15 @@ export const TransactionDetails = ({
   senerio,
   selectedItems,
   onChange,
+  disabledItems = [],
 }: TransactionProps) => {
-  // Determine if we should disable checkboxes
   const isGiftSelected = selectedItems.includes("Vehicle is a Gift");
   const isFamilyTransferSelected = selectedItems.includes("Family Transfer");
+
+  // NEW: Motorcycle <-> Commercial Vehicle mutual exclusivity
+  const isMotorcycleSelected = selectedItems.includes("Is the Vehicle a Motorcycle");
+  const isCommercialSelected = selectedItems.includes("Commercial Vehicle(BUS/LIMO/TAXI)");
+
   const shouldHideWithTitle =
     senerio.includes("Simple Transfer") || senerio.includes("Multiple Transfer") && (senerio.includes("Add Lienholder") || senerio.includes("Remove Lienholder"));
   const filteredFields = shouldHideWithTitle
@@ -41,13 +47,28 @@ export const TransactionDetails = ({
       <Section title={title}>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           {filteredFields.map((field, index) => {
-            // Disable Family Transfer if Vehicle is a Gift is selected
             const shouldDisableFamilyTransfer =
               field.label === "Family Transfer" && isGiftSelected;
-
-            // Disable Vehicle is a Gift if Family Transfer is selected
             const shouldDisableGift =
               field.label === "Vehicle is a Gift" && isFamilyTransferSelected;
+
+            // NEW: disable commercial if motorcycle selected, and vice versa
+            const shouldDisableCommercial =
+              field.label === "Commercial Vehicle(BUS/LIMO/TAXI)" && isMotorcycleSelected;
+            const shouldDisableMotorcycle =
+              field.label === "Is the Vehicle a Motorcycle" && isCommercialSelected;
+
+            const isDisabledByParent = disabledItems.includes(field.label);
+
+            const isDisabled =
+              shouldDisableFamilyTransfer ||
+              shouldDisableGift ||
+              shouldDisableCommercial ||   // NEW
+              shouldDisableMotorcycle ||   // NEW
+              isDisabledByParent ||
+              (senerio.includes("Multiple Transfer") &&
+                ((field.label === "Smog Exemption" && isFamilyTransferSelected) ||
+                  (field.label === "Family Transfer" && selectedItems.includes("Smog Exemption"))));
 
             return (
               <Checkbox
@@ -56,43 +77,21 @@ export const TransactionDetails = ({
                 className="tracking-tight whitespace-nowrap"
                 checked={selectedItems.includes(field.label)}
                 onChange={() => {
-                  // If trying to select a disabled option, do nothing
-                  if (
-                    shouldDisableFamilyTransfer ||
-                    shouldDisableGift ||
-                    (senerio.includes("Multiple Transfer") &&
-                      ((field.label === "Smog Exemption" && isFamilyTransferSelected) ||
-                        (field.label === "Family Transfer" && selectedItems.includes("Smog Exemption"))))
-                  )
-                    return;
+                  if (isDisabled) return;
 
-                  // Call the normal onChange for the clicked field
                   onChange(field.label, !selectedItems.includes(field.label));
 
-                  // ----- NEW RULE -----
-                  // Auto-check Smog Exemption when Family Transfer is clicked
-                  // Auto-check / uncheck Smog Exemption based on Family Transfer
                   if (field.label === "Family Transfer") {
                     const isChecking = !selectedItems.includes("Family Transfer");
-
-                    // If checking Family Transfer, auto-check Smog Exemption
                     if (isChecking && !selectedItems.includes("Smog Exemption")) {
                       onChange("Smog Exemption", true);
                     }
-
-                    // If unchecking Family Transfer, auto-uncheck Smog Exemption
                     if (!isChecking && selectedItems.includes("Smog Exemption")) {
                       onChange("Smog Exemption", false);
                     }
                   }
                 }}
-                disabled={
-                  shouldDisableFamilyTransfer ||
-                  shouldDisableGift ||
-                  (senerio.includes("Multiple Transfer") &&
-                    ((field.label === "Smog Exemption" && isFamilyTransferSelected) ||
-                      (field.label === "Family Transfer" && selectedItems.includes("Smog Exemption"))))
-                }
+                disabled={isDisabled}
               />
             );
           })}
