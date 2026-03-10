@@ -982,6 +982,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "checkbox_78tyvm": senerio?.includes("Name Change") ? senerio?.includes("Legal Name Change") ? true : false : false,
         "text_75ujtd": senerio?.includes("Name Change") ? senerio?.includes("Legal Name Change") ? formData?.nameChangeData?.changeFrom || '' : "" : '',
         "text_74udmw": senerio?.includes("Name Change") ? senerio?.includes("Legal Name Change") ? formData?.nameChangeData?.changeTo || '' : "" : '',
+        "Transfer only box": true,
+
 
         //DMV 14
         //personal or bussiness info
