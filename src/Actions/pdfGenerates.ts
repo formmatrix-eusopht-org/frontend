@@ -2162,7 +2162,9 @@ async function handleOnPDF(form: any, senerio: any) {
             formTypes.push("REG102");
         }
         if (senerio?.includes("Commercial Vehicle")) {
-            formTypes.push("Reg343");
+            if (!formTypes.includes("Reg343")) {
+                formTypes.push("Reg343");
+            }
             // Only push Reg4008 if vehicle is 10,001 lbs or more
             if (form.commercialInfo?.["GVWR"] === "Yes") {
                 formTypes.push("Reg4008");

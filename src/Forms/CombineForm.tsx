@@ -1097,7 +1097,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         />
                     )}
 
-                    {typeOfVehicleBlock && isOutofStateTitle && (
+                    {typeOfVehicleBlock && isOutofStateTitle && !comercialVehicleFlag && (
                         <TypeOfVehicle
                             title="Type of Vehicle"
                             block={typeOfVehicleBlock}
