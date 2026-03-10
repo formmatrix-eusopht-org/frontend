@@ -805,6 +805,10 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
         "street": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.Address || '' : '',
         "city": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.City || '' : '',
+        "area code22": senerio?.includes("Certificate of Non-Operation") ? senerio?.includes("Simple Transfer") ? formData?.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : formData?.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
+        "phone22": senerio?.includes("Certificate of Non-Operation") ? senerio?.includes("Simple Transfer") ? formData?.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : formData?.ownersData?.[0]?.['Phone Number']?.slice(5) || '' : "",
+
+
         // "state": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.State || '' : '',
         // "zip code": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.["ZIP Code"] || '' : '',
 
