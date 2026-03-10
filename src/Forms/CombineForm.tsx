@@ -1121,14 +1121,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onReasonChange={setMissingReason}
                         />
                     )}
-                    {SalvageCertificateBlock && (
-                        <SalvageCertificate
-                            title={SalvageCertificateBlock.blockName}
-                            block={SalvageCertificateBlock} // ✅ pass metadata
-                            values={salvageCertificateState} // ✅ pass current field values
-                            onFieldChange={handleSalvageCertificateChange}
-                        />
-                    )}
+
                     {vehicleInfoBlock && (
                         <VehicleInformationDetails
                             title="Vehicle Information"
@@ -1424,6 +1417,14 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             block={platePurchaseBlock}
                             values={platePurchaseState}
                             onChange={setPlatePurchaseState}
+                        />
+                    )}
+                    {SalvageCertificateBlock && (
+                        <SalvageCertificate
+                            title={SalvageCertificateBlock.blockName}
+                            block={SalvageCertificateBlock} // ✅ pass metadata
+                            values={salvageCertificateState} // ✅ pass current field values
+                            onFieldChange={handleSalvageCertificateChange}
                         />
                     )}
                     {CertificateOfLicensePlateDispositionBlock && (
