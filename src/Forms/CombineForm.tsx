@@ -1088,6 +1088,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             senerio={senerio}
                             selectedItems={transactionSelections}
                             onChange={handleTransactionChange}
+                            disabledItems={[
+                                ...(transactionSelections.includes("Is the Vehicle a Motorcycle")
+                                    ? ["Commercial Vehicle(BUS/LIMO/TAXI)"] : []),
+                                ...(transactionSelections.includes("Commercial Vehicle(BUS/LIMO/TAXI)")
+                                    ? ["Is the Vehicle a Motorcycle"] : []),
+                            ]}
                         />
                     )}
 
