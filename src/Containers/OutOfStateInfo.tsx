@@ -34,7 +34,8 @@ const OutOfStateVehicleSection = ({
       <h2 className="text-lg font-bold mb-4">
         FOR OUT-OF-STATE OR OUT-OF-COUNTRY VEHICLES
       </h2>
-      <div className="border-b pb-4 !mx-4">
+      {/* <div className="border-b pb-4 !mx-4"> */}
+      <div className="relative left-[2px]">
         <div>
           <p className="mb-3">
             For vehicles which enter the state within 1 year of purchase, was Sales Tax paid to another state?
@@ -81,7 +82,7 @@ const OutOfStateVehicleSection = ({
           <p className="mb-3 text-[14px]">
             The plates will not be affixed to any vehicle at any time, unless the vehicle is "Dual Registered" in both states.
           </p>
-          <div className="w-[28rem]">
+          <div className="w-full max-w-[28rem]">
             <p className="text-[12px]">Out of state plates were:</p>
             <CustomDropdown
               value={values.outOfStatePlates.value}
