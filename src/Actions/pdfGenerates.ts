@@ -796,6 +796,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "veh make.8": (senerio?.includes("Filing for Planned Non-Operation (PNO)") || senerio?.includes("Certificate of Non-Operation")) ? formData?.plannedNonOperationState?.[8]?.make || '' : '',
         "veh equip #.8": (senerio?.includes("Filing for Planned Non-Operation (PNO)") || senerio?.includes("Certificate of Non-Operation")) ? formData?.plannedNonOperationState?.[8]?.equipment || '' : '',
 
+        "area code23": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? senerio?.includes("Simple Transfer") ? formData?.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '' : formData?.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '' : '',
+        "phone23": senerio?.includes("Filing for Planned Non-Operation (PNO)") ? senerio?.includes("Simple Transfer") ? formData?.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '' : formData?.ownersData?.[0]?.['Phone Number']?.slice(5) || '' : "",
+
         "from month": senerio?.includes("Certificate of Non-Operation") ? extractDateParts(formData?.vehicleStorageLocation?.["FROM: MONTH, DAY, YEAR"])?.month : '',
         "from day": senerio?.includes("Certificate of Non-Operation") ? extractDateParts(formData?.vehicleStorageLocation?.["FROM: MONTH, DAY, YEAR"])?.day || '' : '',
         "from year": senerio?.includes("Certificate of Non-Operation") ? extractDateParts(formData?.vehicleStorageLocation?.["FROM: MONTH, DAY, YEAR"])?.year || '' : '',
