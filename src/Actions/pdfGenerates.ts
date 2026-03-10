@@ -2167,7 +2167,9 @@ async function handleOnPDF(form: any, senerio: any) {
             if (form.commercialInfo?.["GVWR"] === "Yes") {
                 formTypes.push("Reg4008");
             }
-            formTypes.push("Reg256");
+            if (!formTypes.includes("Reg256")) {
+                formTypes.push("Reg256");
+            }
             formTypes.push("Reg590");
         }
         if (senerio?.includes("Salvage")) {
