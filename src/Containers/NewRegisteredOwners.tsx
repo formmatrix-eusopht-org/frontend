@@ -25,6 +25,7 @@ interface NewRegisteredOwnerDetailsProps {
   isVehicleIsAGift: boolean;
   isMotorcycle: boolean;
   isTRAILERCOACH: boolean;
+  isDisabledPersonPlacards?: boolean;
 }
 
 export const NewRegisteredOwnerDetails = ({
@@ -39,6 +40,7 @@ export const NewRegisteredOwnerDetails = ({
   isVehicleIsAGift,
   isMotorcycle,
   isTRAILERCOACH,
+  isDisabledPersonPlacards = false,
 }: NewRegisteredOwnerDetailsProps) => {
   const registeredOwnerNumbers = block.ownersNumber;
   const RadioButtonValues = [
@@ -52,6 +54,12 @@ export const NewRegisteredOwnerDetails = ({
       if (!isMotorcycle && field.label === "Motorcycle Engine Number") return false;
       if (!isTRAILERCOACH && (field.label === "Length (IN)" || field.label === "Width (IN)")) return false;
       if (field.label === "Date of Sale" && ownerIndex !== 0) return false;
+
+      // Date of Birth: only show for Owner 1 (index 0) when Disabled Person Placards/Plates is checked
+      if (field.label === "Date of Birth") {
+        if (!isDisabledPersonPlacards) return false;  // hide when flag is off
+        if (ownerIndex !== 0) return false;           // only Owner 1
+      }
 
       // Special filters for 2nd and 3rd owners
       if (ownerIndex > 0) {

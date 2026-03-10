@@ -94,7 +94,7 @@ export const seneriosDetails = [
                     label: 'Mileage of Vehicle',
                     type: "input field",
                     placeholder: 'Mileage of Vehicle'
-                },{
+                }, {
                     label: 'Explain Odometer Discrepancy',
                     type: "input field",
                     placeholder: 'Explain Odometer Discrepancy'
@@ -254,6 +254,10 @@ export const seneriosDetails = [
                     label: 'Phone Number',
                     type: "phone",
                     placeholder: 'Phone Number'
+                }, {
+                    label: 'Date of Birth',
+                    type: "date",
+                    placeholder: 'MM/DD/YYYY'
                 }, {
                     label: 'Purchase Price/Value',
                     type: "input field",

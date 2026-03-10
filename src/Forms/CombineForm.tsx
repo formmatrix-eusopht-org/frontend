@@ -1042,6 +1042,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const comercialVehicleFlag = senerio?.includes("Commercial Vehicle");
     const nameChangeSelected = senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? "Correction" : senerio?.includes("Legal Name Change") ? "Change" : senerio?.includes("Name Discrepancy") ? "Discrepancy" : '' : "";
     const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
+    const isDisabledPersonPlacards = senerio?.includes("Disabled Person Placards/Plates");
 
     const handleTransferCountChange = (newCount: number) => {
         const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
@@ -1244,6 +1245,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             isVehicleIsAGift={isVehickeIsAGift}
                             isMotorcycle={isMotorcycle}
                             isTRAILERCOACH={isTRAILERCOACH}
+                            isDisabledPersonPlacards={isDisabledPersonPlacards}
                         />
                     )}
                     {newRegisteredOwnerAddressBlock && (
