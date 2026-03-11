@@ -706,19 +706,21 @@ export const seneriosDetails = [
                     label: 'Width (IN)',
                     type: "input field",
                     placeholder: 'Width (IN)'
-                }, {
-                    label: 'Mileage of Vehicle',
-                    type: "input field",
-                    placeholder: 'Mileage of Vehicle'
-                }, {
-                    label: 'NOT Actual Mileage',
-                    type: "checkbox",
-                    placeholder: 'NOT Actual Mileage'
-                }, {
-                    label: 'Mileage Exceeds Mechanical Limit',
-                    type: "checkbox",
-                    placeholder: 'Mileage Exceeds Mechanical Limit'
-                }, {
+                },
+                //  {
+                //     label: 'Mileage of Vehicle',
+                //     type: "input field",
+                //     placeholder: 'Mileage of Vehicle'
+                // }, {
+                //     label: 'NOT Actual Mileage',
+                //     type: "checkbox",
+                //     placeholder: 'NOT Actual Mileage'
+                // }, {
+                //     label: 'Mileage Exceeds Mechanical Limit',
+                //     type: "checkbox",
+                //     placeholder: 'Mileage Exceeds Mechanical Limit'
+                // }, 
+                {
                     label: 'If kilometers check this box',
                     type: "checkbox",
                     placeholder: 'If kilometers check this box'
