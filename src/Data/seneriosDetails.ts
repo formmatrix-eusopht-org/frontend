@@ -735,7 +735,7 @@ export const seneriosDetails = [
                 { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
                 { label: 'State', type: 'dropdown', placeholder: 'Select' },
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
-                { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
+                // { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
         }, {
             reference: "Owner Address",
