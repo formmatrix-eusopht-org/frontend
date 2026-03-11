@@ -185,6 +185,7 @@ function formatSingleOwner(owner?: OwnerData): string {
     const fullName = [first, middle, last].filter(Boolean).join(' ');
     return fullName;
 }
+
 function formatSingleOwnerWithLastNameFirst(owner?: OwnerData): string {
     if (!owner) return '';
 
@@ -215,7 +216,8 @@ const getCurrentDate = () => {
 };
 
 const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: string]: any } => {
-    const owner1 = formatSingleOwner(formData.ownersData?.[0]);
+    const owner1 = formatSingleOwnerWithLastNameFirst(formData.ownersData?.[0]);
+    // const owner1 = formatSingleOwner(formData.ownersData?.[0]);
     const owner2 = formatSingleOwner(formData.ownersData?.[1]);
     const owner3 = formatSingleOwner(formData.ownersData?.[2]);
 
