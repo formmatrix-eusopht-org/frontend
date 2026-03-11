@@ -9,7 +9,7 @@ export const sidebarSections = [
       },
       {
         label: "Multiple Transfer",
-        disabledWhen: ["Simple Transfer", "Duplicate Registration"]
+        disabledWhen: ["Simple Transfer", "Duplicate Registration", "Duplicate Title"]
       },
     ],
   },
@@ -18,7 +18,7 @@ export const sidebarSections = [
     options: [
       {
         label: "Duplicate Title",
-        disabledWhen: ["Simple Transfer", "Duplicate Registration"]
+        disabledWhen: ["Simple Transfer", "Multiple Transfer", "Duplicate Registration"]
       },
       {
         label: "Duplicate Registration",
