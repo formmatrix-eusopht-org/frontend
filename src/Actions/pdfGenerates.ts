@@ -1997,6 +1997,7 @@ export async function generateMultiple262AndOne227(
         };
 
         // 3️⃣ Add Reg227 and/or Reg343 if required
+        let hasReg227 = false;
         if (!wantsTitle) {
             const reg227Bytes = await mergeFilledPDFs(
                 ["Reg227"],
@@ -2004,7 +2005,10 @@ export async function generateMultiple262AndOne227(
                 "Simple Transfer",
                 false
             );
-            if (reg227Bytes) allFormBytes.push(reg227Bytes);
+            if (reg227Bytes) {
+                allFormBytes.push(reg227Bytes);
+                hasReg227 = true;
+            }
         }
 
         if (first.transactionSelections?.includes("Out of State Title")) {
@@ -2016,14 +2020,17 @@ export async function generateMultiple262AndOne227(
             );
             if (reg343Bytes) allFormBytes.push(reg343Bytes);
         }
-        if (first.transactionSelections?.includes("There is a Current Lienholder")) {
+        if (!hasReg227 && first.transactionSelections?.includes("There is a Current Lienholder")) {
             const reg227Bytes = await mergeFilledPDFs(
                 ["Reg227"],
                 combinedTransferData,
                 "Simple Transfer",
                 false
             );
-            if (reg227Bytes) allFormBytes.push(reg227Bytes);
+            if (reg227Bytes) {
+                allFormBytes.push(reg227Bytes);
+                hasReg227 = true;
+            }
         }
 
         //==> Vehicle is a Gift OR Family Transfer OR Smog Exemption: REG 256
@@ -2195,7 +2202,9 @@ async function handleOnPDF(form: any, senerio: any) {
             formTypes.push("REG195");
         }
         if (senerio?.includes("Duplicate Title")) {
-            formTypes.push("Reg227");
+            if (!formTypes.includes("Reg227")) {
+                formTypes.push("Reg227");
+            }
         }
         if (senerio?.includes("Change of Address")) {
             formTypes.push("DMV14");
