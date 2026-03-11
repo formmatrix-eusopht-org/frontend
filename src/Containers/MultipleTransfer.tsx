@@ -266,54 +266,166 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             )
         );
     };
+
+
     const syncToNextTransfer = (fromTransferNumber: number) => {
+        if (fromTransferNumber !== 1) {
+            // Only sync owner chain (new owner → next registered owner)
+            setMultipleTransfer((prevTransfers) => {
+                const fromTransfer = prevTransfers.find(t => t.transferNumber === fromTransferNumber);
+                if (!fromTransfer) return prevTransfers;
+
+                const nextTransferIndex = prevTransfers.findIndex(t => t.transferNumber === fromTransferNumber + 1);
+                if (nextTransferIndex === -1) return prevTransfers;
+
+                const nextTransfer = prevTransfers[nextTransferIndex];
+
+                const syncedOwnersData = Object.values(fromTransfer.newOwnerData || {});
+                const nextOwnersData = nextTransfer.ownersData || [];
+                const mergedOwnersData = syncedOwnersData.map((owner, i) => {
+                    const nextOwner = nextOwnersData[i] || {};
+                    const hasData = Object.values(nextOwner).some(v => v !== "");
+                    return hasData ? nextOwner : { ...owner };
+                });
+
+                const nextResidential = nextTransfer.ownerAddress?.residential || {};
+                const hasResidentialData = Object.values(nextResidential).some(v => v !== "");
+                const mergedResidential = hasResidentialData ? nextResidential : { ...fromTransfer.newOwnerAddress };
+
+                const nextMailing = nextTransfer.ownerAddress?.mailing || {};
+                const hasMailingData = Object.values(nextMailing).some(v => v !== "");
+                const mergedMailing = hasMailingData ? nextMailing : { ...fromTransfer.newOwnerMailingAddress };
+
+                return prevTransfers.map((t, i) =>
+                    i === nextTransferIndex
+                        ? {
+                            ...nextTransfer,
+                            ownerCount: mergedOwnersData.length || nextTransfer.ownerCount,
+                            ownersData: mergedOwnersData.length > 0 ? mergedOwnersData : nextTransfer.ownersData,
+                            ownerAddress: {
+                                residential: mergedResidential,
+                                mailing: mergedMailing,
+                                isMailingDifferent:
+                                    nextTransfer.ownerAddress?.isMailingDifferent ||
+                                    fromTransfer.selectedRadio?.includes("if-mailing-address-is-different"),
+                            },
+                        }
+                        : t
+                );
+            });
+            return;
+        }
+
+        // fromTransferNumber === 1: sync Transfer 1 data to ALL other transfers (empty fields only)
         setMultipleTransfer((prevTransfers) => {
-            const fromTransfer = prevTransfers.find(
-                (t) => t.transferNumber === fromTransferNumber
-            );
-            if (!fromTransfer) return prevTransfers;
+            const transfer1 = prevTransfers.find(t => t.transferNumber === 1);
+            if (!transfer1) return prevTransfers;
 
-            const nextTransferIndex = prevTransfers.findIndex(
-                (t) => t.transferNumber === fromTransferNumber + 1
-            );
+            return prevTransfers.map(transfer => {
+                if (transfer.transferNumber === 1) return transfer;
 
-            // 🚀 If next transfer doesn't exist, just stop (don’t add new)
-            if (nextTransferIndex === -1) return prevTransfers;
+                // Merge vehicle info — only fill empty fields
+                const mergedVehicleInfo = { ...transfer.vehicleInfoState };
+                Object.entries(transfer1.vehicleInfoState || {}).forEach(([key, val]) => {
+                    if (!mergedVehicleInfo[key]) mergedVehicleInfo[key] = val;
+                });
 
-            const nextTransfer = prevTransfers[nextTransferIndex];
+                // Merge registered owner — only fill empty fields
+                const mergedOwnersData = transfer1.ownersData.map((owner, i) => {
+                    const existing = transfer.ownersData[i] || {};
+                    const hasData = Object.values(existing).some(v => v !== "");
+                    return hasData ? existing : { ...owner };
+                });
 
-            const updatedTransfer = {
-                ...nextTransfer,
-                ownerCount: fromTransfer.newOwnerCount,
-                ownersData: Object.values(fromTransfer.newOwnerData || {}),
-                ownerAddress: {
-                    residential: { ...fromTransfer.newOwnerAddress },
-                    mailing: { ...fromTransfer.newOwnerMailingAddress },
-                    isMailingDifferent: fromTransfer.selectedRadio?.includes("if-mailing-address-is-different"),
-                },
-                vehicleInfoState: {
-                    ...(nextTransfer.vehicleInfoState || {}),
-                    ["Vehicle/Hull Identification Number"]:
-                        fromTransfer.vehicleInfoState?.["Vehicle/Hull Identification Number"] ||
-                        "",
-                    ["Vehicle License Plate or Vessel CF Number"]:
-                        fromTransfer.vehicleInfoState?.[
-                        "Vehicle License Plate or Vessel CF Number"
-                        ] || "",
-                    ["Year of Vehicle"]:
-                        fromTransfer.vehicleInfoState?.["Year of Vehicle"] || "",
-                    ["Make of Vehicle OR Vessel Builder"]:
-                        fromTransfer.vehicleInfoState?.[
-                        "Make of Vehicle OR Vessel Builder"
-                        ] || "",
-                },
-            };
+                // Merge owner address — only fill if empty
+                const nextResidential = transfer.ownerAddress?.residential || {};
+                const hasResidentialData = Object.values(nextResidential).some(v => v !== "");
+                const mergedResidential = hasResidentialData ? nextResidential : { ...transfer1.ownerAddress.residential };
 
-            return prevTransfers.map((t, i) =>
-                i === nextTransferIndex ? updatedTransfer : t
-            );
+                const nextMailing = transfer.ownerAddress?.mailing || {};
+                const hasMailingData = Object.values(nextMailing).some(v => v !== "");
+                const mergedMailing = hasMailingData ? nextMailing : { ...transfer1.ownerAddress.mailing };
+
+                return {
+                    ...transfer,
+                    vehicleInfoState: mergedVehicleInfo,
+                    ownerCount: transfer.ownersData?.length > 0 ? transfer.ownerCount : transfer1.ownerCount,
+                    ownersData: mergedOwnersData,
+                    ownerAddress: {
+                        residential: mergedResidential,
+                        mailing: mergedMailing,
+                        isMailingDifferent: transfer.ownerAddress?.isMailingDifferent,
+                    },
+                };
+            });
         });
     };
+
+    // Sync when leaving a tab (switching to next tab)
+    const prevActiveTabRef = useRef(activeTab);
+    useEffect(() => {
+        const prevTab = prevActiveTabRef.current;
+        prevActiveTabRef.current = activeTab;
+
+        if (prevTab === 1 && activeTab !== 1) {
+            // Leaving Transfer 1 — sync to ALL transfers
+            syncToNextTransfer(1);
+        } else if (activeTab === prevTab + 1 && prevTab !== 1) {
+            // Moving forward between non-1 tabs — sync owner chain only
+            syncToNextTransfer(prevTab);
+        }
+    }, [activeTab]);
+
+
+
+    // const syncToNextTransfer = (fromTransferNumber: number) => {
+    //     setMultipleTransfer((prevTransfers) => {
+    //         const fromTransfer = prevTransfers.find(
+    //             (t) => t.transferNumber === fromTransferNumber
+    //         );
+    //         if (!fromTransfer) return prevTransfers;
+
+    //         const nextTransferIndex = prevTransfers.findIndex(
+    //             (t) => t.transferNumber === fromTransferNumber + 1
+    //         );
+
+    //         // 🚀 If next transfer doesn't exist, just stop (don’t add new)
+    //         if (nextTransferIndex === -1) return prevTransfers;
+
+    //         const nextTransfer = prevTransfers[nextTransferIndex];
+
+    //         const updatedTransfer = {
+    //             ...nextTransfer,
+    //             ownerCount: fromTransfer.newOwnerCount,
+    //             ownersData: Object.values(fromTransfer.newOwnerData || {}),
+    //             ownerAddress: {
+    //                 residential: { ...fromTransfer.newOwnerAddress },
+    //                 mailing: { ...fromTransfer.newOwnerMailingAddress },
+    //                 isMailingDifferent: fromTransfer.selectedRadio?.includes("if-mailing-address-is-different"),
+    //             },
+    //             vehicleInfoState: {
+    //                 ...(nextTransfer.vehicleInfoState || {}),
+    //                 ["Vehicle/Hull Identification Number"]:
+    //                     fromTransfer.vehicleInfoState?.["Vehicle/Hull Identification Number"] ||
+    //                     "",
+    //                 ["Vehicle License Plate or Vessel CF Number"]:
+    //                     fromTransfer.vehicleInfoState?.[
+    //                     "Vehicle License Plate or Vessel CF Number"
+    //                     ] || "",
+    //                 ["Year of Vehicle"]:
+    //                     fromTransfer.vehicleInfoState?.["Year of Vehicle"] || "",
+    //                 ["Make of Vehicle OR Vessel Builder"]:
+    //                     fromTransfer.vehicleInfoState?.[
+    //                     "Make of Vehicle OR Vessel Builder"
+    //                     ] || "",
+    //             },
+    //         };
+
+    //         return prevTransfers.map((t, i) =>
+    //             i === nextTransferIndex ? updatedTransfer : t
+    //         );
+    //     });
+    // };
 
     // useEffect(() => {
     //     const timeout = setTimeout(() => {
@@ -466,60 +578,96 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             vehicleDeclarationEntryData: trimmed,
         });
     };
-    //===>  Handler for vehicle information fields
+
+    // When user types in Transfer 1, broadcast to all transfers (only empty fields)
     const handleVehicleFieldChange = (label: string, value: string | boolean) => {
-        const current = getCurrentTransfer();
-
-        // Update current transfer first
-        updateCurrentTransfer({
-            vehicleInfoState: {
-                ...current.vehicleInfoState,
-                [label]: value,
-            },
-        });
-
-        // Define fields that should sync across ALL transfers
-        const syncAllFields = [
-            "Vehicle/Hull Identification Number",
-            "Vehicle License Plate or Vessel CF Number",
-            "Year of Vehicle",
-            "Make of Vehicle OR Vessel Builder",
-        ];
-
-        setMultipleTransfer((prev) =>
-            prev.map((transfer, i) => {
-                const isActive = transfer.transferNumber === activeTab;
-
-                // Case 1️⃣: Sync to all transfers if label is in syncAllFields
-                if (syncAllFields.includes(label)) {
-                    return {
-                        ...transfer,
-                        vehicleInfoState: {
-                            ...transfer.vehicleInfoState,
-                            [label]: value,
-                        },
-                    };
-                }
-
-                // Case 2️⃣: Sync “Motorcycle Engine Number” only to next transfers
-                if (
-                    label === "Motorcycle Engine Number" &&
-                    i > prev.findIndex((t) => t.transferNumber === activeTab)
-                ) {
-                    return {
-                        ...transfer,
-                        vehicleInfoState: {
-                            ...transfer.vehicleInfoState,
-                            [label]: value,
-                        },
-                    };
-                }
-
-                // Default: no change
-                return transfer;
-            })
-        );
+        if (activeTab === 1) {
+            setMultipleTransfer(prev =>
+                prev.map(transfer => ({
+                    ...transfer,
+                    vehicleInfoState: {
+                        ...transfer.vehicleInfoState,
+                        // Only fill if empty in other transfers, always update current
+                        [label]: transfer.transferNumber === 1
+                            ? value
+                            : (transfer.vehicleInfoState?.[label] ? transfer.vehicleInfoState[label] : value),
+                    },
+                }))
+            );
+        } else {
+            updateCurrentTransfer({
+                vehicleInfoState: {
+                    ...getCurrentTransfer().vehicleInfoState,
+                    [label]: value,
+                },
+            });
+        }
     };
+
+
+    // //===>  Handler for vehicle information fields
+    // const handleVehicleFieldChange = (label: string, value: string | boolean) => {
+    //     // const current = getCurrentTransfer();
+
+    //     // Only update the current active transfer — no cross-transfer syncing
+    //     updateCurrentTransfer({
+    //         vehicleInfoState: {
+    //             ...getCurrentTransfer().vehicleInfoState,
+    //             [label]: value,
+    //         },
+    //     });
+
+
+    //     // // Update current transfer first
+    //     // updateCurrentTransfer({
+    //     //     vehicleInfoState: {
+    //     //         ...current.vehicleInfoState,
+    //     //         [label]: value,
+    //     //     },
+    //     // });
+
+    //     // Define fields that should sync across ALL transfers
+    //     const syncAllFields = [
+    //         "Vehicle/Hull Identification Number",
+    //         "Vehicle License Plate or Vessel CF Number",
+    //         "Year of Vehicle",
+    //         "Make of Vehicle OR Vessel Builder",
+    //     ];
+
+    //     setMultipleTransfer((prev) =>
+    //         prev.map((transfer, i) => {
+    //             const isActive = transfer.transferNumber === activeTab;
+
+    //             // Case 1️⃣: Sync to all transfers if label is in syncAllFields
+    //             if (syncAllFields.includes(label)) {
+    //                 return {
+    //                     ...transfer,
+    //                     vehicleInfoState: {
+    //                         ...transfer.vehicleInfoState,
+    //                         [label]: value,
+    //                     },
+    //                 };
+    //             }
+
+    //             // Case 2️⃣: Sync “Motorcycle Engine Number” only to next transfers
+    //             if (
+    //                 label === "Motorcycle Engine Number" &&
+    //                 i > prev.findIndex((t) => t.transferNumber === activeTab)
+    //             ) {
+    //                 return {
+    //                     ...transfer,
+    //                     vehicleInfoState: {
+    //                         ...transfer.vehicleInfoState,
+    //                         [label]: value,
+    //                     },
+    //                 };
+    //             }
+
+    //             // Default: no change
+    //             return transfer;
+    //         })
+    //     );
+    // };
 
     //===>  Handler for owner count change
     const handleOwnerCountChange = (count: number) => {
@@ -585,8 +733,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             )
         );
 
-        // 👇 Immediately sync to the next transfer
-        syncToNextTransfer(activeTab);
+
     };
 
 
@@ -623,7 +770,6 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                 updateCurrentTransfer({ newOwnerKeptAddress: { ...current.newOwnerKeptAddress, [label]: value } });
                 break;
         }
-        syncToNextTransfer(activeTab);
     };
 
     // ===> Handler for date fields
@@ -1180,7 +1326,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
             </div>
 
             <div className="space-y-6">
-                {transactionBlock && (
+                {transactionBlock && activeTab === 1 && (
                     <TransactionDetails
                         title="Transaction Details"
                         block={{
