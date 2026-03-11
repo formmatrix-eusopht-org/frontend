@@ -1645,7 +1645,7 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                     />
                 )}
 
-                {newLienHolderBlock && transferCount === activeTab && (
+                {newLienHolderBlock && (
                     <NewLienHolder
                         block={newLienHolderBlock}
                         formState={currentTransfer.newLienholder.address}
