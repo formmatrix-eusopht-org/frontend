@@ -217,6 +217,7 @@ const getCurrentDate = () => {
 
 const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: string]: any } => {
     const owner1 = formatSingleOwnerWithLastNameFirst(formData.ownersData?.[0]);
+    const muzowner = formatSingleOwner(formData.ownersData?.[0]);
     // const owner1 = formatSingleOwner(formData.ownersData?.[0]);
     const owner2 = formatSingleOwner(formData.ownersData?.[1]);
     const owner3 = formatSingleOwner(formData.ownersData?.[2]);
@@ -248,7 +249,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Engine number": formData.vehicleInfoState?.['Motorcycle Engine Number'] || '',
         "True full name": (formData.ownerCount ?? 0) > 0 ? owner1 : '',
         "Co owner": (formData.ownerCount ?? 1) > 1 ? owner2 : '',
-        "certification": (formData.newOwnerCount ?? 0) > 0 ? newOwner1 : '',
+        "certification": (formData.ownerCount ?? 0) > 0 ? muzowner : '',
         "telephone number": formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '',
         "title": formData.ownersData?.[0]?.['Title if Signing for a Company'] || '',
         "DL1": formData.ownersData?.[0]?.['Driver License Number']?.split('')[0] || '',
@@ -827,6 +828,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         //reg 156
         "license year": senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : false,
         "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false,
+        "date": getCurrentDate(),
 
         "Check Box51": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Actual" ? true : false : false,
         "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Estimated" ? true : false : false,
