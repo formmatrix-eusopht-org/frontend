@@ -29,8 +29,8 @@ const DpPlacardSection: React.FC<DpPlacardSectionProps> = ({
         { id: "permanent", label: "Permanent DP Parking Placard (No Fee)" },
         { id: "temporary", label: "Temporary DP Parking Placard ($6.00 Fee)" },
         { id: "travel", label: "Travel Parking DP Parking Placard (No Fee)" },
-        { id: "plates", label: "Disabled Person License Plates (No Fee), see Section 3" },
-        { id: "reassign", label: "Disabled Person License Plates Reassignment, see Section 3" },
+        { id: "plates", label: "Disabled Person License Plates (No Fee)" },
+        { id: "reassign", label: "Disabled Person License Plates Reassignment" },
     ],
     values,
     onChange,
@@ -77,8 +77,7 @@ const DpPlacardSection: React.FC<DpPlacardSectionProps> = ({
             {/* Issued before */}
             <div className="mt-2">
                 <p className="mb-3 text-sm">
-                    Have you ever been issued DP License Plates, Disabled Veteran License Plates,
-                    or a Permanent DP parking placard in California?
+                    Have you ever been issued DP License Plates, Disabled Veteran License Plates, or a Permanent DP parking placard in California?
                 </p>
                 <div className="flex flex-col gap-3">
                     <label className="inline-flex items-center cursor-pointer">
@@ -118,6 +117,7 @@ const DpPlacardSection: React.FC<DpPlacardSectionProps> = ({
                     </div>
                 )}
             </div>
+
         </section>
     );
 };
