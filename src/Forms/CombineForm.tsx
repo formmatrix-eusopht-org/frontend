@@ -1446,13 +1446,16 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         />
                     )}
                     {disablePersonVehicleInfoBlock && (
-                        <DisablePersonVehicleInfo
-                            title={disablePersonVehicleInfoBlock.blockName}
-                            values={dpVehicleInfoState}
-                            onChange={setDpVehicleInfoState}
-                            fields={disablePersonVehicleInfoBlock.fields}
-                        />
-                    )}
+                        dpState.selectedPlacard === "plates" ||
+                        dpState.selectedPlacard === "reassign"
+                    ) && (
+                            <DisablePersonVehicleInfo
+                                title={disablePersonVehicleInfoBlock.blockName}
+                                values={dpVehicleInfoState}
+                                onChange={setDpVehicleInfoState}
+                                fields={disablePersonVehicleInfoBlock.fields}
+                            />
+                        )}
                     {documentsReceivedBlock && (
                         <Options
                             selected={optionsForValidation}
