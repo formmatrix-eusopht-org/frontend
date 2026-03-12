@@ -223,6 +223,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     const owner3 = formatSingleOwner(formData.ownersData?.[2]);
 
     const newOwner1 = formatSingleOwner(formData.newOwnerData?.[0]);
+    const newOwner1forDisablepersonPlac = formatSingleOwnerWithLastNameFirst(formData.newOwnerData?.[0]);
     const newOwner2 = formatSingleOwner(formData.newOwnerData?.[1]);
     const newOwner3 = formatSingleOwner(formData.newOwnerData?.[2]);
     const odoMeter = formData.vehicleInfoState?.['Mileage of Vehicle'] || '';
@@ -931,7 +932,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "OL NUMBER 3": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "HAVE BEEN DESTROYED (OCCUPATIONAL LICENSEES ONLY)" ? formData.certificateOfLicensePlateDispositionState?.occupationalLicenseNumber : "" : "",
 
         //Reg 195
-        "Name or organization name": senerio?.includes("Disabled Person Placards/Plates") ? newOwner1 || '' : '',
+        "Name or organization name": senerio?.includes("Disabled Person Placards/Plates") ? newOwner1forDisablepersonPlac || '' : '',
         "DL No.0": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '' : '',
         "DL No.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '' : '',
         "DL No.2": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[2] || '' : '',
