@@ -15,12 +15,12 @@ export default function Section({
   allowToggle = false,
   useStyledRadio = false,
 }: {
-  title: string;
+  title: string | React.ReactNode;
   children: React.ReactNode;
   subSection?: boolean;
   dropdownValue?: number;
   onDropdownChange?: (val: number) => void;
-  numberForFields?: number; // just a single number now
+  numberForFields?: number;
   radioOptions?: { label: string; value: string }[];
   selectedOptions?: string[];
   onToggleOption?: (val: string) => void;
@@ -58,7 +58,7 @@ export default function Section({
           <RadioComponent
             key={opt.value}
             label={opt.label}
-            name={title}
+            name={typeof title === "string" ? title : ""}
             value={opt.value}
             checked={selectedOptions?.includes(opt.value) || false}
             onChange={() => {
