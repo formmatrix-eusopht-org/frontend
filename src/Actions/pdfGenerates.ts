@@ -826,9 +826,10 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
 
         //reg 156
-        "license year": senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : false,
-        "license month": senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : false,
+        "license year": senerio?.includes("Duplicate Plates & Stickers") ? senerio?.includes("Duplicate Stickers") && senerio?.includes("Yearly Sticker") ? true : true : false,
+        "license month": senerio?.includes("Duplicate Plates & Stickers") ? senerio?.includes("Duplicate Stickers") && senerio?.includes("Monthly Sticker") ? true : true : false,
         "date": getCurrentDate(),
+        "License plates": senerio?.includes("Duplicate Plates & Stickers") ? true : false,
 
         "Check Box51": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Actual" ? true : false : false,
         "Check Box55": senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["ActualOrEstimated"] === "Estimated" ? true : false : false,
