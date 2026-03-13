@@ -932,7 +932,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "plate with owner": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "PLATE WITH OWNER - RETAINED BY OWNER FOR REASSIGNMENT" ? true : false : false,
         "OL NUMBER 3": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "HAVE BEEN DESTROYED (OCCUPATIONAL LICENSEES ONLY)" ? formData.certificateOfLicensePlateDispositionState?.occupationalLicenseNumber : "" : "",
 
-        //Reg 195
+        //--Reg 195
         "Name or organization name": senerio?.includes("Disabled Person Placards/Plates") ? newOwner1forDisablepersonPlac || '' : '',
         "DL No.0": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[0] || '' : '',
         "DL No.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.newOwnerData?.[0]?.['Driver License Number']?.split('')[1] || '' : '',
@@ -984,8 +984,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
         "weightexyes": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.commercialWeightFeeExemption === "yes" : false,
         "weightexno": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.commercialWeightFeeExemption === "no" : false,
+        "Executed-Date": getCurrentDate(),
 
-        //reg 256
+        //--reg 256
 
         "checkbox_76urox": senerio?.includes("Name Change") ? senerio?.includes("Name Discrepancy") ? true : false : false,
         "text_71uait": senerio?.includes("Name Change") ? senerio?.includes("Name Discrepancy") ? formData?.nameChangeData?.discrepency1 || '' : '' : '',
