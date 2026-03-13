@@ -62,10 +62,13 @@ interface FormBlock {
         value?: string | boolean;
     }[];
 }
+
+
 type DpState = {
     selectedPlacard: string;
     issuedPreviously: "yes" | "no" | "";
     plate: string;
+    commercialWeightFeeExemption: "yes" | "no" | "";
 };
 type DpVehicleInfo = {
     plate: string;
@@ -263,7 +266,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const [dpState, setDpState] = useState<DpState>({
         selectedPlacard: "",
         issuedPreviously: "",
-        plate: ''
+        plate: '',
+        commercialWeightFeeExemption: ""
     });
     const [dpVehicleInfoState, setDpVehicleInfoState] = useState<DpVehicleInfo>({
         plate: "",
@@ -880,7 +884,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             setDpState(parsed.dpState || {
                 selectedPlacard: "",
                 issuedPreviously: "",
-                plate: ''
+                plate: '',
+                commercialWeightFeeExemption: ""
             })
             setDpVehicleInfoState(parsed.dpVehicleInfoState || {
                 licensePlate: "",

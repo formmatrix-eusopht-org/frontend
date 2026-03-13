@@ -7,10 +7,12 @@ type Option = {
     hint?: string;
 };
 
+
 type DpState = {
     selectedPlacard: string;
     issuedPreviously: "yes" | "no" | "";
     plate: string;
+    commercialWeightFeeExemption: "yes" | "no" | "";
 };
 
 type DpPlacardSectionProps = {
@@ -45,6 +47,10 @@ const DpPlacardSection: React.FC<DpPlacardSectionProps> = ({
     };
     const handlePlatesChange = (val: string) => {
         onChange({ ...values, plate: val });
+    };
+
+    const handleWeightFeeExemptionChange = (val: "yes" | "no") => {
+        onChange({ ...values, commercialWeightFeeExemption: val });
     };
     return (
         <section className={`max-w-3xl ${className}`}>
@@ -116,6 +122,38 @@ const DpPlacardSection: React.FC<DpPlacardSectionProps> = ({
                         />
                     </div>
                 )}
+            </div>
+
+            {/* Commercial Vehicles – Weight Fee Exemption */}
+            <div className="pt-4">
+                <p className="mb-3 text-sm font-semibold">
+                    Commercial Vehicles – Weight Fee Exemption
+                </p>
+                <div className="flex flex-col gap-3">
+                    <label className="inline-flex items-center cursor-pointer">
+                        <input
+                            type="radio"
+                            name="weight-fee-exemption"
+                            value="yes"
+                            checked={values.commercialWeightFeeExemption === "yes"}
+                            onChange={() => handleWeightFeeExemptionChange("yes")}
+                            className="w-4 h-4 mr-3 accent-current"
+                        />
+                        <span className="text-sm">Yes</span>
+                    </label>
+
+                    <label className="inline-flex items-center cursor-pointer">
+                        <input
+                            type="radio"
+                            name="weight-fee-exemption"
+                            value="no"
+                            checked={values.commercialWeightFeeExemption === "no"}
+                            onChange={() => handleWeightFeeExemptionChange("no")}
+                            className="w-4 h-4 mr-3 accent-current"
+                        />
+                        <span className="text-sm">No</span>
+                    </label>
+                </div>
             </div>
 
         </section>

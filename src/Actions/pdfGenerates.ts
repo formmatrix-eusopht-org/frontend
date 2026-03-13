@@ -170,6 +170,7 @@ type FormData = {
     dpState?: {
         selectedPlacard?: "permanent" | "temporary" | "travel" | "plates" | "reassign";
         issuedPreviously?: "yes" | "no";
+        commercialWeightFeeExemption: "yes" | "no";
         plate?: string;
     };
     optionsForValidation?: string[];
@@ -980,6 +981,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "VIN.1": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.vin || '' : '',
         "Veh Make": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.make || '' : '',
         "Veh Year": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpVehicleInfoState?.year || '' : '',
+
+        "weightexyes": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.commercialWeightFeeExemption === "yes" : false,
+        "weightexno": senerio?.includes("Disabled Person Placards/Plates") ? formData.dpState?.commercialWeightFeeExemption === "no" : false,
 
         //reg 256
 
