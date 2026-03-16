@@ -823,8 +823,6 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         // "state": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.State || '' : '',
         // "zip code": senerio?.includes("Certificate of Non-Operation") ? formData?.vehicleStorageLocation?.["ZIP Code"] || '' : '',
 
-        "Check Box34": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Breast Cancer Awareness' ? true : false : formData.transactionSelections?.includes("Out of State Title") ? true : false,
-        "Check Box36": formData.transactionSelections?.includes("Out of State Title") ? true : false,
 
 
         //reg 156
@@ -1516,7 +1514,13 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text28": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.plateNumber || '' : "" : "",
         "Check Box29": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.need === "onePlate" ? true : false : false : false,
         "Check Box30": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.need === "twoPlates" ? true : false : false : false,
-        "Check Box31": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.plateCondition === "lost" ? true : false : false : false,
+        ////--reg 343 sec1 commercial vehicle
+        "Check Box31": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.plateCondition === "lost" ? true : false : false : senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Hire Transport"] === "Yes" : false,
+        "Check Box34": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState.selectedPlate === 'Breast Cancer Awareness' ? true : false : formData.transactionSelections?.includes("Out of State Title") ? true : senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["Hire Transport"] === "No" : false,
+        "Check Box36": formData.transactionSelections?.includes("Out of State Title") ? true : senerio?.includes("Commercial Vehicle") ? formData?.commercialInfo?.["GVWR"] === "No" ? true : false : false,
+        "Check Box35": formData?.commercialInfo?.["GVWR"] === "No" ? false : true,
+
+
         "Check Box32": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.plateCondition === "mutilated" ? true : false : false : false,
         "Check Box33": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Replace") ? formData?.replacementState?.plateCondition === "stolen" ? true : false : false : false,
         "Text56": senerio?.includes("Personalized Plates") ? formData?.personalizePlatesState?.includes("Reassign") ? formData?.specialInterestState?.specialInterestLicensePlateNumber || '' : "" : "",
