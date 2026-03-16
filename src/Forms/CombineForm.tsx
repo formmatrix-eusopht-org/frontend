@@ -1110,15 +1110,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onChange={handleTypeOfVehicleChange}
                         />
                     )}
-                    {forCommercialVehicleOnlyBlock && (
-                        <CommercialVehicleInfo
-                            title={forCommercialVehicleOnlyBlock.blockName}
-                            block={{}}
-                            isCommercialVehicle={isCommercialVehicle} // optional
-                            values={commercialInfo}
-                            onChange={handleCommercialChange}
-                        />
-                    )}
+
                     {missingTitleReasonBlock && !isTransactionWithVehicleTitle && (
                         <MissingTitleReason
                             title="Missing Title Reason"
@@ -1238,15 +1230,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                         />
                     )}
 
-                    {VehicleDeclarationEntryBlock && (
-                        <VehicleDeclarationEntry
-                            title={VehicleDeclarationEntryBlock.blockName}
-                            block={VehicleDeclarationEntryBlock}
-                            values={vehicleDeclarationEntryData}
-                            onFieldChange={handleVehicleDeclarationEntryFieldChange}
-                            onTrimEntries={handleTrimEntries}
-                        />
-                    )}
+
 
 
 
@@ -1288,12 +1272,30 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onChange={handlePowerOfAttorneyChange}
                         />
                     )}
+                    {forCommercialVehicleOnlyBlock && (
+                        <CommercialVehicleInfo
+                            title={forCommercialVehicleOnlyBlock.blockName}
+                            block={{}}
+                            isCommercialVehicle={isCommercialVehicle} // optional
+                            values={commercialInfo}
+                            onChange={handleCommercialChange}
+                        />
+                    )}
                     {(comercialVehicleFlag || isOutofStateTitle) && dateInformationBlock && dateInformationBlock.reference && (
                         <DateInformation
                             title="DATE INFORMATION"
                             block={{ ...dateInformationBlock, reference: dateInformationBlock.reference as string }}
                             dateValues={dateValues}
                             onDateChange={handleDateChange}
+                        />
+                    )}
+                    {VehicleDeclarationEntryBlock && (
+                        <VehicleDeclarationEntry
+                            title={VehicleDeclarationEntryBlock.blockName}
+                            block={VehicleDeclarationEntryBlock}
+                            values={vehicleDeclarationEntryData}
+                            onFieldChange={handleVehicleDeclarationEntryFieldChange}
+                            onTrimEntries={handleTrimEntries}
                         />
                     )}
                     {vehicleStatusBlock && (comercialVehicleFlag || isOutofStateTitle) && (
