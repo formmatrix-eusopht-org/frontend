@@ -123,6 +123,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
     const LOCAL_STORAGE_KEY_form = "formStates";
     const LOCAL_STORAGE_KEY_senerio = "senerio";
+
+
     // State management for various form sections
     // Transaction details
     const [transactionSelections, setTransactionSelections] = useState<string[]>([]);
@@ -291,6 +293,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         releaseInterest: '',
         feeEnclosed: false
     });
+
+
     const [personalizePlatesState, setPersonalizePlatesState] = useState('Order')
     // Handlers for various form interactions
     const handleTransactionChange = (label: string, checked: boolean) => {
@@ -1062,7 +1066,6 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const nameChangeSelected = senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? "Correction" : senerio?.includes("Legal Name Change") ? "Change" : senerio?.includes("Name Discrepancy") ? "Discrepancy" : '' : "";
     const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
     const isDisabledPersonPlacards = senerio?.includes("Disabled Person Placards/Plates");
-
     const handleTransferCountChange = (newCount: number) => {
         const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
             transferNumber: index + 1,
@@ -1156,6 +1159,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onToggleMailingDifferent={handleToggleLienReleaseMailingDifferent}
                         />
                     )}
+
+
 
                     {registeredOwnerBlock && (
                         <RegisteredOwnerDetails
@@ -1445,6 +1450,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onChange={handleCertificateOfLicensePlateDispositionChange}
                         />
                     )}
+
+
                     {disablePersonTypeBlock && (
                         <DpPlacardSection
                             title={disablePersonTypeBlock.blockName}

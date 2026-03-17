@@ -3568,8 +3568,9 @@ export const seneriosDetails = [
         form: "Disabled Person Placards/Plates",
         blocks: [
             {
-                reference: "New Registered Owner(s)",
-                blockName: "New Registered Owner(s)",
+                reference: "Registered Owner(s)",
+                blockName: "Registered Owner(s)",
+                // ownersNumber: 1,
                 fields: [
                     { label: 'First Name', type: 'input field', placeholder: 'First Name' },
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
@@ -3579,66 +3580,26 @@ export const seneriosDetails = [
                     { label: 'Date of Birth', type: 'date', placeholder: 'MM/DD/YYYY' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 ]
-            }, {
-                reference: "New Registered Owner Address",
+            },
+            {
+                reference: "Owner Address",
                 blockName: "Address",
-                subOptions: [
+                subOption: [
                     {
                         label: "If mailing address is different",
-                        fieldName: "Mailing Address",
                         type: "radiocheckbox",
-                        subFields: [
-                            {
-                                label: 'Street',
-                                type: "input field",
-                                placeholder: 'Street'
-                            }, {
-                                label: 'APT./SPACE/STE.#',
-                                type: "input field",
-                                placeholder: 'APT./SPACE/STE.#'
-                            }, {
-                                label: 'City',
-                                type: "input field",
-                                placeholder: 'City'
-                            }, {
-                                label: 'State',
-                                type: "dropdown",
-                                placeholder: 'Select'
-                            }, {
-                                label: 'ZIP Code',
-                                type: "input field",
-                                placeholder: 'ZIP Code'
-                            },
-                        ]
-                    },],
-                fields: [
-                    {
-                        label: 'Street',
-                        type: "input field",
-                        placeholder: 'Street'
-                    }, {
-                        label: 'APT./SPACE/STE.#',
-                        type: "input field",
-                        placeholder: 'APT./SPACE/STE.#'
-                    }, {
-                        label: 'City',
-                        type: "input field",
-                        placeholder: 'City'
-                    }, {
-                        label: 'County',
-                        type: "input field",
-                        placeholder: 'County'
-                    }, {
-                        label: 'State',
-                        type: "dropdown",
-                        placeholder: 'Select'
-                    }, {
-                        label: 'ZIP Code',
-                        type: "input field",
-                        placeholder: 'ZIP Code'
                     }
+                ],
+                fields: [
+                    { label: 'Street', type: "input field", placeholder: 'Street' },
+                    { label: 'APT./SPACE/STE.#', type: "input field", placeholder: 'APT./SPACE/STE.#' },
+                    { label: 'City', type: "input field", placeholder: 'City' },
+                    { label: 'County', type: "input field", placeholder: 'County' },
+                    { label: 'State', type: "dropdown", placeholder: 'Select' },
+                    { label: 'ZIP Code', type: "input field", placeholder: 'ZIP Code' }
                 ]
-            }, {
+            },
+            {
                 reference: "Type of Disabled Person Parking Placard(S) or License Plates",
                 blockName: "Type of Disabled Person Parking Placard(S) or License Plates",
                 fields: [
