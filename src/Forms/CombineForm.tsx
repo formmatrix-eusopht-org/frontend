@@ -1066,6 +1066,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
     const nameChangeSelected = senerio?.includes("Name Change") ? senerio?.includes("Name Correction") ? "Correction" : senerio?.includes("Legal Name Change") ? "Change" : senerio?.includes("Name Discrepancy") ? "Discrepancy" : '' : "";
     const isRegisteredOwnerValidForPNO = requestPNOCardFlag && senerio.includes("Filing for Planned Non-Operation (PNO)")
     const isDisabledPersonPlacards = senerio?.includes("Disabled Person Placards/Plates");
+    const isSalvage = senerio?.includes("Salvage");
     const handleTransferCountChange = (newCount: number) => {
         const updatedTransfers = Array.from({ length: newCount }, (_, index) => ({
             transferNumber: index + 1,
@@ -1092,7 +1093,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                     {transactionBlock && (
                         <TransactionDetails
                             title="Transaction Details"
-                            block={transactionBlock}
+                            block={{
+                                ...transactionBlock,
+                                fields: isSalvage
+                                    ? transactionBlock.fields.filter(f => f.label !== 'Orginal' && f.label !== 'Duplicate')
+                                    : transactionBlock.fields
+                            }}
                             senerio={senerio}
                             selectedItems={transactionSelections}
                             onChange={handleTransactionChange}
@@ -1437,6 +1443,8 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             block={SalvageCertificateBlock} // ✅ pass metadata
                             values={salvageCertificateState} // ✅ pass current field values
                             onFieldChange={handleSalvageCertificateChange}
+                            transactionSelections={transactionSelections}
+                            handleTransactionChange={handleTransactionChange}
                         />
                     )}
                     {CertificateOfLicensePlateDispositionBlock && (

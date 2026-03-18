@@ -3442,7 +3442,7 @@ export const seneriosDetails = [
                 ]
             }, {
                 reference: "Salvage Certificate",
-                blockName: "Salvage Certificate",
+                blockName: "Application for Salvage Certificate",
                 fields: [
                     {
                         label: 'State of last Registeration',

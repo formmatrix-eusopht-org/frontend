@@ -140,7 +140,7 @@ export const seneriosForForms = [
     }, {
         form: "Salvage",
         fields: [
-            "Salvage Certificate",
+            "Application for Salvage Certificate",
             "Vehicle Information",
             "Registered Owners",
             "Owner Address",
