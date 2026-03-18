@@ -3473,6 +3473,8 @@ export const seneriosDetails = [
                         type: "date",
                         placeholder: 'Enter Date recovered'
                     },
+                    { label: 'Agent Name', type: 'input field', placeholder: 'Agent Name' },
+
                 ]
             }, {
                 reference: "Vehicle Information",
@@ -3507,7 +3509,6 @@ export const seneriosDetails = [
                     { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
                     { label: 'State', type: 'dropdown', placeholder: 'Select' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
-                    { label: 'Agent Name', type: 'input field', placeholder: 'Agent Name' },
                 ]
             }, {
                 reference: "Owner Address",

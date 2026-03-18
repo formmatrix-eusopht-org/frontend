@@ -77,6 +77,7 @@ type SalvageCertificateState = {
     'Date wrecked'?: string;
     'Date stolen'?: string;
     'Date recovered'?: string;
+    'Agent Name'?: string;
 };
 
 type FormData = {
@@ -911,6 +912,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "CLAIM NUMBER1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Cost/value'] || "" : '',
         "COST/VALUE1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Claim number'] || "" : '',
         "DATE WRECKED OR DESTROYED1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date wrecked'] || "" : '',
+        "Agent Name": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Agent Name'] || "" : '',
         "DATE STOLEN1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date stolen'] || "" : '',
         "DATE RECOVERED1": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Date recovered'] || "" : '',
         "PRINTED NAME OF INSURANCE CO. OR APPLICANT1": senerio?.includes("Salvage") ? owner1 : '',
@@ -919,7 +921,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "CITY": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.City : '',
         "STATE": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.State : '',
         "ZIP CODE": senerio?.includes("Salvage") ? formData.ownerAddress?.residential?.["ZIP Code"] : '',
-        "PRINTED NAME OF AGENT": senerio?.includes("Salvage") ? formData.ownersData?.[0]?.["Agent Name"] || '' : '',
+        "PRINTED NAME OF AGENT": senerio?.includes("Salvage") ? formData.salvageCertificateState?.['Agent Name'] || '' : '',
 
 
         "Are Being Surrendered": senerio?.includes("Salvage") ? formData.certificateOfLicensePlateDispositionState?.licensePlatesAssignedTo === "ARE BEING SURRENDERED" ? true : false : false,
