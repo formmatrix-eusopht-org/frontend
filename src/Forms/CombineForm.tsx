@@ -1245,7 +1245,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
 
 
 
-                    {newRegisteredOwnerBlock && (
+                    {newRegisteredOwnerBlock && (senerio?.includes("Commercial Vehicle") && !senerio?.includes("Simple Transfer") && !senerio?.includes("Multiple Transfer")) && (
                         <NewRegisteredOwnerDetails
                             title="New Registered Owner(s)"
                             block={newRegisteredOwnerBlock}
@@ -1261,7 +1261,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             isDisabledPersonPlacards={isDisabledPersonPlacards}
                         />
                     )}
-                    {newRegisteredOwnerAddressBlock && (
+                    {newRegisteredOwnerAddressBlock && (senerio?.includes("Commercial Vehicle") && !senerio?.includes("Simple Transfer") && !senerio?.includes("Multiple Transfer")) && (
                         <NewRegisteredOwnerAddress
                             title="New Owner Address"
                             block={newRegisteredOwnerAddressBlock}
