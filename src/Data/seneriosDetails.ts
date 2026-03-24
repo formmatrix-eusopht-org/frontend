@@ -3269,114 +3269,119 @@ export const seneriosDetails = [
                     placeholder: 'ZIP Code'
                 }
             ]
-        }, {
-            reference: "DATE INFORMATION",
-            blockName: "DATE INFORMATION",
-            fields: [
-                {
-                    label: 'DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):',
-                    subFields: [
-                        {
-                            label: "Month",
-                            type: "date input field",
-                            placeholder: "MM"
-                        }, {
-                            label: "Day",
-                            type: "date input field",
-                            placeholder: "DD"
-                        }, {
-                            label: "Year",
-                            type: "date input field",
-                            placeholder: "YYYY"
-                        },
-                    ]
-                }, {
-                    label: 'DATE VEHICLE FIRST OPERATED IN CALIFORNIA:',
-                    subFields: [
-                        {
-                            label: "Month",
-                            type: "date input field",
-                            placeholder: "MM"
-                        }, {
-                            label: "Day",
-                            type: "date input field",
-                            placeholder: "DD"
-                        }, {
-                            label: "Year",
-                            type: "date input field",
-                            placeholder: "YYYY"
-                        },
-                    ]
-                }, {
-                    label: 'DATE YOU WENT TO WORK IN CALIFORNIA, OBTAINED A CA DRIVER LICENSE, OR BECAME A RESIDENT:',
-                    subFields: [
-                        {
-                            label: "Month",
-                            type: "date input field",
-                            placeholder: "MM"
-                        }, {
-                            label: "Day",
-                            type: "date input field",
-                            placeholder: "DD"
-                        }, {
-                            label: "Year",
-                            type: "date input field",
-                            placeholder: "YYYY"
-                        },
-                    ]
-                }, {
-                    label: 'DATE VEHICLE WAS PURCHASED OR ACQUIRED:',
-                    subFields: [
-                        {
-                            label: "Month",
-                            type: "date input field",
-                            placeholder: "MM"
-                        }, {
-                            label: "Day",
-                            type: "date input field",
-                            placeholder: "DD"
-                        }, {
-                            label: "Year",
-                            type: "date input field",
-                            placeholder: "YYYY"
-                        },
-                    ]
-                },
-            ]
-        }, {
-            reference: "Vehicle Status Information",
-            blockName: "Vehicle Status Information",
-            fields: [
-                {
-                    label:
-                        "IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:",
-                    type: "checkbox",
-                    placeholder:
-                        "IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:",
-                },
-                {
-                    label: "IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:",
-                    type: "checkbox",
-                    placeholder: "IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:",
-                },
-                {
-                    label: "Vehicle Condition",
-                    type: "radiobutton",
-                    options: [
-                        { value: "NEW", name: "NEW" },
-                        { value: "USED", name: "USED" },
-                    ],
-                },
-                {
-                    label: "Purchase Location",
-                    type: "radiobutton",
-                    options: [
-                        { value: "INSIDE CA", name: "INSIDE CA" },
-                        { value: "OUTSIDE CA", name: "OUTSIDE CA" },
-                    ],
-                }
-            ],
-        }, {
+        },
+        // {
+        //     reference: "DATE INFORMATION",
+        //     blockName: "DATE INFORMATION",
+        //     fields: [
+        //         {
+        //             label: 'DATE VEHICLE ENTERED OR WILL ENTER CALIFORNIA (CA):',
+        //             subFields: [
+        //                 {
+        //                     label: "Month",
+        //                     type: "date input field",
+        //                     placeholder: "MM"
+        //                 }, {
+        //                     label: "Day",
+        //                     type: "date input field",
+        //                     placeholder: "DD"
+        //                 }, {
+        //                     label: "Year",
+        //                     type: "date input field",
+        //                     placeholder: "YYYY"
+        //                 },
+        //             ]
+        //         }, {
+        //             label: 'DATE VEHICLE FIRST OPERATED IN CALIFORNIA:',
+        //             subFields: [
+        //                 {
+        //                     label: "Month",
+        //                     type: "date input field",
+        //                     placeholder: "MM"
+        //                 }, {
+        //                     label: "Day",
+        //                     type: "date input field",
+        //                     placeholder: "DD"
+        //                 }, {
+        //                     label: "Year",
+        //                     type: "date input field",
+        //                     placeholder: "YYYY"
+        //                 },
+        //             ]
+        //         }, {
+        //             label: 'DATE YOU WENT TO WORK IN CALIFORNIA, OBTAINED A CA DRIVER LICENSE, OR BECAME A RESIDENT:',
+        //             subFields: [
+        //                 {
+        //                     label: "Month",
+        //                     type: "date input field",
+        //                     placeholder: "MM"
+        //                 }, {
+        //                     label: "Day",
+        //                     type: "date input field",
+        //                     placeholder: "DD"
+        //                 }, {
+        //                     label: "Year",
+        //                     type: "date input field",
+        //                     placeholder: "YYYY"
+        //                 },
+        //             ]
+        //         }, {
+        //             label: 'DATE VEHICLE WAS PURCHASED OR ACQUIRED:',
+        //             subFields: [
+        //                 {
+        //                     label: "Month",
+        //                     type: "date input field",
+        //                     placeholder: "MM"
+        //                 }, {
+        //                     label: "Day",
+        //                     type: "date input field",
+        //                     placeholder: "DD"
+        //                 }, {
+        //                     label: "Year",
+        //                     type: "date input field",
+        //                     placeholder: "YYYY"
+        //                 },
+        //             ]
+        //         },
+        //     ]
+        // },
+
+        // {
+        //     reference: "Vehicle Status Information",
+        //     blockName: "Vehicle Status Information",
+        //     fields: [
+        //         {
+        //             label:
+        //                 "IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:",
+        //             type: "checkbox",
+        //             placeholder:
+        //                 "IF VEHICLE WAS PREVIOUSLY REGISTERED IN CA, THEN REGISTERED OR LOCATED OUTSIDE CA AND HAS NOW RETURNED, ENTER DATE VEHICLE ENTERED CA. IF YOU DID NOT OWN THE VEHICLE AT ENTRY, CHECK BOX:",
+        //         },
+        //         {
+        //             label: "IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:",
+        //             type: "checkbox",
+        //             placeholder: "IF YOU ARE NOT A CA RESIDENT, CHECK THIS BOX:",
+        //         },
+        //         {
+        //             label: "Vehicle Condition",
+        //             type: "radiobutton",
+        //             options: [
+        //                 { value: "NEW", name: "NEW" },
+        //                 { value: "USED", name: "USED" },
+        //             ],
+        //         },
+        //         {
+        //             label: "Purchase Location",
+        //             type: "radiobutton",
+        //             options: [
+        //                 { value: "INSIDE CA", name: "INSIDE CA" },
+        //                 { value: "OUTSIDE CA", name: "OUTSIDE CA" },
+        //             ],
+        //         }
+        //     ],
+        // }, 
+
+        {
             blockName: "VEHICLE WAS PURCHASED OR ACQUIRED FROM:",
             reference: "VEHICLE WAS PURCHASED OR ACQUIRED FROM:",
             fields: [
@@ -3565,13 +3570,16 @@ export const seneriosDetails = [
                 ]
             }
         ]
-    }, {
+    },
+
+
+
+    {
         form: "Disabled Person Placards/Plates",
         blocks: [
             {
-                reference: "Registered Owner(s)",
-                blockName: "Registered Owner(s)",
-                // ownersNumber: 1,
+                reference: "New Registered Owner(s)",
+                blockName: "New Registered Owner(s)",
                 fields: [
                     { label: 'First Name', type: 'input field', placeholder: 'First Name' },
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
@@ -3583,23 +3591,68 @@ export const seneriosDetails = [
                 ]
             },
             {
-                reference: "Owner Address",
+                reference: "New Registered Owner Address",
                 blockName: "Address",
-                subOption: [
+                subOptions: [
                     {
                         label: "If mailing address is different",
+                        fieldName: "Mailing Address",
                         type: "radiocheckbox",
-                    }
-                ],
+                        subFields: [
+                            {
+                                label: 'Street',
+                                type: "input field",
+                                placeholder: 'Street'
+                            }, {
+                                label: 'APT./SPACE/STE.#',
+                                type: "input field",
+                                placeholder: 'APT./SPACE/STE.#'
+                            }, {
+                                label: 'City',
+                                type: "input field",
+                                placeholder: 'City'
+                            }, {
+                                label: 'State',
+                                type: "dropdown",
+                                placeholder: 'Select'
+                            }, {
+                                label: 'ZIP Code',
+                                type: "input field",
+                                placeholder: 'ZIP Code'
+                            },
+                        ]
+                    },],
                 fields: [
-                    { label: 'Street', type: "input field", placeholder: 'Street' },
-                    { label: 'APT./SPACE/STE.#', type: "input field", placeholder: 'APT./SPACE/STE.#' },
-                    { label: 'City', type: "input field", placeholder: 'City' },
-                    { label: 'County', type: "input field", placeholder: 'County' },
-                    { label: 'State', type: "dropdown", placeholder: 'Select' },
-                    { label: 'ZIP Code', type: "input field", placeholder: 'ZIP Code' }
+                    {
+                        label: 'Street',
+                        type: "input field",
+                        placeholder: 'Street'
+                    }, {
+                        label: 'APT./SPACE/STE.#',
+                        type: "input field",
+                        placeholder: 'APT./SPACE/STE.#'
+                    }, {
+                        label: 'City',
+                        type: "input field",
+                        placeholder: 'City'
+                    }, {
+                        label: 'County',
+                        type: "input field",
+                        placeholder: 'County'
+                    }, {
+                        label: 'State',
+                        type: "dropdown",
+                        placeholder: 'Select'
+                    }, {
+                        label: 'ZIP Code',
+                        type: "input field",
+                        placeholder: 'ZIP Code'
+                    }
                 ]
             },
+
+
+
             {
                 reference: "Type of Disabled Person Parking Placard(S) or License Plates",
                 blockName: "Type of Disabled Person Parking Placard(S) or License Plates",

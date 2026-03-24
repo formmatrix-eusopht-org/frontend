@@ -1317,14 +1317,16 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             values={vehicleStatusInfoData}
                         />
                     )}
-                    {vehicleAcquisitionBlock && (comercialVehicleFlag || isOutofStateTitle) && (
-                        <VehicleAcquisitionDetails
-                            title={vehicleAcquisitionBlock.blockName}
-                            block={vehicleAcquisitionBlock}
-                            values={vehiclePurchaseInfo}
-                            onFieldChange={handleVehiclePurchaseInfoChange}
-                        />
-                    )}
+                    {vehicleAcquisitionBlock && (
+                        // comercialVehicleFlag ||
+                        isOutofStateTitle) && (
+                            <VehicleAcquisitionDetails
+                                title={vehicleAcquisitionBlock.blockName}
+                                block={vehicleAcquisitionBlock}
+                                values={vehiclePurchaseInfo}
+                                onFieldChange={handleVehiclePurchaseInfoChange}
+                            />
+                        )}
                     {OutOfStateBlock && isOutofStateTitle &&
                         <OutOfStateVehicleSection
                             values={outOfStateVehicle}
