@@ -157,8 +157,8 @@ type FormData = {
             "Vehicle License Number"?: string;
             "Vehicle Identification Number"?: string;
             "Vehicle Make"?: string;
-            "GVW Weight Range"?: string;
-            "CGW Weight Range"?: string;
+            "Vehicle Code Type"?: string;
+            "Weight Range"?: string;
             "Date Operated"?: string;
         };
     };
@@ -238,6 +238,26 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
     // console.log(formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'], "form");
     const newOwnerAddressCombine = `${formData.newOwnerMailingAddress?.Street} ${formData.newOwnerMailingAddress?.["APT./SPACE/STE.#"]}`
     const newLienholderAddressCombine = `${formData.newLienholder?.["address"]?.["Street"]} ${formData.newLienholder?.["address"]?.["APT./SPACE/STE.#"]}`
+
+    const getWeightCode = (range: string) => {
+        const mapping: any = {
+            "10,001-15,000": "A",
+            "15,001-20,000": "B",
+            "20,001-26,000": "C",
+            "26,001-30,000": "D",
+            "30,001-35,000": "E",
+            "35,001-40,000": "F",
+            "40,001-45,000": "G",
+            "45,001-50,000": "H",
+            "50,001-54,999": "I",
+            "55,000-60,000": "J",
+            "60,001-65,000": "K",
+            "65,001-70,000": "L",
+            "70,001-75,000": "M",
+            "75,001-80,000": "N",
+        };
+        return mapping[range] || "";
+    };
 
     return {
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
@@ -857,17 +877,17 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "License- 1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle License Number"] || '' : '',
         "VIN- 1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Identification Number"] || '' : '',
         "Make -1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Make"] || '' : '',
-        // "Under 10,001 pounds.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["GVW Weight Range"] || '' : '',
-        "GVW -1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["GVW Weight Range"] || '' : '',
-        "CGW -1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["CGW Weight Range"] || '' : '',
+        "Under 10,001 pounds.0": senerio?.includes("Commercial Vehicle") && formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Code Type"] === "Vehicle Under 10,001" ? "X" : "",
+        "GVW -1.0": senerio?.includes("Commercial Vehicle") && formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Code Type"] === "GVW" ? getWeightCode(formData?.vehicleDeclarationEntryData?.[0]?.["Weight Range"] || "") : '',
+        "CGW -1.0": senerio?.includes("Commercial Vehicle") && formData?.vehicleDeclarationEntryData?.[0]?.["Vehicle Code Type"] === "CGW" ? getWeightCode(formData?.vehicleDeclarationEntryData?.[0]?.["Weight Range"] || "") : '',
         "Date 1st operated-1.0": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[0]?.["Date Operated"] || '' : '',
 
         "License- 1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle License Number"] || '' : '',
         "VIN- 1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Identification Number"] || '' : '',
         "Make -1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Make"] || '' : '',
-        // "Under 10,001 pounds.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["GVW Weight Range"] || '' : '',
-        "GVW -1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["GVW Weight Range"] || '' : '',
-        "CGW -1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["CGW Weight Range"] || '' : '',
+        "Under 10,001 pounds.1": senerio?.includes("Commercial Vehicle") && formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Code Type"] === "Vehicle Under 10,001" ? "X" : "",
+        "GVW -1.1": senerio?.includes("Commercial Vehicle") && formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Code Type"] === "GVW" ? getWeightCode(formData?.vehicleDeclarationEntryData?.[1]?.["Weight Range"] || "") : '',
+        "CGW -1.1": senerio?.includes("Commercial Vehicle") && formData?.vehicleDeclarationEntryData?.[1]?.["Vehicle Code Type"] === "CGW" ? getWeightCode(formData?.vehicleDeclarationEntryData?.[1]?.["Weight Range"] || "") : '',
         "Date 1st operated-1.1": senerio?.includes("Commercial Vehicle") ? formData?.vehicleDeclarationEntryData?.[1]?.["Date Operated"] || '' : '',
 
         "checkbox_76bcix": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Unladen Weight Checked"] === true || false : false,

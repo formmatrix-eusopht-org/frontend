@@ -55,11 +55,20 @@ const VehicleDeclarationEntry = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {block.fields.map((field) => {
                                 const fieldValue = values?.[index]?.[field.label] || "";
+                                
+                                // Conditional rendering for Weight Range
+                                if (field.label === "Weight Range") {
+                                    const codeType = values?.[index]?.["Vehicle Code Type"];
+                                    if (!codeType || codeType === "Vehicle Under 10,001") {
+                                        return null;
+                                    }
+                                }
+
                                 return (
                                     <Input
                                         label={field.label}
                                         key={field.label}
-                                        type={field.type}
+                                        type={field.type as any}
                                         options={field.options || []}
                                         value={fieldValue}
                                         placeholder={field.placeholder}

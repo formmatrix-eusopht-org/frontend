@@ -568,6 +568,11 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
         if (!updated[index]) updated[index] = {};
         updated[index][label] = value;
 
+        // If Code Type is Under 10k, clear the weight range
+        if (label === "Vehicle Code Type" && value === "Vehicle Under 10,001") {
+            updated[index]["Weight Range"] = "";
+        }
+
         updateCurrentTransfer({
             vehicleDeclarationEntryData: updated,
         });

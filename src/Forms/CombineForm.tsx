@@ -730,6 +730,12 @@ const CombineForm = ({ formData }: CombineFormProps) => {
             const updated = [...prev];
             if (!updated[index]) updated[index] = {};
             updated[index][label] = value;
+            
+            // If Code Type is Under 10k, clear the weight range
+            if (label === "Vehicle Code Type" && value === "Vehicle Under 10,001") {
+                updated[index]["Weight Range"] = "";
+            }
+            
             return updated;
         });
     };
@@ -1300,15 +1306,19 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             onDateChange={handleDateChange}
                         />
                     )}
-                    {VehicleDeclarationEntryBlock && (
-                        <VehicleDeclarationEntry
-                            title={VehicleDeclarationEntryBlock.blockName}
-                            block={VehicleDeclarationEntryBlock}
-                            values={vehicleDeclarationEntryData}
-                            onFieldChange={handleVehicleDeclarationEntryFieldChange}
-                            onTrimEntries={handleTrimEntries}
-                        />
-                    )}
+                    {VehicleDeclarationEntryBlock &&
+                        commercialInfo["GVWR"] === "Yes" && (
+
+
+
+                            <VehicleDeclarationEntry
+                                title={VehicleDeclarationEntryBlock.blockName}
+                                block={VehicleDeclarationEntryBlock}
+                                values={vehicleDeclarationEntryData}
+                                onFieldChange={handleVehicleDeclarationEntryFieldChange}
+                                onTrimEntries={handleTrimEntries}
+                            />
+                        )}
                     {vehicleStatusBlock && (comercialVehicleFlag || isOutofStateTitle) && (
                         <VehicleStatusInformation
                             title="Vehicle Status Information"
