@@ -707,7 +707,14 @@ const CombineForm = ({ formData }: CombineFormProps) => {
         }));
     };
     const handleCommercialChange = (label: string, value: any) => {
-        setCommercialInfo((prev) => ({ ...prev, [label]: value }));
+        setCommercialInfo((prev) => {
+            const updated = { ...prev, [label]: value };
+            if (label === "vehicletype" && value !== "Station Wagon") {
+                delete updated["The owner of this vehicle and it is registered in my name"];
+                delete updated["Employee of a business which required me to own and operate a station wagon which is registered in my name"];
+            }
+            return updated;
+        });
     };
 
     const handleCertificateOfLicensePlateDispositionChange = (

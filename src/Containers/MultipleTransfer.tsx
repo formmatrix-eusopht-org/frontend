@@ -544,11 +544,16 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
         });
     };
     const handleCommercialChange = (label: string, value: any) => {
+        const updatedCommercial = {
+            ...currentTransfer.commercialInfo,
+            [label]: value,
+        };
+        if (label === "vehicletype" && value !== "Station Wagon") {
+            delete updatedCommercial["The owner of this vehicle and it is registered in my name"];
+            delete updatedCommercial["Employee of a business which required me to own and operate a station wagon which is registered in my name"];
+        }
         updateCurrentTransfer({
-            commercialInfo: {
-                ...currentTransfer.commercialInfo,
-                [label]: value,
-            },
+            commercialInfo: updatedCommercial,
         });
     };
     const handleVehicleBodyChange = (label: string, value: any) => {
