@@ -904,8 +904,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
 
         //reg 590
         "Vehicle identification number": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
-        "Text2": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
-        "Text3": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
+        "Text2": senerio?.includes("Commercial Vehicle") ? [formData.vehicleInfoState?.['Year of Vehicle']?.trim(), formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder']?.trim()].filter(Boolean).join(" / ") : '',
+        "Text3": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "" : '',
         "Check Box 4": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Bus" ? true : false || false : false : false,
         "Check Box 5": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Taxicab" ? true : false || false : false : false,
         "Check Box 6": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.vehicletype === "Rental Limousine" ? true : false || false : false : false,
@@ -2230,7 +2230,10 @@ async function handleOnPDF(form: any, senerio: any) {
             if (!formTypes.includes("Reg256")) {
                 formTypes.push("Reg256");
             }
-            formTypes.push("Reg590");
+            // Only push 590 if Commercial Vehicle(BUS/LIMO/TAXI) is selected
+            if (form.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)")) {
+                formTypes.push("Reg590");
+            }
         }
         if (senerio?.includes("Salvage")) {
             formTypes.push("Reg488c");
