@@ -902,7 +902,31 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "text_74aiyr": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Axles Checked"] === true ? formData?.vehicleBodyState?.["Axles From"] || '' : '' : '',
         "text_75aiwg": senerio?.includes("Commercial Vehicle") ? formData?.vehicleBodyState?.["Axles Checked"] === true ? formData?.vehicleBodyState?.["Axles To"] || '' : '' : '',
 
+        ////--reg 590
         //reg 590
+        "590sec4Date": senerio?.includes("Commercial Vehicle") ? (
+            senerio?.includes("Simple Transfer") || senerio?.includes("Multiple Transfer")
+                ? (senerio?.includes("Multiple Transfer")
+                    ? (formData.ownersData?.[formData.ownersData?.length - 1]?.['Date of Sale'] || getCurrentDate())
+                    : (formData.ownersData?.[0]?.['Date of Sale'] || getCurrentDate())
+                )
+                : getCurrentDate()
+        ) : '',
+        "590sec4phone1": senerio?.includes("Commercial Vehicle") ? (
+            senerio?.includes("Simple Transfer") || senerio?.includes("Multiple Transfer")
+                ? (formData.newOwnerData?.[0]?.['Phone Number']?.slice(1, 4) || '')
+                : (formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '')
+        ) : '',
+        "590sec4phone2": senerio?.includes("Commercial Vehicle") ? (
+            senerio?.includes("Simple Transfer") || senerio?.includes("Multiple Transfer")
+                ? (formData.newOwnerData?.[0]?.['Phone Number']?.slice(5) || '')
+                : (formData.ownersData?.[0]?.['Phone Number']?.slice(5) || '')
+        ) : '',
+
+
+        // "590sec4Date": senerio?.includes("Commercial Vehicle") ? getCurrentDate() : '',
+        // "590sec4phone1": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
+        // "590sec4phone2": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
         "Vehicle identification number": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "" : '',
         "Text2": senerio?.includes("Commercial Vehicle") ? [formData.vehicleInfoState?.['Year of Vehicle']?.trim(), formData.vehicleInfoState?.['Make of Vehicle OR Vessel Builder']?.trim()].filter(Boolean).join(" / ") : '',
         "Text3": senerio?.includes("Commercial Vehicle") ? formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "" : '',
@@ -2107,6 +2131,17 @@ export async function generateMultiple262AndOne227(
             if (reg488cBytes) allFormBytes.push(reg488cBytes);
         }
 
+        ////* Commercial + Multiple Transfer: Reg590
+        if (first.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)")) {
+            const reg590Bytes = await mergeFilledPDFs(
+                ["Reg590"],
+                combinedTransferData,
+                senerio,
+                false
+            );
+            if (reg590Bytes) allFormBytes.push(reg590Bytes);
+        }
+
         // 4️⃣ Merge all PDFs together
         const finalMergedPdf = await PDFDocument.create();
         for (const bytes of allFormBytes) {
@@ -2448,120 +2483,6 @@ async function generateCollectionsPDF(
         return null;
     }
 }
-
-
-
-//--old collections design
-// async function generateCollectionsPDF(selectedItems: string[], allItems: string[]): Promise<Uint8Array | null> {
-//     try {
-//         const pdfDoc = await PDFDocument.create();
-//         let currentPage = pdfDoc.addPage([612, 792]); // Standard letter size
-//         const { width, height } = currentPage.getSize();
-
-//         // Title
-//         currentPage.drawText('To Complete The Transactions', {
-//             x: 50,
-//             y: height - 50,
-//             size: 20,
-//         });
-
-//         // Title
-//         currentPage.drawText('Checklist for DMV Paperwork & Requirements', {
-//             x: 50,
-//             y: height - 70,
-//             size: 20,
-//         });
-
-//         // Add a line under the title
-//         currentPage.drawLine({
-//             start: { x: 50, y: height - 90 },
-//             end: { x: width - 50, y: height - 60 },
-//             thickness: 1,
-//         });
-
-//         // List collection items
-//         let yPosition = height - 100;
-//         const lineHeight = 25;
-//         const boxSize = 12;
-//         const textMargin = 70; // Position for text
-
-//         // If no allItems provided, fallback to selectedItems
-//         const itemsToRender = allItems.length > 0 ? allItems : selectedItems;
-
-//         itemsToRender.forEach((item, index) => {
-//             // Check if we need a new page
-//             if (yPosition < 50) {
-//                 currentPage = pdfDoc.addPage([612, 792]);
-//                 yPosition = height - 50;
-//             }
-
-//             const isSelected = selectedItems.includes(item);
-
-//             // Draw Checkbox Square
-//             currentPage.drawRectangle({
-//                 x: 50,
-//                 y: yPosition,
-//                 width: boxSize,
-//                 height: boxSize,
-//                 borderColor: rgb(0, 0, 0),
-//                 borderWidth: 1,
-//             });
-
-//             // Draw Checkmark if selected
-//             if (isSelected) {
-//                 currentPage.drawLine({
-//                     start: { x: 50, y: yPosition },
-//                     end: { x: 50 + boxSize, y: yPosition + boxSize },
-//                     color: rgb(0, 0, 0),
-//                     thickness: 1.5,
-//                 });
-//                 currentPage.drawLine({
-//                     start: { x: 50, y: yPosition + boxSize },
-//                     end: { x: 50 + boxSize, y: yPosition },
-//                     color: rgb(0, 0, 0),
-//                     thickness: 1.5,
-//                 });
-//             }
-
-//             // Draw collection item text
-//             currentPage.drawText(item, {
-//                 x: textMargin,
-//                 y: yPosition, // Adjust for baseline? drawText y is usually baseline. Rectangle y is bottom-left. 
-//                 // However, pdf-lib drawText y is baseline. Rectangle y is bottom-left.
-//                 // It's safer to align them visually.
-//                 // If yPosition is bottom of the line:
-//                 size: 12,
-//                 maxWidth: width - textMargin - 50,
-//             });
-
-//             // Title
-//             currentPage.drawText('Formatic your DMV paperwork simplified', {
-//                 x: 50,
-//                 y: height - 170,
-//                 size: 20,
-//             });
-
-//             // Add a line under the title
-//             currentPage.drawLine({
-//                 start: { x: 50, y: height - 290 },
-//                 end: { x: width - 50, y: height - 60 },
-//                 thickness: 1,
-//             });
-
-//             yPosition -= lineHeight;
-//         });
-
-//         const pdfBytes = await pdfDoc.save();
-//         return pdfBytes;
-//     } catch (error) {
-//         console.error('Error generating Collections PDF:', error);
-//         return null;
-//     }
-// }
-
-
-
-
 
 function getCollectionOptions(senerioName: string): string[] {
     try {
