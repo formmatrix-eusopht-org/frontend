@@ -1209,7 +1209,7 @@ const CombineForm = ({ formData }: CombineFormProps) => {
                             legalOwnerMailingAddress={LegalOwnerOfRecordData?.mailing}
                             selectedRadio={
                                 LegalOwnerOfRecordData?.showMailingAddress
-                                    ? ["if-mailing-address-is-different"]
+                                    ? ["mailing-address-(if-different-from-physical-address-above)"]
                                     : []
                             }
                             senerio={senerio}

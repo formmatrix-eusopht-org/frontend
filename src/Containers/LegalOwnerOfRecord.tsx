@@ -64,7 +64,7 @@ export const LegalOwnerOfRecord = ({
   // }) || [];
   // With this:
   const mailingSubOption = {
-    label: "If mailing address is different",
+    label: "MAILING ADDRESS (IF DIFFERENT FROM PHYSICAL ADDRESS ABOVE)",
     fieldName: "Mailing Address",
     subFields: [
       { label: 'Street', type: "input field" as const, placeholder: 'Street' },
@@ -76,8 +76,8 @@ export const LegalOwnerOfRecord = ({
   };
 
   const filteredSubOptions = showMailingCheckbox
-    ? [mailingSubOption, ...(block?.subOptions?.filter(opt => opt?.label !== "If mailing address is different") || [])]
-    : (block?.subOptions?.filter(opt => opt?.label !== "If mailing address is different") || []);
+    ? [mailingSubOption, ...(block?.subOptions?.filter(opt => opt?.label !== "If mailing address is different" && opt?.label !== "MAILING ADDRESS (IF DIFFERENT FROM PHYSICAL ADDRESS ABOVE)") || [])]
+    : (block?.subOptions?.filter(opt => opt?.label !== "If mailing address is different" && opt?.label !== "MAILING ADDRESS (IF DIFFERENT FROM PHYSICAL ADDRESS ABOVE)") || []);
 
 
   const radioOptions = filteredSubOptions?.map((opt) => ({
@@ -89,7 +89,7 @@ export const LegalOwnerOfRecord = ({
     string,
     { sectionKey: "mailing"; data: Record<string, string> }
   > = {
-    [normalizeKey("If mailing address is different")]: {
+    [normalizeKey("MAILING ADDRESS (IF DIFFERENT FROM PHYSICAL ADDRESS ABOVE)")]: {
       sectionKey: "mailing",
       data: legalOwnerMailingAddress,
     },
