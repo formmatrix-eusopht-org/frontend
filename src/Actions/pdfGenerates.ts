@@ -923,7 +923,10 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Check Box18": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState.assignedFor !== "" ? formData?.selectConfigState.deliveryType === "DMV Office" ? true : false : false : false : false,
         "Text14": senerio?.includes("Commercial Vehicle") ? formData.transactionSelections?.includes("Commercial Vehicle(BUS/LIMO/TAXI)") ? formData.commercialInfo?.["commercialStartDate"] || '' : '' : '',
 
-        //reg 488c
+        ////--reg 488c
+        // if simple transfer or multiple transfer with salvage then date of sale else if only salvage current date
+        "DATE1": senerio?.includes("Salvage") ? ((senerio?.includes("Simple Transfer") || senerio?.includes("Multiple Transfer")) ? (formData.ownersData?.[0]?.['Date of Sale'] || "") : getCurrentDate()) : '',
+        "CERTIFICATION DATE": senerio?.includes("Salvage") ? ((senerio?.includes("Simple Transfer") || senerio?.includes("Multiple Transfer")) ? (formData.ownersData?.[0]?.['Date of Sale'] || "") : getCurrentDate()) : '',
         "original": senerio?.includes("Salvage") ? formData.transactionSelections?.includes("Orginal") ? true : false : false,
         "duplicate": senerio?.includes("Salvage") ? formData.transactionSelections?.includes("Duplicate") ? true : false : false,
         "VEHICLE LICENSE NUMBER": senerio?.includes("Salvage") ? formData.vehicleInfoState?.['Vehicle License Plate or Vessel CF Number'] || "" : '',
@@ -1988,6 +1991,8 @@ const mergeFilledPDFs = async (
 
     return await mergedPdf.save();
 };
+
+
 export async function generateMultiple262AndOne227(
     multipleFormDataList: FormData[],
     openInNewTab = true,
@@ -2033,7 +2038,10 @@ export async function generateMultiple262AndOne227(
             dateValues: last.dateValues,
             vehicleStatusInfoData: last.vehicleStatusInfoData,
             vehiclePurchaseInfo: last.vehiclePurchaseInfo,
-            outOfStateVehicle: last.outOfStateVehicle
+            outOfStateVehicle: last.outOfStateVehicle,
+
+            //! Add the date of sale from the last transfer
+            ownersData: [{ ...first.ownersData?.[0], 'Date of Sale': last.ownersData?.[0]?.['Date of Sale'] || first.ownersData?.[0]?.['Date of Sale'] }]
         };
 
         // 3️⃣ Add Reg227 and/or Reg343 if required
@@ -2087,6 +2095,18 @@ export async function generateMultiple262AndOne227(
             );
             if (Reg256Bytes) allFormBytes.push(Reg256Bytes);
         }
+
+        ////* Salvage + Multiple Transfer: Reg488c
+        if (senerio?.includes("Salvage")) {
+            const reg488cBytes = await mergeFilledPDFs(
+                ["Reg488c"],
+                combinedTransferData,
+                senerio,
+                false
+            );
+            if (reg488cBytes) allFormBytes.push(reg488cBytes);
+        }
+
         // 4️⃣ Merge all PDFs together
         const finalMergedPdf = await PDFDocument.create();
         for (const bytes of allFormBytes) {
