@@ -1915,6 +1915,7 @@ const mergeFilledPDFs = async (
     plainPdf?: boolean,
 ): Promise<Uint8Array> => {
     const mergedPdf = await PDFDocument.create();
+    const excludingForAutoFontSize = ["Make -1.0", "Make -1.1"];
     for (const type of formTypes) {
         const pdfUrl = `/${plainPdf ? "plain pdf" : 'pdfs'}/${type}.pdf`;
         const res = await fetch(pdfUrl);
@@ -1949,7 +1950,9 @@ const mergeFilledPDFs = async (
                         field.setMaxLength(undefined);
 
                         field.setText(strValue);
-                        field.setFontSize(11);
+                        if (!excludingForAutoFontSize.includes(name)) {
+                            field.setFontSize(11);
+                        }
                     } else if (field instanceof PDFCheckBox) {
                         if (value === true || value === 'true') {
                             field.check();
