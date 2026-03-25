@@ -112,7 +112,8 @@ export const seneriosDetails = [
                     placeholder: 'If kilometers check this box'
                 }
             ]
-        }, {
+        },
+        {
             reference: "Registered Owner(s)",
             blockName: "Registered Owner(s)",
             ownersNumber: 3,
@@ -125,7 +126,8 @@ export const seneriosDetails = [
                 { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
                 { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
             ]
-        }, {
+        },
+        {
             reference: "Owner Address",
             blockName: "Address",
             subOption: [
@@ -3562,53 +3564,34 @@ export const seneriosDetails = [
 
 
     {
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+
+
         form: "Disabled Person Placards/Plates",
         blocks: [
             {
-                reference: "New Registered Owner(s)",
-                blockName: "New Registered Owner(s)",
+                reference: "Registered Owner(s)",
+                blockName: "Registered Owner(s)",
                 fields: [
                     { label: 'First Name', type: 'input field', placeholder: 'First Name' },
                     { label: 'Middle Name', type: 'input field', placeholder: 'Middle Name' },
                     { label: 'Last Name', type: 'input field', placeholder: 'Last Name' },
-                    { label: 'Driver License Number', type: 'input field', placeholder: 'Driver License Number' },
+                    { label: 'Driver License Numberss', type: 'input field', placeholder: 'Driver License Number' },
                     { label: 'State', type: 'dropdown', placeholder: 'Select' },
-                    { label: 'Date of Birth', type: 'date', placeholder: 'MM/DD/YYYY' },
                     { label: 'Phone Number', type: 'phone', placeholder: 'Phone Number' },
+                    { label: 'Date of Sale', type: 'date', placeholder: 'MM/DD/YYYY' },
                 ]
             },
+
             {
-                reference: "New Registered Owner Address",
+                reference: "Owner Address",
                 blockName: "Address",
-                subOptions: [
+                subOption: [
                     {
                         label: "If mailing address is different",
-                        fieldName: "Mailing Address",
                         type: "radiocheckbox",
-                        subFields: [
-                            {
-                                label: 'Street',
-                                type: "input field",
-                                placeholder: 'Street'
-                            }, {
-                                label: 'APT./SPACE/STE.#',
-                                type: "input field",
-                                placeholder: 'APT./SPACE/STE.#'
-                            }, {
-                                label: 'City',
-                                type: "input field",
-                                placeholder: 'City'
-                            }, {
-                                label: 'State',
-                                type: "dropdown",
-                                placeholder: 'Select'
-                            }, {
-                                label: 'ZIP Code',
-                                type: "input field",
-                                placeholder: 'ZIP Code'
-                            },
-                        ]
-                    },],
+                    }
+                ],
                 fields: [
                     {
                         label: 'Street',
@@ -3637,6 +3620,7 @@ export const seneriosDetails = [
                     }
                 ]
             },
+
 
 
 
