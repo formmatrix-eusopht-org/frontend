@@ -1514,6 +1514,8 @@ const MultipleTransfer = ({ title, state, setState, onTransferCountChange, block
                         onToggleOption={legalOwnerToggleMailingAddress}
                         onAddressChange={handleLegalOwnerFieldChange}
                         isOutofStateTitle={isOutofStateTitle}
+                        showMailingCheckbox={isOutofStateTitle || isCommercialVehicle}  // Add this prop
+
                     />
                 )}
 

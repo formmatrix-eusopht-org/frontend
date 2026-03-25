@@ -26,6 +26,7 @@ interface Props {
   legalOwnerAddress: Record<string, string>;
   isOutofStateTitle: Boolean;
   legalOwnerMailingAddress: Record<string, string>;
+  showMailingCheckbox?: boolean;  //!added
   selectedRadio: string[];
   senerio: string[];
   onToggleOption: (val: string) => void;
@@ -47,11 +48,39 @@ export const LegalOwnerOfRecord = ({
   onToggleOption,
   onAddressChange,
   isOutofStateTitle,
-  senerio
+  senerio,
+  showMailingCheckbox = false  //! Add this with default false
 }: Props) => {
   const fields = block?.fields || [];
 
-  const radioOptions = block?.subOptions?.map((opt) => ({
+  // Filter subOptions based on showMailingCheckbox prop
+  // const filteredSubOptions = block?.subOptions?.filter((opt) => {
+  //   // Only show "If mailing address is different" option if showMailingCheckbox is true
+  //   if (opt?.label === "If mailing address is different") {
+  //     return showMailingCheckbox;
+  //   }
+  //   // For any other subOptions, always show them (if any exist)
+  //   return true;
+  // }) || [];
+  // With this:
+  const mailingSubOption = {
+    label: "If mailing address is different",
+    fieldName: "Mailing Address",
+    subFields: [
+      { label: 'Street', type: "input field" as const, placeholder: 'Street' },
+      { label: 'APT./SPACE/STE.#', type: "input field" as const, placeholder: 'APT./SPACE/STE.#' },
+      { label: 'City', type: "input field" as const, placeholder: 'City' },
+      { label: 'State', type: "dropdown" as const, placeholder: 'Select' },
+      { label: 'ZIP Code', type: "input field" as const, placeholder: 'ZIP Code' },
+    ]
+  };
+
+  const filteredSubOptions = showMailingCheckbox
+    ? [mailingSubOption, ...(block?.subOptions?.filter(opt => opt?.label !== "If mailing address is different") || [])]
+    : (block?.subOptions?.filter(opt => opt?.label !== "If mailing address is different") || []);
+
+
+  const radioOptions = filteredSubOptions?.map((opt) => ({
     label: opt?.label,
     value: normalizeKey(opt?.label),
   })) || [];
@@ -65,7 +94,9 @@ export const LegalOwnerOfRecord = ({
       data: legalOwnerMailingAddress,
     },
   };
-  const isCommercialVehicle = senerio?.includes("Commercial Vehicle")
+
+  const isCommercialVehicle = senerio?.includes("Commercial Vehicle");
+
   return (
     <div className="pb-4">
       <Section
@@ -117,7 +148,7 @@ export const LegalOwnerOfRecord = ({
 
 
       {/* Mailing Address (Conditional Sub Section) */}
-      {block.subOptions?.map((option) => {
+      {filteredSubOptions?.map((option) => {
         const key = normalizeKey(option?.label);
         const isVisible = selectedRadio?.includes(key);
         const mapped = addressMap[key];
