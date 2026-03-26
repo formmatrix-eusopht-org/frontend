@@ -2579,37 +2579,47 @@ function getCollectionOptions(senerioName: string): string[] {
 
 
 export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
-
-    const message = (() => {
-        if (sourceOfClick === "Multiple Transfer") {
-            const saved = localStorage.getItem("multipleTransferStates") || "{}";
-            try {
-                const parsed = JSON.parse(saved);
-                const list = parsed?.multipleTransfer ?? [];
-                const count = Array.isArray(list) ? list.length : 0;
-                return `“Please load the printer with (${count}) DMV 262 forms before continuing.”`;
-            } catch {
-                return `“Please load the printer with (0) DMV 262 forms before continuing.”`;
-            }
-        } else {
-            return "“Please load the printer with one DMV 262 form before continuing.”";
-        }
-    })();
-
-    const obj = {
-        message,
-        confirm: "Proceed",
-        cancel: "Cancel",
-    };
-
-    const result = await confirm(obj);
-
-    if (!result) {
-        // toast("Action cancelled.", { icon: "⚠️" });
-        return;
-    }
-    const finalMergedPdf = await PDFDocument.create();
     const savedSenerio = localStorage.getItem("senerio") || "Simple Transfer";
+
+    const needsMessage =
+        savedSenerio?.includes("Simple Transfer") ||
+        savedSenerio?.includes("Multiple Transfer") ||
+        savedSenerio?.includes("Add Lienholder") ||
+        sourceOfClick === "Multiple Transfer";
+
+    if (needsMessage) {
+        const message = (() => {
+            if (sourceOfClick === "Multiple Transfer" || savedSenerio?.includes("Multiple Transfer")) {
+                const saved = localStorage.getItem("multipleTransferStates") || "{}";
+                try {
+                    const parsed = JSON.parse(saved);
+                    const list = parsed?.multipleTransfer ?? [];
+                    const count = Array.isArray(list) ? list.length : 0;
+                    return `“Please load the printer with (${count}) DMV 262 forms before continuing.”`;
+                } catch {
+                    return `“Please load the printer with (0) DMV 262 forms before continuing.”`;
+                }
+            } else {
+                return "“Please load the printer with one DMV 262 form before continuing.”";
+            }
+        })();
+
+        const obj = {
+            message,
+            confirm: "Proceed",
+            cancel: "Cancel",
+        };
+
+        const result = await confirm(obj);
+
+        if (!result) {
+            // toast("Action cancelled.", { icon: "⚠️" });
+            return;
+        }
+    }
+
+    const finalMergedPdf = await PDFDocument.create();
+    // const savedSenerio = localStorage.getItem("senerio") || "Simple Transfer";
     if (sourceOfClick === "Multiple Transfer") {
         const savedForm = localStorage.getItem("multipleTransferStates");
         const parsed = JSON.parse(savedForm || "{}");
