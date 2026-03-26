@@ -2001,9 +2001,10 @@ const mergeFilledPDFs = async (
     const mergedPdf = await PDFDocument.create();
     const excludingForAutoFontSize = ["Make -1.0", "Make -1.1"];
     for (const type of formTypes) {
-        const pdfUrl = `/${plainPdf ? "plain pdf" : 'pdfs'}/${type}.pdf`;
+        const isPlain = plainPdf || (type === 'title' && (senerio?.includes("Simple Transfer") || senerio?.includes("Multiple Transfer")));
+        const pdfUrl = `/${isPlain ? "plain pdf" : 'pdfs'}/${type}.pdf`;
         const res = await fetch(pdfUrl);
-        console.log(plainPdf);
+        console.log(isPlain);
 
 
         if (!res.ok) {
