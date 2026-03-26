@@ -259,7 +259,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         return mapping[range] || "";
     };
 
+    ////--reg 262 fields probably
     return {
+        "Explain odometer discrepancy": formData.vehicleInfoState?.['Explain Odometer Discrepancy'] || '',
         'IDENTIFICATION NUMBER': formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         "VIN": formData.vehicleInfoState?.['Vehicle/Hull Identification Number'] || "",
         'YEAR MODEL': formData.vehicleInfoState?.['Year of Vehicle'] || "",
