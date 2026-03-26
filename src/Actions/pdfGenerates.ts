@@ -1883,7 +1883,7 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "dl/idcardno_7": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[6] : '' : "",
         "dl/idcardno_8": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Driver License Number"]?.[7] : '' : "",
 
-        "purchase_date": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Purchase Price/Value"] : '' : "",
+        // "purchase_date": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Purchase Price/Value"] : '' : "",
 
         "dl/idcardno_9": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[0] : '' : "",
         "dl/idcardno_10": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[1] : '' : "",
@@ -1894,7 +1894,8 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "dl/idcardno_15": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[6] : '' : "",
         "dl/idcardno_16": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 1 ? formData.newOwnerData?.[1]?.["Driver License Number"]?.[7] : '' : "",
 
-        "purchase_price": isTitleAvailable ? formData.transactionSelections?.includes("Vehicle is a Gift") ? (formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Gift Value"] : "" : '' : "",
+        "purchase_date": isTitleAvailable ? (formData.newOwnerCount ?? 0) > 0 ? formData.ownersData?.[0]?.["Date of Sale"] : '' : "",
+        "purchase_price": isTitleAvailable ? (formData.transactionSelections?.includes("Vehicle is a Gift") ? ((formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Gift Value"] : '') : ((formData.newOwnerCount ?? 0) > 0 ? formData.newOwnerData?.[0]?.["Purchase Price/Value"] : '')) : ((formData.newOwnerCount ?? 0) > 0 ? '' : ''),
 
         "lienholder_2.1": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[0] : '' : "",
         "lienholder_2.2": isTitleAvailable ? senerio?.includes("Add Lienholder") ? formData.newLienholder?.["address"]?.["True Full Name or Bank/Finance Company or Individual"]?.[1] : '' : "",
