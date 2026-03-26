@@ -451,9 +451,9 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "3 Print Name Legal Owner.2.0": owner2,
         // "3 Date.0": formData.ownersData?.[0]?.['Date of Sale'] || '',
         // "4 Date-2": (formData.ownerCount ?? 0) > 1 ? formData.ownersData?.[0]?.['Date of Sale'] || '' : '',
-        "4 Date-2": getCurrentDate(),
 
         "3 Date.0": getCurrentDate(),
+        "4 Date-2": formData.ownersData?.[0]?.['Date of Sale'] || '',
         "date.0": formData.ownersData?.[0]?.['Date of Sale'] || '',
         "area code.0": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
         "area": formData.ownersData?.[0]?.['Phone Number']?.slice(1, 4) || '',
