@@ -125,10 +125,20 @@ export const SenerioProvider = ({ children }: { children: ReactNode }) => {
   });
 
   // Rebuild formData whenever senerio changes
+  // useEffect(() => {
+  //   const combined = buildCombinedForm(senerio, seneriosDetails);
+  //   setFormData(combined.blocks);
+  //   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(senerio));
+  // }, [senerio]);
+
   useEffect(() => {
     const combined = buildCombinedForm(senerio, seneriosDetails);
     setFormData(combined.blocks);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(senerio));
+
+    ////-- Clear stale form field state whenever scenario changes
+    localStorage.removeItem("formStates");
+
   }, [senerio]);
 
   const handleClear = () => {
