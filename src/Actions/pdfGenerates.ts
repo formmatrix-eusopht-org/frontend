@@ -2211,7 +2211,7 @@ export async function generateMultiple262AndOne227(
             if (reg590Bytes) allFormBytes.push(reg590Bytes);
         }
 
-        // 4️⃣ Merge all PDFs together
+        // 4️⃣ Merge all PDFs together AND generate title PDF in parallel
         const finalMergedPdf = await PDFDocument.create();
         for (const bytes of allFormBytes) {
             const doc = await PDFDocument.load(bytes);
@@ -2219,44 +2219,45 @@ export async function generateMultiple262AndOne227(
             pages.forEach((p) => finalMergedPdf.addPage(p));
         }
 
+        // Start title PDF generation in parallel with collections
+        const titlePromise = wantsTitle
+            ? mergeFilledPDFs(["title"], combinedTransferData, "Simple Transfer", true).catch((e) => {
+                console.warn("Could not generate title.pdf:", e);
+                return undefined;
+            })
+            : Promise.resolve(undefined);
+
         // Add Collections PDF if there are any collections (from the last transfer)
         const collections = last.optionsForValidation || [];
         const allOptions = getCollectionOptions(senerio);
 
-        if (collections.length > 0 || allOptions.length > 0) {
-            const collectionsPdfBytes = await generateCollectionsPDF(collections, allOptions);
-            if (collectionsPdfBytes) {
-                const collectionsDoc = await PDFDocument.load(collectionsPdfBytes);
-                const collectionsPages = await finalMergedPdf.copyPages(collectionsDoc, collectionsDoc.getPageIndices());
-                collectionsPages.forEach((p) => finalMergedPdf.addPage(p));
-            }
-        }
+        const [titleBytes] = await Promise.all([
+            titlePromise,
+            (async () => {
+                if (collections.length > 0 || allOptions.length > 0) {
+                    const collectionsPdfBytes = await generateCollectionsPDF(collections, allOptions);
+                    if (collectionsPdfBytes) {
+                        const collectionsDoc = await PDFDocument.load(collectionsPdfBytes);
+                        const collectionsPages = await finalMergedPdf.copyPages(collectionsDoc, collectionsDoc.getPageIndices());
+                        collectionsPages.forEach((p) => finalMergedPdf.addPage(p));
+                    }
+                }
+            })(),
+        ]);
 
         const finalBytes = await finalMergedPdf.save();
 
-        // 5️⃣ Open merged PDF
+        // 5️⃣ Open both paperwork PDF and title PDF tabs at the same time
         if (openInNewTab) {
             const blob = new Blob([finalBytes.buffer as ArrayBuffer], { type: "application/pdf" });
             const url = URL.createObjectURL(blob);
             window.open(url);
         }
 
-        // 6️⃣ If title form required, open separately (print-only)
-        if (wantsTitle) {
-            try {
-                const titleBytes = await mergeFilledPDFs(
-                    ["title"],
-                    combinedTransferData,
-                    "Simple Transfer",
-                    true // print-only mode
-                );
-
-                const blob = new Blob([titleBytes.buffer as ArrayBuffer], { type: "application/pdf" });
-                const url = URL.createObjectURL(blob);
-                window.open(url, "_blank");
-            } catch (e) {
-                console.warn("Could not open title.pdf in a new tab:", e);
-            }
+        if (titleBytes) {
+            const blob = new Blob([titleBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
         }
 
         return finalBytes;
@@ -2267,29 +2268,15 @@ export async function generateMultiple262AndOne227(
 }
 
 
-async function handleOnPDF(form: any, senerio: any) {
+async function handleOnPDF(form: any, senerio: any): Promise<{ mergedBytes?: Uint8Array; titleBytes?: Uint8Array }> {
     try {
         let formTypes: string[] = [];
+        let needsSeparateTitle = false;
         if (senerio?.includes("Simple Transfer")) {
             formTypes.push('DMVREG262new', 'Reg227');
-            //==> Without Title: REG 227
+            //==> With Title: generate title PDF separately to open in its own tab
             if (form.transactionSelections?.includes("Transaction with Vehicle Title")) {
-                // formTypes = formTypes.filter(formType => formType !== "Reg227");
-                // formTypes.push("title")
-                try {
-                    const titleBytes = await mergeFilledPDFs(
-                        ["title"],
-                        form,
-                        "Simple Transfer",
-                        false // print-only mode
-                    );
-
-                    const blob = new Blob([titleBytes.buffer as ArrayBuffer], { type: "application/pdf" });
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, "_blank");
-                } catch (e) {
-                    console.warn("Could not open title.pdf in a new tab:", e);
-                }
+                needsSeparateTitle = true;
             }
 
             //==> Out Of State Title: REG 343
@@ -2379,11 +2366,25 @@ async function handleOnPDF(form: any, senerio: any) {
         if (senerio?.includes("Personalized Plates")) {
             formTypes.push("REG17");
         }
-        const mergedBytes = await mergeFilledPDFs(formTypes, form, senerio, false);
-        return mergedBytes;
+
+        // Generate paperwork PDF and title PDF in parallel so both tabs open at the same time
+        const titlePromise = needsSeparateTitle
+            ? mergeFilledPDFs(["title"], form, "Simple Transfer", false).catch((e) => {
+                console.warn("Could not generate title.pdf:", e);
+                return undefined;
+            })
+            : Promise.resolve(undefined);
+
+        const [mergedBytes, titleBytes] = await Promise.all([
+            mergeFilledPDFs(formTypes, form, senerio, false),
+            titlePromise,
+        ]);
+
+        return { mergedBytes, titleBytes };
 
     } catch (e) {
         console.error("error in genrating pdf : ", e)
+        return {};
     }
 }
 
@@ -2642,7 +2643,7 @@ export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
             const savedForm = localStorage.getItem("formStates");
             // const savedSenerio = localStorage.getItem("senerio"); // Removed to use outer declaration
             const parsed = JSON.parse(savedForm || "{}");
-            const filledBytes = await handleOnPDF(parsed, savedSenerio);
+            const { mergedBytes: filledBytes, titleBytes } = await handleOnPDF(parsed, savedSenerio);
 
             if (filledBytes) {
                 const filledDoc = await PDFDocument.load(filledBytes);
@@ -2663,6 +2664,20 @@ export async function headHandlerForPDf(sourceOfClick: string, confirm: any) {
                     collectionsPages.forEach((page) => finalMergedPdf.addPage(page));
                 }
             }
+
+            // Open both paperwork PDF and title PDF tabs at the same time
+            const finalBytes = await finalMergedPdf.save();
+            const paperworkBlob = new Blob([finalBytes as BlobPart], { type: 'application/pdf' });
+            const paperworkUrl = URL.createObjectURL(paperworkBlob);
+            window.open(paperworkUrl);
+
+            if (titleBytes) {
+                const titleBlob = new Blob([titleBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+                const titleUrl = URL.createObjectURL(titleBlob);
+                window.open(titleUrl, "_blank");
+            }
+
+            return;
         } catch (e) {
             console.error(`Error processing filled PDF:`, e);
         }
