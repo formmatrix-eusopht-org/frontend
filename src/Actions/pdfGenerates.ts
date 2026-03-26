@@ -650,7 +650,11 @@ const buildFieldMapping = (formData: FormData = {}, senerio: string): { [key: st
         "Text132.5": reversedOdoMeter?.replace(/\D/g, "").slice(0, 6).split('')[0] || "",
         //Reg343
         "Text12": `${formData.statementForSomgExemptionData?.diesel ? 'Diesel' : formData.statementForSomgExemptionData?.electricity ? 'Electricity' : formData.statementForSomgExemptionData?.Other || ''}`,
-        "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : "",
+        ////--Reg343 section 1
+        "Text13": senerio?.includes("Personalized Plates") ? (formData?.platesSelectionState?.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : (formData.vehicleInfoState?.['California License Number'] || '')) : (formData.vehicleInfoState?.['California License Number'] || ''),
+        "Text16": formData.vehicleInfoState?.['Model or Series'] || '',
+        "Text17": formData.vehicleInfoState?.['Body Type Model'] || '',
+        // "Text13": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Duplicate Decal" ? formData?.platesSelectionState?.duplicatePlate : "" : "",
         "Text18": senerio?.includes("Personalized Plates") ? formData?.platesSelectionState?.selectedPlate === "Veterans' Organization" ? formData?.platesSelectionState?.veteranCode : "" : formData.typeOfVehicleSelection?.includes("MOTORCYCLE") ? formData.vehicleInfoState?.['Motorcycle Engine Number'] || '' : '',
         "Text29": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[0] : '' : '' : formData.typeOfVehicleSelection?.includes("TRAILER COACH") ? formData.vehicleInfoState?.['Length (IN)'] || '' : '',
         "Text30": senerio?.includes("Personalized Plates") ? (formData?.personalizePlatesState === "Order" || formData?.personalizePlatesState === "Exchange") ? formData?.selectConfigState?.assignedFor === "Personalized" ? formData?.selectConfigState?.plateChoices[0]?.text[1] : '' : '' : '',

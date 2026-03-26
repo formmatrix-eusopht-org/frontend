@@ -2926,7 +2926,23 @@ export const seneriosDetails = [
                     label: 'Mileage of Vehicle',
                     type: "input field",
                     placeholder: 'Mileage of Vehicle'
-                }, {
+                },
+                {
+                    label: 'California License Number',
+                    type: "input field",
+                    placeholder: 'California License Number'
+                },
+                {
+                    label: 'Model or Series',
+                    type: "input field",
+                    placeholder: 'Model or Series'
+                },
+                {
+                    label: 'Body Type Model',
+                    type: "input field",
+                    placeholder: 'Body Type Model'
+                },
+                {
                     label: 'NOT Actual Mileage',
                     type: "checkbox",
                     placeholder: 'NOT Actual Mileage'
